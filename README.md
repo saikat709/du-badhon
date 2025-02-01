@@ -1,4 +1,4 @@
-<img src='https://raw.githubusercontent.com/saikat709/du_badhon/refs/heads/main/_readme_assets/title.png' height='60' width='170'/>
+<img src='https://raw.githubusercontent.com/saikat709/du-badhon/refs/heads/main/_readme_assets/title.png' height='60' width='170'/>
 
 # Badhon Website
 
@@ -52,7 +52,6 @@ Ensure you have the following installed:
    The app will be available at `http://localhost:3000`
 
 ## # Samples
-title
 ![Badhon Sample 1](https://raw.githubusercontent.com/saikat709/du-badhon/refs/heads/main/_readme_assets/blood_requests.png)
 
 ## Deployment
