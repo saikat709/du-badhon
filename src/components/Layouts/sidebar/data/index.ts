@@ -1,3 +1,4 @@
+import { url } from "inspector";
 import * as Icons from "../icons";
 
 export const NAV_DATA = [
@@ -7,31 +8,8 @@ export const NAV_DATA = [
       {
         title: "Dashboard",
         icon: Icons.HomeIcon,
-        items: [
-          {
-            title: "FH Hall Unit",
-            url: "/",
-          },
-          {
-            title: "Sufia Kamal Hall Unit",
-            url: "/",
-          },
-          {
-            title: "SH Hall Unit",
-            url: "/",
-          },
-          {
-            title: "Bangabandhu Hall Unit",
-            url: "/",
-          },
-        ],
+        url: "/dashbard",
       },
-      // {
-      //   title: "Calendar",
-      //   url: "/calendar",
-      //   icon: Icons.Calendar,
-      //   items: [],
-      // },
       {
         title: "Your Profile",
         url: "/profile",
@@ -75,6 +53,7 @@ export const NAV_DATA = [
           },
         ],
       },
+
       {
         title: "Users",
         url: "/tables",
@@ -98,6 +77,7 @@ export const NAV_DATA = [
           },
         ],
       },
+      
       {
         title: "Settings",
         icon: Icons.Alphabet,

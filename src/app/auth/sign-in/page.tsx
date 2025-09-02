@@ -1,5 +1,4 @@
 import Signin from "@/components/Auth/Signin";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,31 +10,29 @@ export const metadata: Metadata = {
 export default function SignIn() {
   return (
     <>
-      <Breadcrumb pageName="Sign In" />
-
-      <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
-        <div className="flex flex-wrap items-center">
+      <div className="rounded-lg bg-white shadow-1 dark:bg-gray-dark dark:shadow-card w-full h-full p-2">
+        <div className="flex flex-wrap items-center justify-center xl:justify-between h-full">
           <div className="w-full xl:w-1/2">
-            <div className="w-full p-4 sm:p-12.5 xl:p-15">
+            <div className="w-full p-0 sm:p-3 xl:p-0 px-7.5 md:w-[90%] lg:w-[80%] mx-auto">
               <Signin />
             </div>
           </div>
 
-          <div className="hidden w-full p-7.5 xl:block xl:w-1/2">
-            <div className="custom-gradient-1 overflow-hidden rounded-2xl px-12.5 pt-12.5 dark:!bg-dark-2 dark:bg-none">
+          <div className="hidden w-full xl:block xl:w-1/2 pr-10">
+            <div className="custom-gradient-1 overflow-hidden rounded-2xl dark:!bg-dark-2 dark:bg-none md:w-[80%] lg:w-[60%] xl:w-full mx-auto p-7.5 pt-5 text-left">
               <Link className="mb-10 inline-block" href="/">
                 <Image
                   className="hidden dark:block"
                   src={"/images/logo/logo.svg"}
                   alt="Logo"
-                  width={176}
+                  width={126}
                   height={32}
                 />
                 <Image
                   className="dark:hidden"
                   src={"/images/logo/logo-dark.svg"}
                   alt="Logo"
-                  width={176}
+                  width={126}
                   height={32}
                 />
               </Link>
@@ -56,8 +53,8 @@ export default function SignIn() {
                 <Image
                   src={"/images/grids/grid-02.svg"}
                   alt="Logo"
-                  width={405}
-                  height={325}
+                  width={205}
+                  height={225}
                   className="mx-auto dark:opacity-30"
                 />
               </div>
