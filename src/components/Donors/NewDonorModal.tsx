@@ -3,7 +3,6 @@
 import { BloodGroup, HallUnit } from "@/types/badhon";
 import { sanitizeInputText, validateAndSanitizePhone } from "@/utils/security";
 import {
-  Building2,
   Calendar,
   GraduationCap,
   Phone,

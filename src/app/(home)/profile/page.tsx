@@ -4,16 +4,10 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useBadhon } from "@/context/badhon-context";
 import { getSafeTelUri } from "@/utils/security";
 import {
-  Building2,
-  Calendar,
-  CheckCircle2,
   Droplet,
   ExternalLink,
-  GraduationCap,
-  MapPin,
   Phone,
   ShieldCheck,
-  User,
   Users,
 } from "lucide-react";
 import Link from "next/link";

@@ -16,7 +16,6 @@ import {
   MapPin,
   Phone,
   RotateCcw,
-  ShieldCheck,
   User,
 } from "lucide-react";
 import Link from "next/link";

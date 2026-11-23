@@ -5,33 +5,23 @@ import { ThemeToggleSwitch } from "@/components/Layouts/header/theme-toggle";
 import { useBadhon, isDonorEligible } from "@/context/badhon-context";
 import { BloodGroup, HallUnit } from "@/types/badhon";
 import {
-  AlertCircle,
   ArrowRight,
   Award,
   Building2,
-  Calendar,
-  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Clock,
   Download,
   Droplet,
   ExternalLink,
-  Heart,
   HeartHandshake,
-  HelpCircle,
-  Info,
   Lock,
-  MapPin,
   Menu,
   Phone,
   Plus,
   Search,
   ShieldCheck,
   Smartphone,
-  Sparkles,
-  User,
-  Users,
   X,
 } from "lucide-react";
 import Image from "next/image";

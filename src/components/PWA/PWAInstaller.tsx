@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useSyncExternalStore } from "react";
-import { Download, Smartphone, X, Share, CheckCircle2, ChevronRight } from "lucide-react";
+import {
+  CheckCircle2,
+  Download,
+  Share,
+  Smartphone,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 
 export interface BeforeInstallPromptEvent extends Event {

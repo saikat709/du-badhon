@@ -7,11 +7,8 @@ import { useBadhon, isDonorEligible, isLockActive } from "@/context/badhon-conte
 import { BloodGroup, Donor, HallUnit } from "@/types/badhon";
 import {
   Droplet,
-  Lock,
   Plus,
   Search,
-  ShieldCheck,
-  UserCheck,
   Users,
 } from "lucide-react";
 import React, { Suspense, useMemo, useState } from "react";

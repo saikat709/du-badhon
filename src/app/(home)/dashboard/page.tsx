@@ -13,11 +13,9 @@ import {
   Droplet,
   HeartHandshake,
   Lock,
-  PartyPopper,
   Plus,
   Search,
   ShieldCheck,
-  Sparkles,
   Users,
 } from "lucide-react";
 import Image from "next/image";

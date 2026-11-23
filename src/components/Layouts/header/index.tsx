@@ -1,6 +1,9 @@
 "use client";
 
-import { Menu, Plus, Smartphone } from "lucide-react";
+import {
+  Menu,
+  Plus,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSidebarContext } from "../sidebar/sidebar-context";

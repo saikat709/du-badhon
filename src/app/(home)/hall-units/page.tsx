@@ -4,18 +4,13 @@ import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import {
   Building2,
-  Phone,
-  MessageCircle,
-  Search,
-  ShieldCheck,
-  User,
   GraduationCap,
-  Droplet,
-  ExternalLink,
-  RotateCcw,
-  Sparkles,
   MapPin,
-  CheckCircle2,
+  MessageCircle,
+  Phone,
+  RotateCcw,
+  Search,
+  User,
 } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useBadhon } from "@/context/badhon-context";
