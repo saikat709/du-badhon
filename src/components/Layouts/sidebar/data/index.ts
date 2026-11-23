@@ -7,132 +7,59 @@ export const NAV_DATA = [
       {
         title: "Dashboard",
         icon: Icons.HomeIcon,
-        url: "/dashbard",
+        url: "/dashboard",
+        items: [
+          {
+            title: "All Units Overview",
+            url: "/dashboard",
+          },
+          {
+            title: "FH Hall Unit",
+            url: "/dashboard?unit=Fazlul+Huq+Muslim+Hall",
+          },
+          {
+            title: "Shahidullah Hall Unit",
+            url: "/dashboard?unit=Shahidullah+Hall",
+          },
+          {
+            title: "Sufia Kamal Hall Unit",
+            url: "/dashboard?unit=Kabi+Sufia+Kamal+Hall",
+          },
+          {
+            title: "Jagannath Hall Unit",
+            url: "/dashboard?unit=Jagannath+Hall",
+          },
+        ],
+      },
+      {
+        title: "Blood Requests",
+        url: "/blood-requests",
+        icon: Icons.FourCircle,
+        items: [],
+      },
+      {
+        title: "Search Blood",
+        url: "/search-blood",
+        icon: Icons.Alphabet,
+        items: [],
+      },
+      {
+        title: "Donors Directory",
+        url: "/donors",
+        icon: Icons.User,
+        items: [],
+      },
+      {
+        title: "Donation Records",
+        url: "/donations",
+        icon: Icons.Table,
+        items: [],
       },
       {
         title: "Your Profile",
         url: "/profile",
         icon: Icons.User,
         items: [],
-      },
-
-      {
-        title: "Blodd Requests",
-        url: "/blood-requets",
-        icon: Icons.User,
-        items: [],
-      },
-
-      {
-        title: "Search Blood",
-        url: "/search-blood",
-        icon: Icons.FourCircle,
-        items: [],
-      },
-
-      {
-        title: "Donations",
-        icon: Icons.Alphabet,
-        items: [
-          {
-            title: "Total",
-            url: "/forms/form-elements",
-          },
-          {
-            title: "Succesfull",
-            url: "/forms/form-elements",
-          },
-          {
-            title: "Pending",
-            url: "/forms/form-layout",
-          },
-          {
-            title: "Failed",
-            url: "/forms/form-layout",
-          },
-        ],
-      },
-
-      {
-        title: "Users",
-        url: "/tables",
-        icon: Icons.Table,
-        items: [
-          {
-            title: "Volunteers",
-            url: "/tables",
-          },
-          {
-            title: "Donors",
-            url: "/tables",
-          },
-          {
-            title: "Non-Donors",
-            url: "/tables",
-          },
-          {
-            title: "Add Donor",
-            url: "/tables",
-          },
-        ],
-      },
-      
-      {
-        title: "Settings",
-        icon: Icons.Alphabet,
-        items: [
-          {
-            title: "Edit Profile",
-            url: "/pages/settings",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: "OTHERS",
-    items: [
-      // {
-      //   title: "Charts",
-      //   icon: Icons.PieChart,
-      //   items: [
-      //     {
-      //       title: "Basic Chart",
-      //       url: "/charts/basic-chart",
-      //     },
-      //   ],
-      // },
-      // {
-      //   title: "UI Elements",
-      //   icon: Icons.FourCircle,
-      //   items: [
-      //     {
-      //       title: "Alerts",
-      //       url: "/ui-elements/alerts",
-      //     },
-      //     {
-      //       title: "Buttons",
-      //       url: "/ui-elements/buttons",
-      //     },
-      //   ],
-      // },
-      {
-        title: "Authentication",
-        icon: Icons.Authentication,
-        items: [
-          {
-            title: "Sign In",
-            url: "/auth/sign-in",
-          },
-          {
-            title: "Register",
-            url: "/auth/resgiter",
-          },
-          {
-            title: "Reset Password",
-            url: "/auth/reset-password",
-          },
-        ],
       },
     ],
   },

@@ -4,23 +4,23 @@ import Image from "next/image";
 
 export function Logo() {
   return (
-    <div className="relative h-8 max-w-[10.847rem]">
+    <div className="relative flex items-center h-10 w-[200px]">
       <Image
         src={logo}
-        fill
-        className="dark:hidden"
-        alt="Badhon logo"
-        role="presentation"
-        quality={100}
+        alt="Badhon Voluntary Blood Donors Organization"
+        width={200}
+        height={38}
+        className="dark:hidden object-contain"
+        priority
       />
 
       <Image
         src={darkLogo}
-        fill
-        className="hidden dark:block"
-        alt="Badhon logo"
-        role="presentation"
-        quality={100}
+        alt="Badhon Voluntary Blood Donors Organization"
+        width={200}
+        height={38}
+        className="hidden dark:block object-contain"
+        priority
       />
     </div>
   );
