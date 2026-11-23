@@ -173,18 +173,18 @@ function DonorsContent() {
           </div>
         </div>
 
-        {/* Blood Groups */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-stroke dark:border-dark-3">
+        {/* Blood Groups: Wrapped responsive pills, no ugly horizontal scrollbar */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-stroke dark:border-dark-3">
           <span className="text-[11px] font-bold text-dark-5 dark:text-dark-6 mr-1 inline-flex items-center gap-1">
             <Droplet className="size-3 text-rose-500" />
             <span>Group:</span>
           </span>
           <button
             onClick={() => setSelectedGroup("all")}
-            className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition ${
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
               selectedGroup === "all"
-                ? "bg-dark text-white dark:bg-white dark:text-dark"
-                : "bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6"
+                ? "bg-dark text-white dark:bg-white dark:text-dark shadow-2xs"
+                : "bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6 hover:bg-gray-3 hover:text-dark dark:hover:text-white"
             }`}
           >
             All
@@ -193,10 +193,10 @@ function DonorsContent() {
             <button
               key={bg}
               onClick={() => setSelectedGroup(bg)}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-black transition ${
                 selectedGroup === bg
                   ? "bg-rose-600 text-white shadow-xs"
-                  : "bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6 hover:bg-rose-50 hover:text-rose-600"
+                  : "bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40"
               }`}
             >
               {bg}

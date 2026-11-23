@@ -161,73 +161,97 @@ function BloodRequestsContent() {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-white dark:bg-dark-2 p-4 rounded-2xl border border-stroke dark:border-dark-3 space-y-3 shadow-xs">
+      <div className="bg-white dark:bg-dark-2 p-3.5 sm:p-4 rounded-2xl border border-stroke dark:border-dark-3 space-y-3.5 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Status Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+          {/* Status Tabs: Wrap naturally on mobile, tabs on desktop */}
+          <div className="flex flex-wrap items-center gap-1.5">
             {[
-              { id: "all", label: "All Requests" },
-              { id: "active", label: `Active (${stats.active})` },
-              { id: "managed", label: `Managed (${stats.managed})` },
-              { id: "completed", label: `Completed (${stats.completed})` },
+              { id: "all", label: "All Requests", count: stats.total },
+              { id: "active", label: "Active", count: stats.active },
+              { id: "managed", label: "Managed", count: stats.managed },
+              { id: "completed", label: "Completed", count: stats.completed },
               { id: "cancelled", label: "Cancelled" },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setStatusFilter(tab.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition inline-flex items-center gap-1.5 ${
                   statusFilter === tab.id
                     ? "bg-rose-600 text-white shadow-xs"
-                    : "text-dark-5 dark:text-dark-6 hover:bg-gray-2 dark:hover:bg-dark-3"
+                    : "bg-gray-1 hover:bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-dark-4 hover:text-dark dark:hover:text-white"
                 }`}
               >
-                {tab.label}
+                <span>{tab.label}</span>
+                {tab.count !== undefined && (
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                      statusFilter === tab.id
+                        ? "bg-white/25 text-white"
+                        : "bg-dark/10 dark:bg-white/10 text-dark-5 dark:text-dark-6"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                )}
               </button>
             ))}
           </div>
 
           {/* Search Box */}
-          <div className="w-full md:w-72 relative">
+          <div className="w-full md:w-72 relative shrink-0">
             <input
               type="text"
-              placeholder="Search hospital, patient, phone..."
+              placeholder="Search hospital, patient, creator..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-stroke bg-gray-1 dark:bg-dark-3 pl-9 pr-3.5 py-2 text-xs text-dark dark:text-white outline-none focus:border-rose-600"
+              className="w-full rounded-xl border border-stroke bg-gray-1 dark:bg-dark-3 pl-9 pr-3.5 py-2 text-xs text-dark dark:text-white outline-none focus:border-rose-600 placeholder:text-dark-5 dark:placeholder:text-dark-6"
             />
             <Search className="size-3.5 text-gray-4 absolute left-3 top-2.5" />
           </div>
         </div>
 
-        {/* Blood Group Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-stroke dark:border-dark-3">
-          <span className="text-[11px] font-bold text-dark-5 dark:text-dark-6 mr-1 inline-flex items-center gap-1">
-            <Droplet className="size-3 text-rose-500" />
-            <span>Group:</span>
-          </span>
-          <button
-            onClick={() => setGroupFilter("all")}
-            className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition ${
-              groupFilter === "all"
-                ? "bg-dark text-white dark:bg-white dark:text-dark"
-                : "bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6 hover:bg-gray-3"
-            }`}
-          >
-            All
-          </button>
-          {BLOOD_GROUPS.map((bg) => (
+        {/* Blood Group Filter: Wrap into an accessible pill grid on mobile */}
+        <div className="pt-2.5 border-t border-stroke dark:border-dark-3 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-dark-5 dark:text-dark-6 inline-flex items-center gap-1">
+              <Droplet className="size-3 text-rose-500" />
+              <span>Blood Group:</span>
+            </span>
+            {groupFilter !== "all" && (
+              <button
+                onClick={() => setGroupFilter("all")}
+                className="text-[11px] font-bold text-rose-600 dark:text-rose-400 hover:underline"
+              >
+                Clear Group Filter
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5">
             <button
-              key={bg}
-              onClick={() => setGroupFilter(bg)}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-black transition ${
-                groupFilter === bg
-                  ? "bg-rose-600 text-white shadow-xs"
-                  : "bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40"
+              onClick={() => setGroupFilter("all")}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition flex-1 sm:flex-initial text-center ${
+                groupFilter === "all"
+                  ? "bg-dark text-white dark:bg-white dark:text-dark shadow-2xs"
+                  : "bg-gray-1 hover:bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6 hover:text-dark dark:hover:text-white"
               }`}
             >
-              {bg}
+              All Groups
             </button>
-          ))}
+            {BLOOD_GROUPS.map((bg) => (
+              <button
+                key={bg}
+                onClick={() => setGroupFilter(bg)}
+                className={`flex-1 sm:flex-initial min-w-[38px] px-2.5 py-1 rounded-lg text-xs font-black transition text-center ${
+                  groupFilter === bg
+                    ? "bg-rose-600 text-white shadow-xs"
+                    : "bg-gray-1 hover:bg-rose-50 hover:text-rose-600 text-dark-5 dark:bg-dark-3 dark:text-dark-6 dark:hover:bg-rose-950/40"
+                }`}
+              >
+                {bg}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
