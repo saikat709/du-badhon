@@ -1,0 +1,91 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Badhon - DU Voluntary Blood Donors' Organization",
+    short_name: "DU Badhon",
+    description:
+      "Management and donor coordination platform for Badhon, University of Dhaka. Real-time call tracking, multi-bag blood request fulfillment, and donor search.",
+    start_url: "/",
+    id: "/",
+    display: "standalone",
+    display_override: ["window-controls-overlay", "standalone", "minimal-ui"],
+    background_color: "#0f172a",
+    theme_color: "#e11d48",
+    orientation: "portrait-primary",
+    scope: "/",
+    categories: ["medical", "health", "social", "productivity"],
+    lang: "en",
+    icons: [
+      {
+        src: "/images/logo/logo-icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
+        purpose: "any",
+      },
+      {
+        src: "/images/logo/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/images/logo/maskable-icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable",
+      },
+      {
+        src: "/images/logo/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/images/logo/maskable-icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
+    ],
+    screenshots: [
+      {
+        src: "/images/screenshots/dashboard.jpg",
+        sizes: "1280x720",
+        type: "image/jpeg",
+        form_factor: "wide",
+        label: "DU Badhon Operations Dashboard",
+      },
+      {
+        src: "/images/screenshots/requests.png",
+        sizes: "750x1334",
+        type: "image/png",
+        form_factor: "narrow",
+        label: "Blood Requests & Bag Management",
+      },
+    ],
+    shortcuts: [
+      {
+        name: "Blood Requests",
+        short_name: "Requests",
+        description: "View active emergency blood requests",
+        url: "/blood-requests",
+        icons: [{ src: "/images/logo/icon-192.png", sizes: "192x192" }],
+      },
+      {
+        name: "Search Donors",
+        short_name: "Search",
+        description: "Search eligible donors across DU halls",
+        url: "/search-blood",
+        icons: [{ src: "/images/logo/icon-192.png", sizes: "192x192" }],
+      },
+      {
+        name: "Donors Directory",
+        short_name: "Donors",
+        description: "Browse registered donors and call history",
+        url: "/donors",
+        icons: [{ src: "/images/logo/icon-192.png", sizes: "192x192" }],
+      },
+    ],
+  };
+}

@@ -13,6 +13,7 @@
   <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5.x-blue?style=for-the-badge&logo=typescript" alt="TypeScript" /></a>
   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" /></a>
   <a href="https://lucide.dev"><img src="https://img.shields.io/badge/Icons-Lucide_React-E11D48?style=for-the-badge" alt="Lucide React" /></a>
+  <a href="#-installable-progressive-web-app-pwa"><img src="https://img.shields.io/badge/PWA-Installable-success?style=for-the-badge&logo=pwa" alt="PWA Installable" /></a>
 </p>
 
 ---
@@ -67,9 +68,32 @@ This platform is the **official digital coordination & management platform** for
 - Seamless Dark & Light mode support powered by `next-themes`.
 - Vector SVG icons via `lucide-react` (zero keyboard emojis).
 
+### 📱 8. Progressive Web App (PWA) — Install on Phone or Laptop
+- **One-Click Installation**: Installable directly from Chrome, Edge, Brave, and Android browsers via the native install icon in the URL bar or the in-app **"Install App"** button.
+- **iOS Safari Support**: Guided instructions for adding the app directly to iOS Home Screen via the Share sheet (`Add to Home Screen`).
+- **Offline & Standalone**: Runs in dedicated standalone window mode without browser bars, with offline caching for essential assets and emergency workflows.
+
 ---
 
-## 🚀 Technology Stack
+## 📲 How to Install the App (PWA)
+
+### 💻 On Desktop / Laptop (Chrome, Edge, Brave, Opera)
+1. Open the website in your browser.
+2. Click the **"Install App"** button in the header, or click the **Install icon (⊕ / 💻)** in the browser's address bar.
+3. Confirm **Install**. The app will launch in its own standalone window and appear in your OS Applications / Start Menu.
+
+### 📱 On Android (Chrome, Edge, Samsung Internet)
+1. Open the website on your phone.
+2. Tap the bottom banner **"Install DU Badhon App"** or tap the browser menu (⋮) -> **"Install app"** / **"Add to Home screen"**.
+3. The DU Badhon app icon will appear on your phone's home screen and app drawer.
+
+### 🍏 On iPhone / iPad (Safari)
+1. Open the website in **Safari**.
+2. Tap the **Share** button (⎋ with arrow) in the bottom toolbar.
+3. Scroll down and tap **"Add to Home Screen"** (➕).
+4. Tap **Add**. The app will be available on your iOS home screen as an app.
+
+---
 
 | Technology | Purpose |
 |---|---|

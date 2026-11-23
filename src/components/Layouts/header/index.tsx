@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSidebarContext } from "../sidebar/sidebar-context";
 import { ThemeToggleSwitch } from "./theme-toggle";
 import { UserInfo } from "./user-info";
+import { HeaderInstallButton } from "@/components/PWA/PWAInstaller";
 
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
@@ -49,7 +50,9 @@ export function Header() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2.5 sm:gap-4">
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        <HeaderInstallButton />
+
         <Link
           href="/blood-requests?new=true"
           className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 px-3.5 py-2 text-xs font-bold text-white shadow-sm transition active:scale-95"

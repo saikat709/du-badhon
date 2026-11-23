@@ -4,11 +4,23 @@ import "@/css/style.css";
 import "flatpickr/dist/flatpickr.min.css";
 import "jsvectormap/dist/jsvectormap.css";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import NextTopLoader from "nextjs-toploader";
 import type { PropsWithChildren } from "react";
 import { Providers } from "./providers";
 import { Header } from "@/components/Layouts/header";
+import { PWAInstaller } from "@/components/PWA/PWAInstaller";
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: {
@@ -17,13 +29,26 @@ export const metadata: Metadata = {
   },
   description:
     "Badhon is a voluntary blood donors' organization operating at the University of Dhaka. Digital coordination platform for donor tracking, call locking, feedback logging, and multi-bag blood request fulfillment.",
+  applicationName: "DU Badhon",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "DU Badhon",
+  },
+  formatDetection: {
+    telephone: true,
+  },
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/images/logo/logo-icon.svg", type: "image/svg+xml" },
+      { url: "/images/logo/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/images/logo/icon-512.png", sizes: "512x512", type: "image/png" },
       { url: "/favicon.ico" },
     ],
     apple: [
+      { url: "/images/logo/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
       { url: "/apple-icon.svg", type: "image/svg+xml" },
     ],
     shortcut: "/icon.svg",
@@ -33,7 +58,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className="antialiased">
         <Providers>
           <NextTopLoader showSpinner={false} />
 
@@ -45,6 +70,8 @@ export default function RootLayout({ children }: PropsWithChildren) {
               </main>
             </div>
           </div>
+
+          <PWAInstaller />
         </Providers>
       </body>
     </html>
