@@ -1,11 +1,19 @@
 "use client";
 
 import { useBadhon } from "@/context/badhon-context";
+import {
+  CheckCircle2,
+  ClipboardList,
+  Droplet,
+  HeartHandshake,
+  Search,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import React, { Suspense, useMemo, useState } from "react";
 
 function DonationsContent() {
-  const { bloodRequests, donors } = useBadhon();
+  const { bloodRequests } = useBadhon();
   const [filterHospital, setFilterHospital] = useState("all");
   const [search, setSearch] = useState("");
 
@@ -73,7 +81,8 @@ function DonationsContent() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-dark dark:text-white flex items-center gap-2">
-            <span>📋 DU Badhon Donation Ledger</span>
+            <ClipboardList className="size-7 text-rose-600" />
+            <span>DU Badhon Donation Ledger</span>
           </h1>
           <p className="text-xs text-dark-5 dark:text-dark-6 mt-1">
             Historical audit trail of completed blood and plasma units donated through Badhon.
@@ -82,22 +91,24 @@ function DonationsContent() {
 
         <Link
           href="/blood-requests"
-          className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition"
         >
-          View Blood Requests
+          <HeartHandshake className="size-4" />
+          <span>View Blood Requests</span>
         </Link>
       </div>
 
       {/* Filter */}
       <div className="bg-white dark:bg-dark-2 p-4 rounded-2xl border border-stroke dark:border-dark-3 flex flex-col sm:flex-row gap-3 justify-between items-center shadow-xs">
-        <div className="w-full sm:w-72">
+        <div className="w-full sm:w-72 relative">
           <input
             type="text"
             placeholder="Search patient, donor, hospital..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-stroke bg-gray-1 dark:bg-dark-3 px-3 py-2 text-xs text-dark dark:text-white outline-none focus:border-rose-600"
+            className="w-full rounded-xl border border-stroke bg-gray-1 dark:bg-dark-3 pl-8 pr-3 py-2 text-xs text-dark dark:text-white outline-none focus:border-rose-600"
           />
+          <Search className="size-3.5 text-gray-4 absolute left-2.5 top-2.5" />
         </div>
 
         <div className="w-full sm:w-72">
@@ -172,7 +183,7 @@ function DonationsContent() {
                     </td>
                     <td className="p-4 text-right">
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-                        <span>✓</span>
+                        <CheckCircle2 className="size-3" />
                         <span>Donated</span>
                       </span>
                     </td>

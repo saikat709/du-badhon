@@ -1,6 +1,21 @@
 "use client";
 
 import { BloodRequest } from "@/types/badhon";
+import {
+  AlertCircle,
+  Building2,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Droplet,
+  Phone,
+  PhoneCall,
+  Search,
+  Sparkles,
+  User,
+  X,
+  XCircle,
+} from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 
@@ -31,28 +46,38 @@ export function RequestDetailsModal({
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-700 to-indigo-800 p-6 text-white flex justify-between items-start">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1.5">
               <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
                 {request.id}
               </span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-600">
-                {request.bloodGroup} {request.isPlasma ? "Plasma" : "Blood"}
+              <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-600">
+                {request.isPlasma ? (
+                  <Sparkles className="size-3" />
+                ) : (
+                  <Droplet className="size-3" />
+                )}
+                <span>
+                  {request.bloodGroup} {request.isPlasma ? "Plasma" : "Blood"}
+                </span>
               </span>
               <span className="text-xs font-medium text-white/80">
                 Created by {request.createdByVolunteerName}
               </span>
             </div>
-            <h2 className="text-xl font-bold">{request.hospital}</h2>
-            <p className="text-sm text-blue-100">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Building2 className="size-5 text-blue-200 shrink-0" />
+              <span>{request.hospital}</span>
+            </h2>
+            <p className="text-xs text-blue-100 mt-1">
               Patient: <span className="font-semibold text-white">{request.patientName}</span> ({request.reason})
             </p>
           </div>
 
           <button
             onClick={onClose}
-            className="text-white/80 hover:text-white text-2xl font-bold p-1 leading-none"
+            className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition"
           >
-            &times;
+            <X className="size-5" />
           </button>
         </div>
 
@@ -60,33 +85,47 @@ export function RequestDetailsModal({
           {/* Key Info Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-1 dark:bg-dark-3 p-4 rounded-xl text-xs">
             <div>
-              <span className="text-dark-5 dark:text-dark-6 block">Attendant Phone</span>
+              <span className="text-dark-5 dark:text-dark-6 flex items-center gap-1">
+                <Phone className="size-3" />
+                <span>Attendant Phone</span>
+              </span>
               <a
                 href={`tel:${request.contactPhone}`}
-                className="font-bold text-rose-600 dark:text-rose-400 text-sm hover:underline"
+                className="font-bold text-rose-600 dark:text-rose-400 text-sm hover:underline block mt-0.5"
               >
                 {request.contactPhone}
               </a>
-              <span className="text-[10px] text-gray-5 block">{request.contactPerson}</span>
+              <span className="text-[10px] text-gray-5 block truncate">
+                {request.contactPerson}
+              </span>
             </div>
 
             <div>
-              <span className="text-dark-5 dark:text-dark-6 block">Bags Status</span>
-              <span className="font-bold text-dark dark:text-white text-sm">
+              <span className="text-dark-5 dark:text-dark-6 flex items-center gap-1">
+                <Droplet className="size-3 text-rose-500" />
+                <span>Bags Status</span>
+              </span>
+              <span className="font-bold text-dark dark:text-white text-sm block mt-0.5">
                 {request.managedBags} / {request.totalBags} Managed
               </span>
             </div>
 
             <div>
-              <span className="text-dark-5 dark:text-dark-6 block">Urgency</span>
-              <span className="font-bold text-amber-600 dark:text-amber-400 text-sm">
+              <span className="text-dark-5 dark:text-dark-6 flex items-center gap-1">
+                <AlertCircle className="size-3 text-amber-500" />
+                <span>Urgency</span>
+              </span>
+              <span className="font-bold text-amber-600 dark:text-amber-400 text-sm block mt-0.5">
                 {request.urgency.split(" ")[0]}
               </span>
             </div>
 
             <div>
-              <span className="text-dark-5 dark:text-dark-6 block">Needed Date</span>
-              <span className="font-bold text-dark dark:text-white text-sm">
+              <span className="text-dark-5 dark:text-dark-6 flex items-center gap-1">
+                <Calendar className="size-3" />
+                <span>Needed Date</span>
+              </span>
+              <span className="font-bold text-dark dark:text-white text-sm block mt-0.5">
                 {request.dateNeeded}
               </span>
             </div>
@@ -102,8 +141,9 @@ export function RequestDetailsModal({
           {/* Bag Slots Management */}
           <div>
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-sm font-bold text-dark dark:text-white">
-                Bag Slots ({request.totalBags} Required)
+              <h3 className="text-sm font-bold text-dark dark:text-white flex items-center gap-1.5">
+                <Droplet className="size-4 text-rose-600" />
+                <span>Bag Slots ({request.totalBags} Required)</span>
               </h3>
               {request.managedBags < request.totalBags &&
                 request.status !== "completed" &&
@@ -113,9 +153,10 @@ export function RequestDetailsModal({
                       request.bloodGroup,
                     )}`}
                     onClick={onClose}
-                    className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1"
+                    className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1"
                   >
-                    <span>+ Search Donors to Fill Remaining</span>
+                    <Search className="size-3" />
+                    <span>Search Donors to Fill Remaining</span>
                   </Link>
                 )}
             </div>
@@ -124,7 +165,7 @@ export function RequestDetailsModal({
               {request.assignedBags.map((bag) => (
                 <div
                   key={bag.bagNumber}
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl border text-xs gap-2 ${
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl border text-xs gap-2 ${
                     bag.donorId
                       ? "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40"
                       : "bg-gray-1 dark:bg-dark-3 border-dashed border-gray-300 dark:border-dark-4"
@@ -151,9 +192,10 @@ export function RequestDetailsModal({
                           </p>
                           <a
                             href={`tel:${bag.donorPhone}`}
-                            className="text-emerald-700 dark:text-emerald-400 font-medium hover:underline"
+                            className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-medium hover:underline mt-0.5"
                           >
-                            📞 {bag.donorPhone}
+                            <PhoneCall className="size-3" />
+                            <span>{bag.donorPhone}</span>
                           </a>
                         </>
                       ) : (
@@ -184,9 +226,10 @@ export function RequestDetailsModal({
                             bag.bagNumber
                           }&group=${encodeURIComponent(request.bloodGroup)}`}
                           onClick={onClose}
-                          className="px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition"
                         >
-                          Find Donor
+                          <Search className="size-3" />
+                          <span>Find Donor</span>
                         </Link>
                       )
                     )}
@@ -199,21 +242,22 @@ export function RequestDetailsModal({
           {/* Cancellation View */}
           {showCancelPrompt ? (
             <div className="p-4 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 space-y-3">
-              <h4 className="text-xs font-bold text-rose-700 dark:text-rose-400">
-                Cancel Blood Request
+              <h4 className="text-xs font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
+                <XCircle className="size-4" />
+                <span>Cancel Blood Request</span>
               </h4>
               <input
                 type="text"
                 placeholder="Reason for cancellation (e.g. Patient managed from family, surgery postponed)"
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
-                className="w-full rounded-lg border border-rose-300 dark:border-rose-900 bg-white dark:bg-dark-2 px-3 py-2 text-xs text-dark dark:text-white outline-none"
+                className="w-full rounded-xl border border-rose-300 dark:border-rose-900 bg-white dark:bg-dark-2 px-3 py-2 text-xs text-dark dark:text-white outline-none"
               />
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowCancelPrompt(false)}
-                  className="px-3 py-1.5 rounded-lg border text-xs font-semibold"
+                  className="px-3 py-1.5 rounded-xl border text-xs font-semibold"
                 >
                   Back
                 </button>
@@ -224,7 +268,7 @@ export function RequestDetailsModal({
                     onCancelRequest(request.id, cancelReason.trim());
                     onClose();
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-bold"
+                  className="px-3 py-1.5 rounded-xl bg-rose-600 text-white text-xs font-bold"
                 >
                   Confirm Cancel
                 </button>
@@ -238,16 +282,17 @@ export function RequestDetailsModal({
               <button
                 type="button"
                 onClick={() => setShowCancelPrompt(true)}
-                className="text-xs text-rose-600 dark:text-rose-400 font-semibold hover:underline"
+                className="text-xs text-rose-600 dark:text-rose-400 font-semibold hover:underline flex items-center gap-1"
               >
-                Cancel this Request
+                <XCircle className="size-3.5" />
+                <span>Cancel this Request</span>
               </button>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 rounded-lg border border-stroke text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white text-xs font-semibold transition"
+                  className="px-4 py-2 rounded-xl border border-stroke text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white text-xs font-semibold transition"
                 >
                   Close
                 </button>
@@ -258,9 +303,10 @@ export function RequestDetailsModal({
                     onMarkCompleted(request.id, completeNote);
                     onClose();
                   }}
-                  className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition"
                 >
-                  ✓ Mark Donation as Completed
+                  <CheckCircle2 className="size-3.5" />
+                  <span>Mark Donation as Completed</span>
                 </button>
               </div>
             </div>

@@ -4,6 +4,18 @@ import { CallDonorModal } from "@/components/Donors/CallDonorModal";
 import { DonorCard } from "@/components/Donors/DonorCard";
 import { useBadhon } from "@/context/badhon-context";
 import { BloodGroup, Donor, HallUnit } from "@/types/badhon";
+import {
+  ArrowLeft,
+  Building2,
+  Droplet,
+  Filter,
+  Lock,
+  Plus,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useMemo, useState } from "react";
@@ -121,13 +133,19 @@ function SearchBloodContent() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[11px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
-                Active Search Target: {targetRequest.id}
+                Target: {targetRequest.id}
               </span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-600">
-                {targetRequest.bloodGroup} {targetRequest.isPlasma ? "Plasma" : "Blood"}
+              <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-600">
+                {targetRequest.isPlasma ? <Sparkles className="size-3" /> : <Droplet className="size-3" />}
+                <span>
+                  {targetRequest.bloodGroup} {targetRequest.isPlasma ? "Plasma" : "Blood"}
+                </span>
               </span>
             </div>
-            <h2 className="text-lg font-black">{targetRequest.hospital}</h2>
+            <h2 className="text-lg font-black flex items-center gap-2">
+              <Building2 className="size-5 text-blue-200 shrink-0" />
+              <span>{targetRequest.hospital}</span>
+            </h2>
             <p className="text-xs text-blue-100 mt-0.5">
               Patient: <strong>{targetRequest.patientName}</strong> ({targetRequest.reason}) • Fulfilling Bag #{targetBagNumber}
             </p>
@@ -136,9 +154,10 @@ function SearchBloodContent() {
           <div className="flex items-center gap-2">
             <Link
               href="/blood-requests"
-              className="px-3.5 py-2 rounded-xl bg-white/20 text-white hover:bg-white/30 text-xs font-bold transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/20 text-white hover:bg-white/30 text-xs font-bold transition"
             >
-              Back to Requests
+              <ArrowLeft className="size-3.5" />
+              <span>Back to Requests</span>
             </Link>
           </div>
         </div>
@@ -148,7 +167,8 @@ function SearchBloodContent() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black text-dark dark:text-white flex items-center gap-2">
-            <span>🔍 Search Blood Donors</span>
+            <Search className="size-6 text-rose-600" />
+            <span>Search Blood Donors</span>
             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
               DU Hall Registry
             </span>
@@ -161,15 +181,17 @@ function SearchBloodContent() {
         <div className="flex items-center gap-2">
           <Link
             href="/donors"
-            className="px-4 py-2 rounded-xl bg-white dark:bg-dark-2 border border-stroke dark:border-dark-3 text-xs font-bold text-dark dark:text-white hover:bg-gray-1 dark:hover:bg-dark-3 transition"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-dark-2 border border-stroke dark:border-dark-3 text-xs font-bold text-dark dark:text-white hover:bg-gray-1 dark:hover:bg-dark-3 transition"
           >
-            All Donors Directory
+            <Users className="size-3.5" />
+            <span>Donors Directory</span>
           </Link>
           <Link
             href="/blood-requests?new=true"
-            className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition"
           >
-            + Record Request
+            <Plus className="size-3.5" />
+            <span>Record Request</span>
           </Link>
         </div>
       </div>
@@ -179,8 +201,9 @@ function SearchBloodContent() {
         {/* Blood Group Select Pills */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-xs font-bold text-dark dark:text-white">
-              Filter by Blood Group:
+            <label className="text-xs font-bold text-dark dark:text-white flex items-center gap-1">
+              <Droplet className="size-3.5 text-rose-600" />
+              <span>Filter by Blood Group:</span>
             </label>
             {selectedGroup !== "all" && (
               <button
@@ -257,13 +280,16 @@ function SearchBloodContent() {
             <label className="block text-[11px] font-bold text-dark-5 dark:text-dark-6 mb-1">
               Search by Keyword:
             </label>
-            <input
-              type="text"
-              placeholder="Search donor name, dept, session..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-stroke bg-gray-1 dark:bg-dark-3 px-3 py-2 text-xs text-dark dark:text-white outline-none focus:border-rose-600"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search donor name, dept, session..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-xl border border-stroke bg-gray-1 dark:bg-dark-3 pl-8 pr-3 py-2 text-xs text-dark dark:text-white outline-none focus:border-rose-600"
+              />
+              <Search className="size-3.5 text-gray-4 absolute left-2.5 top-2.5" />
+            </div>
           </div>
         </div>
       </div>
@@ -275,12 +301,12 @@ function SearchBloodContent() {
         </p>
 
         <div className="flex items-center gap-3 text-[11px] text-dark-5 dark:text-dark-6">
-          <span className="flex items-center gap-1">
-            <span className="size-2 rounded-full bg-emerald-500 inline-block" />
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="size-3.5 text-emerald-600" />
             <span>Ready to Donate</span>
           </span>
-          <span className="flex items-center gap-1">
-            <span className="size-2 rounded-full bg-amber-500 inline-block" />
+          <span className="flex items-center gap-1.5">
+            <Lock className="size-3 text-amber-600" />
             <span>Locked / In Call with Volunteer</span>
           </span>
         </div>
@@ -301,7 +327,7 @@ function SearchBloodContent() {
         </div>
       ) : (
         <div className="bg-white dark:bg-dark-2 p-12 rounded-2xl border border-stroke dark:border-dark-3 text-center space-y-3">
-          <span className="text-4xl block">🩸</span>
+          <Droplet className="size-10 text-rose-500 mx-auto" />
           <h3 className="text-base font-bold text-dark dark:text-white">
             No donors found matching the selected filters
           </h3>

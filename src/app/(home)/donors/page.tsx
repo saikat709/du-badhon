@@ -5,6 +5,15 @@ import { DonorCard } from "@/components/Donors/DonorCard";
 import { NewDonorModal } from "@/components/Donors/NewDonorModal";
 import { useBadhon } from "@/context/badhon-context";
 import { BloodGroup, Donor, HallUnit } from "@/types/badhon";
+import {
+  Droplet,
+  Lock,
+  Plus,
+  Search,
+  ShieldCheck,
+  UserCheck,
+  Users,
+} from "lucide-react";
 import React, { Suspense, useMemo, useState } from "react";
 
 const BLOOD_GROUPS: BloodGroup[] = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -85,7 +94,8 @@ function DonorsContent() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-dark dark:text-white flex items-center gap-2">
-            <span>👥 DU Badhon Donors Registry</span>
+            <Users className="size-7 text-rose-600" />
+            <span>DU Badhon Donors Registry</span>
           </h1>
           <p className="text-xs text-dark-5 dark:text-dark-6 mt-1">
             Student blood donor directory across 16 Dhaka University halls.
@@ -96,7 +106,7 @@ function DonorsContent() {
           onClick={() => setIsAddModalOpen(true)}
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition active:scale-95"
         >
-          <span className="text-base font-black">+</span>
+          <Plus className="size-4" />
           <span>Register New Donor</span>
         </button>
       </div>
@@ -143,14 +153,15 @@ function DonorsContent() {
       {/* Filter and Search Box */}
       <div className="bg-white dark:bg-dark-2 p-4 rounded-2xl border border-stroke dark:border-dark-3 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
-          <div className="w-full sm:w-72">
+          <div className="w-full sm:w-72 relative">
             <input
               type="text"
               placeholder="Search by name, department, session, phone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-stroke bg-gray-1 dark:bg-dark-3 px-3.5 py-2 text-xs text-dark dark:text-white outline-none focus:border-rose-600"
+              className="w-full rounded-xl border border-stroke bg-gray-1 dark:bg-dark-3 pl-8 pr-3.5 py-2 text-xs text-dark dark:text-white outline-none focus:border-rose-600"
             />
+            <Search className="size-3.5 text-gray-4 absolute left-2.5 top-2.5" />
           </div>
 
           <div className="w-full sm:w-64">
@@ -171,8 +182,9 @@ function DonorsContent() {
 
         {/* Blood Groups */}
         <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-stroke dark:border-dark-3">
-          <span className="text-[11px] font-bold text-dark-5 dark:text-dark-6 mr-1">
-            Group:
+          <span className="text-[11px] font-bold text-dark-5 dark:text-dark-6 mr-1 inline-flex items-center gap-1">
+            <Droplet className="size-3 text-rose-500" />
+            <span>Group:</span>
           </span>
           <button
             onClick={() => setSelectedGroup("all")}

@@ -1,3 +1,14 @@
+import {
+  ArrowRight,
+  Building2,
+  Droplet,
+  HeartHandshake,
+  Lock,
+  Plus,
+  Search,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -41,9 +52,10 @@ export default function HomePage() {
             </Link>
             <Link
               href="/dashboard"
-              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition active:scale-95"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition active:scale-95"
             >
-              Go to Dashboard &rarr;
+              <span>Go to Dashboard</span>
+              <ArrowRight className="size-3.5" />
             </Link>
           </div>
         </div>
@@ -72,21 +84,24 @@ export default function HomePage() {
               href="/search-blood"
               className="px-7 py-3.5 rounded-xl font-bold bg-rose-600 hover:bg-rose-700 text-white text-sm shadow-md transition active:scale-95 flex items-center gap-2"
             >
-              <span>🔍 Search Donors</span>
+              <Search className="size-4" />
+              <span>Search Donors</span>
             </Link>
 
             <Link
               href="/blood-requests?new=true"
               className="px-7 py-3.5 rounded-xl font-bold bg-white dark:bg-dark-3 hover:bg-gray-2 dark:hover:bg-dark-4 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-900 text-sm shadow-xs transition active:scale-95 flex items-center gap-2"
             >
-              <span>+ Record Blood Request</span>
+              <Plus className="size-4" />
+              <span>Record Blood Request</span>
             </Link>
 
             <Link
               href="/dashboard"
-              className="px-6 py-3.5 rounded-xl font-bold bg-blue-700 hover:bg-blue-800 text-white text-sm shadow-md transition active:scale-95"
+              className="px-6 py-3.5 rounded-xl font-bold bg-blue-700 hover:bg-blue-800 text-white text-sm shadow-md transition active:scale-95 flex items-center gap-2"
             >
-              Operations Center &rarr;
+              <span>Operations Center</span>
+              <ArrowRight className="size-4" />
             </Link>
           </div>
         </div>
@@ -102,9 +117,9 @@ export default function HomePage() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-dark-3 rounded-2xl p-6 border border-stroke dark:border-dark-4 shadow-xs space-y-2.5">
-            <span className="size-12 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center text-xl font-bold">
-              🔒
+          <div className="bg-white dark:bg-dark-3 rounded-2xl p-6 border border-stroke dark:border-dark-4 shadow-xs space-y-3">
+            <span className="size-12 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center">
+              <Lock className="size-6" />
             </span>
             <h3 className="font-bold text-base">Member Call Conflict Prevention</h3>
             <p className="text-xs text-dark-5 dark:text-dark-6 leading-relaxed">
@@ -113,9 +128,9 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-dark-3 rounded-2xl p-6 border border-stroke dark:border-dark-4 shadow-xs space-y-2.5">
-            <span className="size-12 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xl font-bold">
-              🩸
+          <div className="bg-white dark:bg-dark-3 rounded-2xl p-6 border border-stroke dark:border-dark-4 shadow-xs space-y-3">
+            <span className="size-12 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
+              <Droplet className="size-6" />
             </span>
             <h3 className="font-bold text-base">Multi-Bag & Plasma Fulfillment</h3>
             <p className="text-xs text-dark-5 dark:text-dark-6 leading-relaxed">
@@ -123,9 +138,9 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-dark-3 rounded-2xl p-6 border border-stroke dark:border-dark-4 shadow-xs space-y-2.5">
-            <span className="size-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xl font-bold">
-              🏛️
+          <div className="bg-white dark:bg-dark-3 rounded-2xl p-6 border border-stroke dark:border-dark-4 shadow-xs space-y-3">
+            <span className="size-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center">
+              <Building2 className="size-6" />
             </span>
             <h3 className="font-bold text-base">16 DU Hall Units Connected</h3>
             <p className="text-xs text-dark-5 dark:text-dark-6 leading-relaxed">

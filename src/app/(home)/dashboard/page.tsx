@@ -4,6 +4,20 @@ import { RequestCard } from "@/components/BloodRequests/RequestCard";
 import { RequestDetailsModal } from "@/components/BloodRequests/RequestDetailsModal";
 import { useBadhon } from "@/context/badhon-context";
 import { BloodGroup, BloodRequest } from "@/types/badhon";
+import {
+  Activity,
+  AlertOctagon,
+  ArrowRight,
+  CheckCircle2,
+  Droplet,
+  HeartHandshake,
+  Lock,
+  PartyPopper,
+  Plus,
+  Search,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import React, { Suspense, useMemo, useState } from "react";
@@ -69,13 +83,24 @@ function DashboardContent() {
   const totalBagsManaged = activeRequests.reduce((sum, r) => sum + r.managedBags, 0);
   const activeInCallDonors = donors.filter((d) => d.currentLock != null);
 
+  const readyDonorsCount = useMemo(() => {
+    return filteredDonors.filter((d) => {
+      if (!d.lastDonationDate) return true;
+      const diffDays = Math.ceil(
+        Math.abs(Date.now() - new Date(d.lastDonationDate).getTime()) /
+          (1000 * 60 * 60 * 24),
+      );
+      return diffDays >= 90;
+    }).length;
+  }, [filteredDonors]);
+
   return (
     <div className="space-y-7">
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-950 p-6 md:p-8 text-white shadow-lg">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur-xs">
+          <div className="space-y-2.5 max-w-xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold backdrop-blur-xs">
               <span className="flex size-2 rounded-full bg-emerald-400 animate-ping" />
               <span>DU Badhon Operations Live</span>
               {unitFilter && <span>• {unitFilter}</span>}
@@ -83,7 +108,7 @@ function DashboardContent() {
             <h1 className="text-2xl md:text-3xl font-black tracking-tight">
               Welcome back, {currentVolunteer.name}!
             </h1>
-            <p className="text-xs md:text-sm text-rose-100 font-medium">
+            <p className="text-xs md:text-sm text-rose-100 font-medium leading-relaxed">
               You are on duty representing <strong>{currentVolunteer.hallUnit}</strong>. There are{" "}
               <strong className="text-amber-300 underline underline-offset-2">
                 {activeRequests.length} active emergency blood requests
@@ -97,18 +122,20 @@ function DashboardContent() {
               href="/blood-requests?new=true"
               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-rose-800 hover:bg-rose-50 text-xs font-black shadow-md transition active:scale-95"
             >
-              <span>+ Record Blood Request</span>
+              <Plus className="size-4 text-rose-800" />
+              <span>Record Blood Request</span>
             </Link>
             <Link
               href="/search-blood"
               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-rose-950/80 hover:bg-rose-950 text-white text-xs font-bold border border-rose-500/40 transition"
             >
-              <span>🔍 Search Donors</span>
+              <Search className="size-4" />
+              <span>Search Donors</span>
             </Link>
           </div>
         </div>
 
-        {/* Subtle decorative circles */}
+        {/* Decorative background glows */}
         <div className="absolute -right-10 -bottom-10 size-60 rounded-full bg-rose-500/10 pointer-events-none" />
         <div className="absolute right-40 -top-10 size-40 rounded-full bg-rose-400/10 pointer-events-none" />
       </div>
@@ -117,11 +144,11 @@ function DashboardContent() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-dark-2 p-5 rounded-2xl border border-stroke dark:border-dark-3 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-dark-5 dark:text-dark-6 font-bold uppercase">
+            <span className="text-xs text-dark-5 dark:text-dark-6 font-bold uppercase tracking-wider">
               Emergency Requests
             </span>
-            <span className="size-8 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center font-black text-sm">
-              🚨
+            <span className="size-9 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center font-black">
+              <AlertOctagon className="size-4.5" />
             </span>
           </div>
           <p className="text-3xl font-black text-rose-600 dark:text-rose-400 mt-2">
@@ -134,11 +161,11 @@ function DashboardContent() {
 
         <div className="bg-white dark:bg-dark-2 p-5 rounded-2xl border border-stroke dark:border-dark-3 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-dark-5 dark:text-dark-6 font-bold uppercase">
+            <span className="text-xs text-dark-5 dark:text-dark-6 font-bold uppercase tracking-wider">
               Bags Managed Today
             </span>
-            <span className="size-8 rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center font-black text-sm">
-              🩸
+            <span className="size-9 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center font-black">
+              <Droplet className="size-4.5" />
             </span>
           </div>
           <p className="text-3xl font-black text-blue-600 dark:text-blue-400 mt-2">
@@ -149,15 +176,15 @@ function DashboardContent() {
 
         <div className="bg-white dark:bg-dark-2 p-5 rounded-2xl border border-stroke dark:border-dark-3 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-dark-5 dark:text-dark-6 font-bold uppercase">
+            <span className="text-xs text-dark-5 dark:text-dark-6 font-bold uppercase tracking-wider">
               Ready Donors (90d+)
             </span>
-            <span className="size-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center font-black text-sm">
-              ✓
+            <span className="size-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center font-black">
+              <ShieldCheck className="size-4.5" />
             </span>
           </div>
           <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-2">
-            {filteredDonors.filter((d) => !d.lastDonationDate || Math.ceil(Math.abs(Date.now() - new Date(d.lastDonationDate).getTime()) / (1000 * 60 * 60 * 24)) >= 90).length}
+            {readyDonorsCount}
           </p>
           <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-1">
             Available across halls
@@ -166,11 +193,11 @@ function DashboardContent() {
 
         <div className="bg-white dark:bg-dark-2 p-5 rounded-2xl border border-stroke dark:border-dark-3 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-dark-5 dark:text-dark-6 font-bold uppercase">
+            <span className="text-xs text-dark-5 dark:text-dark-6 font-bold uppercase tracking-wider">
               Active Call Locks
             </span>
-            <span className="size-8 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center font-black text-sm">
-              🔒
+            <span className="size-9 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center font-black">
+              <Lock className="size-4.5" />
             </span>
           </div>
           <p className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-2">
@@ -187,7 +214,8 @@ function DashboardContent() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-sm font-bold text-dark dark:text-white flex items-center gap-1.5">
-              <span>🩸 Blood Group Availability & Urgent Demand</span>
+              <Droplet className="size-4 text-rose-600" />
+              <span>Blood Group Availability & Immediate Demand</span>
             </h2>
             <p className="text-xs text-dark-5 dark:text-dark-6">
               Instant snapshot of ready donors vs. immediate bags required across Dhaka
@@ -195,9 +223,10 @@ function DashboardContent() {
           </div>
           <Link
             href="/search-blood"
-            className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline"
+            className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1"
           >
-            Open Full Search &rarr;
+            <span>Open Full Search</span>
+            <ArrowRight className="size-3" />
           </Link>
         </div>
 
@@ -234,11 +263,12 @@ function DashboardContent() {
         </div>
       </div>
 
-      {/* Active Blood Requests Grid (Matching blood_requests.png layout) */}
+      {/* Active Blood Requests Grid */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-black text-dark dark:text-white flex items-center gap-2">
+              <HeartHandshake className="size-5 text-rose-600" />
               <span>Active Blood Requests</span>
               <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
                 {activeRequests.length} Requiring Attention
@@ -251,9 +281,10 @@ function DashboardContent() {
 
           <Link
             href="/blood-requests"
-            className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline"
+            className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1"
           >
-            View All Requests ({bloodRequests.length}) &rarr;
+            <span>View All Requests ({bloodRequests.length})</span>
+            <ArrowRight className="size-3" />
           </Link>
         </div>
 
@@ -274,7 +305,7 @@ function DashboardContent() {
           </div>
         ) : (
           <div className="bg-white dark:bg-dark-2 p-10 rounded-2xl border border-stroke dark:border-dark-3 text-center space-y-2">
-            <span className="text-3xl block">🎉</span>
+            <PartyPopper className="size-8 text-rose-500 mx-auto" />
             <p className="text-sm font-bold text-dark dark:text-white">
               All blood requests are currently managed or completed!
             </p>
@@ -290,6 +321,7 @@ function DashboardContent() {
         <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded-2xl border border-amber-300 dark:border-amber-900/50 space-y-2">
           <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-300">
             <span className="size-2 rounded-full bg-amber-500 animate-ping" />
+            <Lock className="size-3.5" />
             <span>Currently Active Volunteer Calls ({activeInCallDonors.length} Donors Locked):</span>
           </div>
 
@@ -301,8 +333,9 @@ function DashboardContent() {
               >
                 <span className="font-bold text-rose-600 dark:text-rose-400">{d.bloodGroup}</span>
                 <span className="font-semibold text-dark dark:text-white">{d.name}</span>
-                <span className="text-[10px] text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-1.5 py-0.5 rounded-md font-medium">
-                  🔒 {d.currentLock?.lockedByVolunteerName} is calling
+                <span className="text-[10px] text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-1.5 py-0.5 rounded-md font-medium inline-flex items-center gap-1">
+                  <Lock className="size-2.5" />
+                  <span>{d.currentLock?.lockedByVolunteerName} is calling</span>
                 </span>
               </div>
             ))}
