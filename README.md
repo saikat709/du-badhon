@@ -14,6 +14,9 @@
   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" /></a>
   <a href="https://lucide.dev"><img src="https://img.shields.io/badge/Icons-Lucide_React-E11D48?style=for-the-badge" alt="Lucide React" /></a>
   <a href="#-installable-progressive-web-app-pwa"><img src="https://img.shields.io/badge/PWA-Installable-success?style=for-the-badge&logo=pwa" alt="PWA Installable" /></a>
+  <a href="#-mobile-android-app-apk--capacitor"><img src="https://img.shields.io/badge/Android_APK-v1.2.0-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android APK" /></a>
+  <a href="#-installable-progressive-web-app-pwa"><img src="https://img.shields.io/badge/PWA-Installable-success?style=for-the-badge&logo=pwa" alt="PWA Installable" /></a>
+  <a href="#-mobile-android-app-apk--capacitor"><img src="https://img.shields.io/badge/Android_APK-v1.2.0-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android APK" /></a>
 </p>
 
 ---
@@ -95,9 +98,74 @@ This platform is the **official digital coordination & management platform** for
 
 ---
 
+## 🤖 Mobile Android App (APK & Capacitor)
+
+In addition to PWA, the platform is configured with **Capacitor Android** for standalone native APK deployment:
+- **Direct APK Download**: Available from `/download-app` or directly via [public/downloads/du-badhon.apk](file:///home/saikat/projects/du-badhon/public/downloads/du-badhon.apk).
+- **Fast 1-Tap Dialer**: Launches the system phone dialer with donor contact numbers directly.
+- **Offline Reliability**: Bundles static Next.js export assets directly inside the APK for instant loading without network delays.
+
+### Android Build Commands
+```bash
+# 1. Export static web assets
+npm run build:mobile
+
+# 2. Sync web assets with Capacitor Android
+npx cap sync android
+
+# 3. Assemble Debug APK via Gradle
+npm run build:apk
+```
+
+---
+
+## 📲 How to Install the App (PWA)
+
+### 💻 On Desktop / Laptop (Chrome, Edge, Brave, Opera)
+1. Open the website in your browser.
+2. Click the **"Install App"** button in the header, or click the **Install icon (⊕ / 💻)** in the browser's address bar.
+3. Confirm **Install**. The app will launch in its own standalone window and appear in your OS Applications / Start Menu.
+
+### 📱 On Android (Chrome, Edge, Samsung Internet)
+1. Open the website on your phone.
+2. Tap the bottom banner **"Install DU Badhon App"** or tap the browser menu (⋮) -> **"Install app"** / **"Add to Home screen"**.
+3. The DU Badhon app icon will appear on your phone's home screen and app drawer.
+
+### 🍏 On iPhone / iPad (Safari)
+1. Open the website in **Safari**.
+2. Tap the **Share** button (⎋ with arrow) in the bottom toolbar.
+3. Scroll down and tap **"Add to Home Screen"** (➕).
+4. Tap **Add**. The app will be available on your iOS home screen as an app.
+
+---
+
+## 🤖 Mobile Android App (APK & Capacitor)
+
+In addition to PWA, the platform is configured with **Capacitor Android** for standalone native APK deployment:
+- **Direct APK Download**: Available from `/download-app` or directly via [public/downloads/du-badhon.apk](file:///home/saikat/projects/du-badhon/public/downloads/du-badhon.apk).
+- **Fast 1-Tap Dialer**: Launches the system phone dialer with donor contact numbers directly.
+- **Offline Reliability**: Bundles static Next.js export assets directly inside the APK for instant loading without network delays.
+
+### Android Build Commands
+```bash
+# 1. Export static web assets
+npm run build:mobile
+
+# 2. Sync web assets with Capacitor Android
+npx cap sync android
+
+# 3. Assemble Debug APK via Gradle
+npm run build:apk
+```
+
+---
+
+## 🚀 Technology Stack
+
 | Technology | Purpose |
 |---|---|
 | **Next.js 16.4.6 (Turbopack)** | React Framework, App Router, Static & Dynamic SSR |
+| **Capacitor 8.6.2** | Native Android runtime & WebView container |
 | **React 19.3.1 & React DOM 19** | Modern UI rendering & concurrency primitives |
 | **TypeScript 5.x** | End-to-end static typing and domain interfaces |
 | **Tailwind CSS 3.4** | Modern responsive design and dark-mode styling |

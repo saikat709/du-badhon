@@ -3,6 +3,7 @@ import {
   HeartHandshake,
   LayoutDashboard,
   Search,
+  Smartphone,
   User,
   Users,
 } from "lucide-react";
@@ -66,6 +67,12 @@ export const NAV_DATA = [
         title: "Your Profile",
         url: "/profile",
         icon: User,
+        items: [],
+      },
+      {
+        title: "Download App",
+        url: "/download-app",
+        icon: Smartphone,
         items: [],
       },
     ],
