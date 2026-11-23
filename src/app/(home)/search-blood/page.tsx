@@ -3,7 +3,7 @@
 import { CallDonorModal } from "@/components/Donors/CallDonorModal";
 import { DonorCard } from "@/components/Donors/DonorCard";
 import { useBadhon, isDonorEligible } from "@/context/badhon-context";
-import { BloodGroup, Donor, HallUnit } from "@/types/badhon";
+import { ALL_BLOOD_GROUPS, ALL_HALL_UNITS, BloodGroup, Donor, HallUnit } from "@/types/badhon";
 import {
   ArrowLeft,
   Building2,
@@ -20,26 +20,9 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useMemo, useState } from "react";
 
-const BLOOD_GROUPS: BloodGroup[] = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const BLOOD_GROUPS = ALL_BLOOD_GROUPS;
 
-const HALL_UNITS: HallUnit[] = [
-  "Fazlul Huq Muslim Hall",
-  "Shahidullah Hall",
-  "Amar Ekushey Hall",
-  "Jagannath Hall",
-  "Bangabandhu Sheikh Mujibur Rahman Hall",
-  "Kabi Jasimuddin Hall",
-  "Bijoy Ekattor Hall",
-  "Ziaur Rahman Hall",
-  "Surja Sen Hall",
-  "Haji Muhammad Mohsin Hall",
-  "Salimullah Muslim Hall",
-  "Ruqayyah Hall",
-  "Shamsun Nahar Hall",
-  "Kabi Sufia Kamal Hall",
-  "Bangladesh-Kuwait Maitree Hall",
-  "Fazilatunnesa Mujib Hall",
-];
+const HALL_UNITS = ALL_HALL_UNITS;
 
 function SearchBloodContent() {
   const router = useRouter();

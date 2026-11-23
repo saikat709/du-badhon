@@ -3,7 +3,7 @@
 import { SmartAppButton } from "@/components/PWA/PWAInstaller";
 import { ThemeToggleSwitch } from "@/components/Layouts/header/theme-toggle";
 import { useBadhon, isDonorEligible } from "@/context/badhon-context";
-import { BloodGroup, HallUnit } from "@/types/badhon";
+import { ALL_BLOOD_GROUPS, ALL_HALL_UNITS, BloodGroup, HallUnit } from "@/types/badhon";
 import {
   ArrowRight,
   Award,
@@ -28,7 +28,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
 
-const BLOOD_GROUPS: BloodGroup[] = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
+const BLOOD_GROUPS = ALL_BLOOD_GROUPS;
 
 const HALL_CLUSTERS: Array<{
   category: string;

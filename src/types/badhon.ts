@@ -37,6 +37,8 @@ export const ALL_HALL_UNITS: HallUnit[] = [
 
 export type BloodGroup = "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 
+export const ALL_BLOOD_GROUPS: BloodGroup[] = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
 export type CallOutcome =
   | "agreed"
   | "refused"

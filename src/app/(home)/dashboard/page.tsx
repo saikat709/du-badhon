@@ -3,7 +3,7 @@
 import { RequestCard } from "@/components/BloodRequests/RequestCard";
 import { RequestDetailsModal } from "@/components/BloodRequests/RequestDetailsModal";
 import { useBadhon, isDonorEligible, isLockActive } from "@/context/badhon-context";
-import { BloodGroup, BloodRequest, isRequestVisibleToUnit } from "@/types/badhon";
+import { ALL_BLOOD_GROUPS, ALL_HALL_UNITS, BloodGroup, BloodRequest, isRequestVisibleToUnit } from "@/types/badhon";
 import {
   Activity,
   AlertOctagon,
@@ -22,7 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { Suspense, useMemo, useState } from "react";
 
-const BLOOD_GROUPS: BloodGroup[] = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const BLOOD_GROUPS = ALL_BLOOD_GROUPS;
 
 function DashboardContent() {
   const {

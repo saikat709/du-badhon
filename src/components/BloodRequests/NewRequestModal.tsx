@@ -1,6 +1,6 @@
 "use client";
 
-import { ALL_HALL_UNITS, BloodGroup, HallUnit, UrgencyLevel, getShortHallUnit } from "@/types/badhon";
+import { ALL_BLOOD_GROUPS, ALL_HALL_UNITS, BloodGroup, HallUnit, UrgencyLevel, getShortHallUnit } from "@/types/badhon";
 import { useBadhon } from "@/context/badhon-context";
 import { sanitizeInputText, validateAndSanitizePhone } from "@/utils/security";
 import {
@@ -52,7 +52,7 @@ const COMMON_HOSPITALS = [
   "Suhrawardy Medical College Hospital",
 ];
 
-const BLOOD_GROUPS: BloodGroup[] = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const BLOOD_GROUPS = ALL_BLOOD_GROUPS;
 
 const TARGET_UNITS_CACHE_KEY = "badhon_preferred_target_units";
 
