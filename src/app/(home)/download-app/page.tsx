@@ -106,8 +106,9 @@ export default function DownloadAppPage() {
                 <Image
                   src="/images/logo/logo-icon.svg"
                   width={48}
-                  height={50}
+                  height={48}
                   alt="DU Badhon"
+                  style={{ width: "auto", height: "auto" }}
                   priority
                 />
               </div>

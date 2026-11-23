@@ -17,7 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { SmartAppButton } from "@/components/PWA/PWAInstaller";
-import { ThemeToggleSwitch } from "@/components/Layouts/header/theme-toggle";
+import { ThemeToggleSwitch } from "@/components/Layouts/header";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"] as const;
 
@@ -35,9 +35,10 @@ export default function HomePage() {
               <div className="size-full rounded-[10px] bg-slate-900 flex items-center justify-center">
                 <Image
                   src="/images/logo/logo-icon.svg"
-                  width={22}
+                  width={24}
                   height={24}
                   alt="Badhon Logo"
+                  style={{ width: "auto", height: "auto" }}
                   priority
                 />
               </div>

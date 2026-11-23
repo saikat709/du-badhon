@@ -71,8 +71,9 @@ export function Sidebar() {
                     <Image
                       src="/images/logo/logo-icon.svg"
                       width={24}
-                      height={26}
+                      height={24}
                       alt="Badhon Logo"
+                      style={{ width: "auto", height: "auto" }}
                       priority
                     />
                   </div>

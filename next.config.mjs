@@ -4,6 +4,15 @@ const isMobileExport = process.env.BUILD_TARGET === "mobile" || process.env.NEXT
 const nextConfig = {
   ...(isMobileExport ? { output: "export" } : {}),
   ...(!isMobileExport ? {
+    async redirects() {
+      return [
+        {
+          source: '/admin',
+          destination: '/dashboard',
+          permanent: false,
+        },
+      ];
+    },
     async headers() {
       return [
         {

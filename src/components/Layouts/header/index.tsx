@@ -9,6 +9,8 @@ import { UserInfo } from "./user-info";
 import { SmartAppButton } from "@/components/PWA/PWAInstaller";
 import { useBadhon } from "@/context/badhon-context";
 
+export { ThemeToggleSwitch } from "./theme-toggle";
+
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
   const { currentVolunteer } = useBadhon();
@@ -29,8 +31,9 @@ export function Header() {
             <Image
               src={"/images/logo/logo-icon.svg"}
               width={28}
-              height={30}
+              height={28}
               alt="Badhon Logo"
+              style={{ width: "auto", height: "auto" }}
               priority
             />
             <span className="font-black text-rose-600 text-lg tracking-wider">BADHON</span>

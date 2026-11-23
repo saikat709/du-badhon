@@ -97,9 +97,10 @@ function DashboardContent() {
             <div className="w-16 h-16 rounded-2xl bg-slate-900/90 border border-white/20 p-2.5 flex items-center justify-center shadow-2xl shrink-0">
               <Image
                 src="/images/logo/logo-icon.svg"
-                width={42}
+                width={44}
                 height={44}
                 alt="Badhon Logo"
+                style={{ width: "auto", height: "auto" }}
                 priority
               />
             </div>
