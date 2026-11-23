@@ -25,16 +25,12 @@ function RequestCard(){
 }
 
 export default function BloodRequest(){
-    const [requests, setRequests] = useState<Array<Number>>();
-
-    useEffect(()=>{
-        setRequests([1,1,1,1,1,1,1,1,11,1,1,1,1,1,1,1,1])
-    }, []);
+    const [requests] = useState<number[]>([1,1,1,1,1,1,1,1,11,1,1,1,1,1,1,1,1]);
 
     return (
         <div className="flex justify-center items-start">
             <div className="grid md:grid-cols-3 lg:grid-cols-4 grid-cols-1 justify-center mx-auto gap-2">
-                { requests?.map( ( req, ind ) => {
+                { requests.map( ( req, ind ) => {
                     return <RequestCard key={ind.toString()} />
                 }) }
             </div>
