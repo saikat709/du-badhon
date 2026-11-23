@@ -100,7 +100,7 @@ export default function DownloadAppPage() {
               </div>
               <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60 text-left">
                 <span className="text-slate-400 block text-[10px]">Size</span>
-                <span className="font-bold text-white">~5.2 MB</span>
+                <span className="font-bold text-white">~14 MB</span>
               </div>
               <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60 text-left">
                 <span className="text-slate-400 block text-[10px]">OS</span>
@@ -171,7 +171,7 @@ export default function DownloadAppPage() {
               className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md shadow-rose-600/30 transition-all active:scale-98"
             >
               <Download className="w-4 h-4" />
-              <span>Download APK File (5.2 MB)</span>
+              <span>Download APK File (14 MB)</span>
             </a>
 
             <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
