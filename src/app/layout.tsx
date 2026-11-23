@@ -13,10 +13,21 @@ import { Header } from "@/components/Layouts/header";
 export const metadata: Metadata = {
   title: {
     template: "%s | Badhon - Bond made by blood",
-    default: "Badhon - Bond made by blood",
+    default: "Badhon - Dhaka University Voluntary Blood Donors' Organization",
   },
   description:
-    "Badhon is the blood donating website used to help people, and it is monitored by university students.",
+    "Badhon is a voluntary blood donors' organization operating at the University of Dhaka. Digital coordination platform for donor tracking, call locking, feedback logging, and multi-bag blood request fulfillment.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/images/logo/logo-icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico" },
+    ],
+    apple: [
+      { url: "/apple-icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
