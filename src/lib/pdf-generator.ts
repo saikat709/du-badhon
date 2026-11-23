@@ -19,11 +19,13 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
   // A4 Landscape orientation: 841.89 x 595.28 pt
   const pageWidth = 841.89;
   const pageHeight = 595.28;
-  const margin = 36;
-  const contentWidth = pageWidth - margin * 2;
+  const sideMargin = 36;
+  const topMargin = 50;
+  const bottomMargin = 36;
+  const contentWidth = pageWidth - sideMargin * 2;
 
   let page = pdfDoc.addPage([pageWidth, pageHeight]);
-  let y = pageHeight - margin;
+  let y = pageHeight - topMargin;
 
   const primaryColor = rgb(0.88, 0.11, 0.28); // Rose 600
   const headerBgColor = rgb(0.96, 0.96, 0.98);
@@ -33,32 +35,36 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
   const borderColor = rgb(0.85, 0.88, 0.92);
 
   // Helper to draw header
-  const drawPageHeader = (pageNum: number, totalPagesPlaceholder = false) => {
-    // Header Bar
+  const drawPageHeader = (pageNum: number) => {
+    // Header Accent Bar: spans height from y to y - 38
+    const barHeight = 40;
     page.drawRectangle({
-      x: margin,
-      y: y - 5,
+      x: sideMargin,
+      y: y - barHeight,
       width: 4,
-      height: 38,
+      height: barHeight,
       color: primaryColor,
     });
 
+    // Brand Title: top line
     page.drawText("BADHON — University of Dhaka", {
-      x: margin + 12,
-      y: y + 20,
+      x: sideMargin + 12,
+      y: y - 12,
       size: 15,
       font: fontBold,
       color: primaryColor,
     });
 
+    // Report Title: middle line
     page.drawText(payload.title, {
-      x: margin + 12,
-      y: y + 6,
+      x: sideMargin + 12,
+      y: y - 26,
       size: 11,
       font: fontBold,
       color: textColor,
     });
 
+    // Subtitle & Metadata: bottom line
     const metaParts = [
       payload.subtitle,
       payload.scope ? `Scope: ${payload.scope}` : null,
@@ -67,18 +73,17 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
     ].filter(Boolean) as string[];
 
     page.drawText(metaParts.join("   |   "), {
-      x: margin + 12,
-      y: y - 6,
+      x: sideMargin + 12,
+      y: y - 38,
       size: 8,
       font: fontRegular,
       color: mutedColor,
     });
 
-    y -= 28;
+    y -= barHeight + 16;
   };
 
   drawPageHeader(1);
-  y -= 15;
 
   // Table column widths calculation
   const colCount = payload.headers.length;
@@ -108,8 +113,8 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
 
   const drawTableHeader = () => {
     page.drawRectangle({
-      x: margin,
-      y: y - headerHeight + 5,
+      x: sideMargin,
+      y: y - headerHeight,
       width: contentWidth,
       height: headerHeight,
       color: headerBgColor,
@@ -117,14 +122,14 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
       borderWidth: 0.5,
     });
 
-    let currentX = margin;
+    let currentX = sideMargin;
     payload.headers.forEach((headerText, i) => {
       const colW = colWidths[i];
       // Clean text to avoid non-ASCII crash in standard font
       const safeText = String(headerText).replace(/[^\x20-\x7E]/g, " ");
       page.drawText(safeText, {
         x: currentX + 6,
-        y: y - 8,
+        y: y - 14,
         size: 8,
         font: fontBold,
         color: textColor,
@@ -140,20 +145,19 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
   // Draw Data Rows
   payload.rows.forEach((row, rowIdx) => {
     // Check if new page needed
-    if (y - rowHeight < margin + 25) {
+    if (y - rowHeight < bottomMargin + 20) {
       // Add page
       page = pdfDoc.addPage([pageWidth, pageHeight]);
-      y = pageHeight - margin;
+      y = pageHeight - topMargin;
       drawPageHeader(pdfDoc.getPageCount());
-      y -= 15;
       drawTableHeader();
     }
 
     // Row background (alternating)
     if (rowIdx % 2 === 1) {
       page.drawRectangle({
-        x: margin,
-        y: y - rowHeight + 5,
+        x: sideMargin,
+        y: y - rowHeight,
         width: contentWidth,
         height: rowHeight,
         color: altRowColor,
@@ -162,13 +166,13 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
 
     // Row bottom border
     page.drawLine({
-      start: { x: margin, y: y - rowHeight + 5 },
-      end: { x: margin + contentWidth, y: y - rowHeight + 5 },
+      start: { x: sideMargin, y: y - rowHeight },
+      end: { x: sideMargin + contentWidth, y: y - rowHeight },
       thickness: 0.5,
       color: borderColor,
     });
 
-    let currentX = margin;
+    let currentX = sideMargin;
     row.forEach((cellVal, colIdx) => {
       const colW = colWidths[colIdx];
       let str = String(cellVal ?? "").replace(/[^\x20-\x7E]/g, " ").trim();
@@ -181,7 +185,7 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
 
       page.drawText(str, {
         x: currentX + 6,
-        y: y - 9,
+        y: y - 13,
         size: 7.5,
         font: fontRegular,
         color: textColor,
@@ -197,15 +201,15 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
   const totalPages = pdfDoc.getPageCount();
   pdfDoc.getPages().forEach((p, idx) => {
     p.drawLine({
-      start: { x: margin, y: margin + 12 },
-      end: { x: margin + contentWidth, y: margin + 12 },
+      start: { x: sideMargin, y: bottomMargin + 12 },
+      end: { x: sideMargin + contentWidth, y: bottomMargin + 12 },
       thickness: 0.5,
       color: borderColor,
     });
 
     p.drawText("Badhon (Voluntary Blood Donors' Organization) — Central Operations Ledger", {
-      x: margin,
-      y: margin + 2,
+      x: sideMargin,
+      y: bottomMargin + 2,
       size: 7,
       font: fontRegular,
       color: mutedColor,
@@ -214,8 +218,8 @@ export async function generateDonationReportPdf(payload: PdfReportPayload): Prom
     const pageStr = `Page ${idx + 1} of ${totalPages}`;
     const pageStrWidth = fontRegular.widthOfTextAtSize(pageStr, 7);
     p.drawText(pageStr, {
-      x: margin + contentWidth - pageStrWidth,
-      y: margin + 2,
+      x: sideMargin + contentWidth - pageStrWidth,
+      y: bottomMargin + 2,
       size: 7,
       font: fontRegular,
       color: mutedColor,
