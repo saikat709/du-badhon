@@ -3,7 +3,7 @@
 import { RequestCard } from "@/components/BloodRequests/RequestCard";
 import { RequestDetailsModal } from "@/components/BloodRequests/RequestDetailsModal";
 import { useBadhon, isDonorEligible, isLockActive } from "@/context/badhon-context";
-import { BloodGroup, BloodRequest } from "@/types/badhon";
+import { BloodGroup, BloodRequest, isRequestVisibleToUnit } from "@/types/badhon";
 import {
   Activity,
   AlertOctagon,
@@ -40,12 +40,16 @@ function DashboardContent() {
   // Default to volunteer's assigned hall unit
   const [viewScope, setViewScope] = useState<"hall" | "campus">("hall");
 
-  // Active requests needing fulfillment
+  // Active requests needing fulfillment (filtered by hall visibility when in hall scope)
   const activeRequests = useMemo(() => {
-    return bloodRequests.filter(
-      (r) => r.status === "active" || r.status === "partially_managed",
-    );
-  }, [bloodRequests]);
+    return bloodRequests.filter((r) => {
+      if (r.status !== "active" && r.status !== "partially_managed") return false;
+      if (viewScope === "hall") {
+        return isRequestVisibleToUnit(r, currentVolunteer.hallUnit);
+      }
+      return true;
+    });
+  }, [bloodRequests, viewScope, currentVolunteer.hallUnit]);
 
   // Donors in user's hall unit vs campus
   const hallDonors = useMemo(() => {

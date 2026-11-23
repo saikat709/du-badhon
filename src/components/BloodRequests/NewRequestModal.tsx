@@ -1,12 +1,14 @@
 "use client";
 
-import { BloodGroup, UrgencyLevel } from "@/types/badhon";
+import { ALL_HALL_UNITS, BloodGroup, HallUnit, UrgencyLevel, getShortHallUnit } from "@/types/badhon";
+import { useBadhon } from "@/context/badhon-context";
 import { sanitizeInputText, validateAndSanitizePhone } from "@/utils/security";
 import {
   AlertCircle,
   AlertTriangle,
   Building2,
   Calendar,
+  Check,
   CheckCircle2,
   Clock,
   Droplet,
@@ -14,11 +16,13 @@ import {
   Minus,
   Phone,
   Plus,
+  Search,
+  Shield,
   Sparkles,
   User,
   X,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 interface NewRequestModalProps {
   isOpen: boolean;
@@ -35,6 +39,7 @@ interface NewRequestModalProps {
     dateNeeded: string;
     reason: string;
     notes?: string;
+    visibleUnits: HallUnit[];
   }) => void;
 }
 
@@ -52,7 +57,30 @@ const COMMON_HOSPITALS = [
 
 const BLOOD_GROUPS: BloodGroup[] = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
+const TARGET_UNITS_CACHE_KEY = "badhon_preferred_target_units";
+
+function getCachedTargetUnits(ownUnit: HallUnit): HallUnit[] {
+  if (typeof window === "undefined") return [ownUnit];
+  try {
+    const raw = localStorage.getItem(TARGET_UNITS_CACHE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const valid = parsed.filter((u) => ALL_HALL_UNITS.includes(u as HallUnit)) as HallUnit[];
+        if (!valid.includes(ownUnit)) {
+          valid.unshift(ownUnit);
+        }
+        return valid;
+      }
+    }
+  } catch {}
+  return [ownUnit];
+}
+
 export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalProps) {
+  const { currentVolunteer } = useBadhon();
+  const ownUnit = currentVolunteer.hallUnit;
+
   const [patientName, setPatientName] = useState("");
   const [hospital, setHospital] = useState(COMMON_HOSPITALS[0]);
   const [customHospital, setCustomHospital] = useState("");
@@ -69,6 +97,12 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
   const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
 
+  const [selectedUnits, setSelectedUnits] = useState<HallUnit[]>(() =>
+    getCachedTargetUnits(ownUnit),
+  );
+  const [unitSearch, setUnitSearch] = useState("");
+  const [isUnitDropdownOpen, setIsUnitDropdownOpen] = useState(false);
+
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -77,6 +111,31 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
+
+  const filteredSuggestions = useMemo(() => {
+    const query = unitSearch.trim().toLowerCase();
+    if (!query) return ALL_HALL_UNITS;
+    return ALL_HALL_UNITS.filter(
+      (h) =>
+        h.toLowerCase().includes(query) ||
+        getShortHallUnit(h).toLowerCase().includes(query),
+    );
+  }, [unitSearch]);
+
+  const toggleUnit = (unit: HallUnit) => {
+    if (unit === ownUnit) return;
+    setSelectedUnits((prev) =>
+      prev.includes(unit) ? prev.filter((u) => u !== unit) : [...prev, unit],
+    );
+  };
+
+  const selectAllUnits = () => {
+    setSelectedUnits([...ALL_HALL_UNITS]);
+  };
+
+  const selectOnlyOwnUnit = () => {
+    setSelectedUnits([ownUnit]);
+  };
 
   if (!isOpen) return null;
 
@@ -100,6 +159,11 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
       return alert(phoneValidation.error || "Please enter a valid contact phone number.");
     }
 
+    const finalVisibleUnits = Array.from(new Set([ownUnit, ...selectedUnits]));
+    try {
+      localStorage.setItem(TARGET_UNITS_CACHE_KEY, JSON.stringify(finalVisibleUnits));
+    } catch {}
+
     onSubmit({
       patientName: cleanPatient,
       hospital: finalHospital,
@@ -112,6 +176,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
       dateNeeded,
       reason: cleanReason,
       notes: cleanNotes,
+      visibleUnits: finalVisibleUnits,
     });
 
     onClose();
@@ -409,6 +474,147 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
                 className="w-full rounded-xl border border-stroke bg-transparent pl-9 pr-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
               />
               <Calendar className="size-4 text-gray-4 absolute left-3 top-2.5" />
+            </div>
+          </div>
+
+          {/* Target Hall Units Visibility */}
+          <div className="p-4 rounded-2xl bg-gray-1/70 dark:bg-dark-3/50 border border-stroke dark:border-dark-3 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <label className="block text-xs font-bold text-dark dark:text-white flex items-center gap-1.5">
+                  <Building2 className="size-4 text-rose-600" />
+                  <span>Target Hall Units (Who Can See This Request)</span>
+                </label>
+                <p className="text-[11px] text-dark-5 dark:text-dark-6">
+                  Only your own unit and the other DU units selected below will be able to view and coordinate this blood request.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1.5 self-start sm:self-auto shrink-0">
+                <button
+                  type="button"
+                  onClick={selectOnlyOwnUnit}
+                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold border border-stroke dark:border-dark-3 bg-white dark:bg-dark-2 text-dark hover:border-rose-300 dark:text-white transition"
+                >
+                  My Unit Only
+                </button>
+                <button
+                  type="button"
+                  onClick={selectAllUnits}
+                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold border border-stroke dark:border-dark-3 bg-white dark:bg-dark-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
+                >
+                  All 16 Units
+                </button>
+              </div>
+            </div>
+
+            {/* Search & Type-ahead Input */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Type to search DU hall units (e.g. Shahidullah, Ekushey, Rokeya)..."
+                value={unitSearch}
+                onChange={(e) => {
+                  setUnitSearch(e.target.value);
+                  setIsUnitDropdownOpen(true);
+                }}
+                onFocus={() => setIsUnitDropdownOpen(true)}
+                className="w-full rounded-xl border border-stroke bg-white dark:bg-dark-2 pl-9 pr-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+              />
+              <Search className="size-3.5 text-gray-4 absolute left-3 top-2.5" />
+            </div>
+
+            {/* Type Suggestions Dropdown */}
+            {isUnitDropdownOpen && (
+              <div className="rounded-xl border border-stroke dark:border-dark-3 bg-white dark:bg-dark-2 shadow-lg max-h-48 overflow-y-auto p-1.5 space-y-1">
+                <div className="flex items-center justify-between px-2 py-1 text-[10px] font-bold text-dark-5 dark:text-dark-6 border-b border-stroke dark:border-dark-3">
+                  <span>Click to toggle unit visibility ({filteredSuggestions.length} found)</span>
+                  <button
+                    type="button"
+                    onClick={() => setIsUnitDropdownOpen(false)}
+                    className="text-rose-600 hover:underline"
+                  >
+                    Done
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 pt-1">
+                  {filteredSuggestions.map((unit) => {
+                    const isSelected = selectedUnits.includes(unit);
+                    const isOwn = unit === ownUnit;
+
+                    return (
+                      <button
+                        type="button"
+                        key={unit}
+                        onClick={() => toggleUnit(unit)}
+                        disabled={isOwn}
+                        className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-left transition ${
+                          isOwn
+                            ? "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 font-bold opacity-90 cursor-default"
+                            : isSelected
+                              ? "bg-rose-600 text-white font-bold"
+                              : "hover:bg-gray-1 dark:hover:bg-dark-3 text-dark dark:text-white"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 truncate">
+                          <span className="truncate">{unit}</span>
+                          {isOwn && (
+                            <span className="text-[9px] px-1 py-0.2 rounded bg-rose-200/80 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200">
+                              Own Unit
+                            </span>
+                          )}
+                        </div>
+                        {isSelected && <Check className="size-3.5 shrink-0 ml-1" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Active Selected Units Chips */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] text-dark-5 dark:text-dark-6">
+                <span>
+                  Currently Selected: <strong className="text-dark dark:text-white">{selectedUnits.length}</strong> of 16 units
+                </span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                  ✓ Preferences cached for future requests
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5">
+                {selectedUnits.map((unit) => {
+                  const isOwn = unit === ownUnit;
+                  return (
+                    <span
+                      key={unit}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition ${
+                        isOwn
+                          ? "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-900"
+                          : "bg-white dark:bg-dark-2 text-dark dark:text-white border-stroke dark:border-dark-3"
+                      }`}
+                    >
+                      <span>{getShortHallUnit(unit)}</span>
+                      {isOwn ? (
+                        <span className="text-[9px] font-semibold text-rose-600 dark:text-rose-400">
+                          (Owner)
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => toggleUnit(unit)}
+                          className="hover:text-rose-600 transition p-0.5 rounded"
+                          title={`Remove ${unit}`}
+                        >
+                          <X className="size-3" />
+                        </button>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

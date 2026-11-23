@@ -16,6 +16,25 @@ export type HallUnit =
   | "Bangladesh-Kuwait Maitree Hall"
   | "Fazilatunnesa Mujib Hall";
 
+export const ALL_HALL_UNITS: HallUnit[] = [
+  "Fazlul Huq Muslim Hall",
+  "Shahidullah Hall",
+  "Amar Ekushey Hall",
+  "Jagannath Hall",
+  "Bangabandhu Sheikh Mujibur Rahman Hall",
+  "Kabi Jasimuddin Hall",
+  "Bijoy Ekattor Hall",
+  "Ziaur Rahman Hall",
+  "Surja Sen Hall",
+  "Haji Muhammad Mohsin Hall",
+  "Salimullah Muslim Hall",
+  "Ruqayyah Hall",
+  "Shamsun Nahar Hall",
+  "Kabi Sufia Kamal Hall",
+  "Bangladesh-Kuwait Maitree Hall",
+  "Fazilatunnesa Mujib Hall",
+];
+
 export type BloodGroup = "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 
 export type CallOutcome =
@@ -93,12 +112,35 @@ export interface BloodRequest {
   createdAt: string;
   createdByVolunteerName: string;
   createdByVolunteerHall?: string;
+  visibleUnits?: HallUnit[];
   managedByVolunteerId?: string;
   managedByVolunteerName?: string;
   managedByVolunteerHall?: string;
   managedAt?: string;
   completedAt?: string;
   cancelledAt?: string;
+}
+
+export function isRequestVisibleToUnit(request: BloodRequest, unit?: string): boolean {
+  if (!unit) return true;
+  // Creator's own unit can ALWAYS see the request
+  if (request.createdByVolunteerHall && request.createdByVolunteerHall === unit) {
+    return true;
+  }
+  // Coordinator/Manager unit can see the request
+  if (request.managedByVolunteerHall && request.managedByVolunteerHall === unit) {
+    return true;
+  }
+  // If assigned bags have donors from this unit
+  if (request.assignedBags?.some((b) => b.donorHall === unit)) {
+    return true;
+  }
+  // If visibleUnits is not specified, default to visible for backwards compatibility
+  if (!request.visibleUnits || request.visibleUnits.length === 0) {
+    return true;
+  }
+  // If explicitly listed in visibleUnits
+  return request.visibleUnits.includes(unit as HallUnit);
 }
 
 export function getShortHallUnit(hall?: string): string {

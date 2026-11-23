@@ -45,6 +45,7 @@ interface BadhonContextType {
     dateNeeded: string;
     reason: string;
     notes?: string;
+    visibleUnits?: HallUnit[];
   }) => BloodRequest;
   assignDonorToBag: (
     requestId: string,
@@ -248,6 +249,7 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
     dateNeeded: string;
     reason: string;
     notes?: string;
+    visibleUnits?: HallUnit[];
   }) => {
     const assignedBags: BagSlot[] = Array.from(
       { length: data.totalBags },
@@ -257,9 +259,17 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
       }),
     );
 
+    // Ensure creator's own unit is always in visibleUnits
+    const finalVisibleUnits = data.visibleUnits && data.visibleUnits.length > 0
+      ? (data.visibleUnits.includes(currentVolunteer.hallUnit)
+          ? data.visibleUnits
+          : [currentVolunteer.hallUnit, ...data.visibleUnits])
+      : [currentVolunteer.hallUnit];
+
     const newRequest: BloodRequest = {
       id: `BR-${100 + bloodRequests.length + 1}`,
       ...data,
+      visibleUnits: finalVisibleUnits,
       managedBags: 0,
       status: "active",
       assignedBags,

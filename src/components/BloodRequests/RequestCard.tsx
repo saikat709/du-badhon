@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Clock,
   Droplet,
+  Eye,
   Search,
   Sparkles,
   User,
@@ -247,6 +248,22 @@ export function RequestCard({
                   )}
                 </div>
               )}
+
+            {request.visibleUnits && request.visibleUnits.length > 0 && (
+              <div className="flex items-center justify-between gap-1 text-[10px] opacity-75 pt-1 border-t border-white/10 dark:border-slate-800">
+                <span className="flex items-center gap-1">
+                  <Eye className="size-2.5 text-rose-400" />
+                  <span>Visible to:</span>
+                </span>
+                <span className="font-semibold truncate max-w-[170px]" title={request.visibleUnits.join(", ")}>
+                  {request.visibleUnits.length === 16
+                    ? "All 16 Units"
+                    : request.visibleUnits.length === 1
+                      ? `${getShortHallUnit(request.visibleUnits[0])} only`
+                      : request.visibleUnits.map(getShortHallUnit).join(", ")}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

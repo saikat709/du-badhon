@@ -4,12 +4,15 @@ import { NewRequestModal } from "@/components/BloodRequests/NewRequestModal";
 import { RequestCard } from "@/components/BloodRequests/RequestCard";
 import { RequestDetailsModal } from "@/components/BloodRequests/RequestDetailsModal";
 import { useBadhon } from "@/context/badhon-context";
-import { BloodGroup, BloodRequest } from "@/types/badhon";
+import { BloodGroup, BloodRequest, isRequestVisibleToUnit } from "@/types/badhon";
 import {
+  Building2,
   Droplet,
+  Eye,
   HeartHandshake,
   Plus,
   Search,
+  ShieldCheck,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect, useMemo, useState } from "react";
@@ -21,6 +24,7 @@ function BloodRequestsContent() {
   const searchParams = useSearchParams();
   const {
     bloodRequests,
+    currentVolunteer,
     addBloodRequest,
     unassignDonorFromBag,
     markRequestCompleted,
@@ -33,6 +37,7 @@ function BloodRequestsContent() {
   const [selectedRequest, setSelectedRequest] = useState<BloodRequest | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [groupFilter, setGroupFilter] = useState<string>("all");
+  const [visibilityScope, setVisibilityScope] = useState<"visible" | "own" | "all">("visible");
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleCloseNewModal = () => {
@@ -45,6 +50,14 @@ function BloodRequestsContent() {
   // Derived filtered requests
   const filteredRequests = useMemo(() => {
     return bloodRequests.filter((req) => {
+      // Unit Visibility Scope:
+      if (visibilityScope === "visible" && !isRequestVisibleToUnit(req, currentVolunteer.hallUnit)) {
+        return false;
+      }
+      if (visibilityScope === "own" && req.createdByVolunteerHall !== currentVolunteer.hallUnit) {
+        return false;
+      }
+
       // Status filter
       if (statusFilter === "active" && req.status !== "active" && req.status !== "partially_managed") {
         return false;
@@ -81,7 +94,19 @@ function BloodRequestsContent() {
 
       return true;
     });
-  }, [bloodRequests, statusFilter, groupFilter, searchQuery]);
+  }, [bloodRequests, visibilityScope, currentVolunteer.hallUnit, statusFilter, groupFilter, searchQuery]);
+
+  // Counts for scope indicators
+  const scopeCounts = useMemo(() => {
+    const visibleCount = bloodRequests.filter((r) =>
+      isRequestVisibleToUnit(r, currentVolunteer.hallUnit),
+    ).length;
+    const ownCount = bloodRequests.filter(
+      (r) => r.createdByVolunteerHall === currentVolunteer.hallUnit,
+    ).length;
+    const totalCount = bloodRequests.length;
+    return { visibleCount, ownCount, totalCount };
+  }, [bloodRequests, currentVolunteer.hallUnit]);
 
   // Stats calculation
   const stats = useMemo(() => {
@@ -162,6 +187,58 @@ function BloodRequestsContent() {
 
       {/* Filter & Search Bar */}
       <div className="bg-white dark:bg-dark-2 p-3.5 sm:p-4 rounded-2xl border border-stroke dark:border-dark-3 space-y-3.5 shadow-xs">
+        {/* Unit Visibility Scope Switcher */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-stroke dark:border-dark-3">
+          <div className="flex items-center gap-2">
+            <span className="flex size-7 items-center justify-center rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-600">
+              <Building2 className="size-3.5" />
+            </span>
+            <div>
+              <span className="text-xs font-bold text-dark dark:text-white block leading-tight">
+                Hall Unit Access Scope
+              </span>
+              <span className="text-[10px] text-dark-5 dark:text-dark-6">
+                Active unit: <strong>{currentVolunteer.hallUnit}</strong>
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-gray-1 dark:bg-dark-3 self-start sm:self-auto">
+            <button
+              onClick={() => setVisibilityScope("visible")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                visibilityScope === "visible"
+                  ? "bg-rose-600 text-white shadow-xs"
+                  : "text-dark-5 dark:text-dark-6 hover:text-dark dark:hover:text-white"
+              }`}
+            >
+              <Eye className="size-3" />
+              <span>Shared With Us ({scopeCounts.visibleCount})</span>
+            </button>
+            <button
+              onClick={() => setVisibilityScope("own")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                visibilityScope === "own"
+                  ? "bg-rose-600 text-white shadow-xs"
+                  : "text-dark-5 dark:text-dark-6 hover:text-dark dark:hover:text-white"
+              }`}
+            >
+              <ShieldCheck className="size-3" />
+              <span>Our Unit Only ({scopeCounts.ownCount})</span>
+            </button>
+            <button
+              onClick={() => setVisibilityScope("all")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                visibilityScope === "all"
+                  ? "bg-rose-600 text-white shadow-xs"
+                  : "text-dark-5 dark:text-dark-6 hover:text-dark dark:hover:text-white"
+              }`}
+            >
+              <span>All Campus ({scopeCounts.totalCount})</span>
+            </button>
+          </div>
+        </div>
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Status Tabs: Wrap naturally on mobile, tabs on desktop */}
           <div className="flex flex-wrap items-center gap-1.5">

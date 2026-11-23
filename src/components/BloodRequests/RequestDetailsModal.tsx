@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Clock,
   Droplet,
+  Eye,
   Phone,
   PhoneCall,
   Search,
@@ -177,6 +178,31 @@ export function RequestDetailsModal({
                 )}
               </div>
             </div>
+
+            {request.visibleUnits && request.visibleUnits.length > 0 && (
+              <div className="p-3 rounded-xl bg-gray-1 dark:bg-dark-3/60 border border-stroke dark:border-dark-3 space-y-1.5 text-xs">
+                <div className="flex items-center justify-between text-dark-5 dark:text-dark-6">
+                  <span className="font-bold text-dark dark:text-white flex items-center gap-1.5">
+                    <Eye className="size-3.5 text-rose-600" />
+                    <span>Target Visibility ({request.visibleUnits.length} of 16 Units):</span>
+                  </span>
+                  <span className="text-[10px] text-dark-5 dark:text-dark-6">
+                    {request.visibleUnits.length === 16 ? "Campus-wide Broadcast" : "Selected Units Only"}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1">
+                  {request.visibleUnits.map((u) => (
+                    <span
+                      key={u}
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-dark-2 border border-stroke dark:border-dark-3 text-dark dark:text-white"
+                    >
+                      {getShortHallUnit(u)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {(request.status === "completed" || request.status === "cancelled") && (
               <div className="flex items-center justify-end px-1 text-xs">
