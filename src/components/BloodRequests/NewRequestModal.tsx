@@ -1,6 +1,7 @@
 "use client";
 
 import { BloodGroup, UrgencyLevel } from "@/types/badhon";
+import { sanitizeInputText, validateAndSanitizePhone } from "@/utils/security";
 import {
   AlertTriangle,
   Building2,
@@ -76,25 +77,36 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!patientName.trim()) return alert("Please enter patient name");
-    if (!contactPhone.trim()) return alert("Please enter contact phone");
-    if (!reason.trim()) return alert("Please enter the reason / condition");
+    const cleanPatient = sanitizeInputText(patientName, 100);
+    const cleanPerson = sanitizeInputText(contactPerson, 100);
+    const cleanReason = sanitizeInputText(reason, 200);
+    const cleanNotes = sanitizeInputText(notes, 500);
+    const finalHospital = sanitizeInputText(
+      hospital === "Other" ? customHospital : hospital,
+      120,
+    );
 
-    const finalHospital = hospital === "Other" ? customHospital.trim() : hospital;
+    if (!cleanPatient) return alert("Please enter patient name");
+    if (!cleanReason) return alert("Please enter the reason / condition");
     if (!finalHospital) return alert("Please select or enter hospital name");
 
+    const phoneValidation = validateAndSanitizePhone(contactPhone);
+    if (!phoneValidation.valid) {
+      return alert(phoneValidation.error || "Please enter a valid contact phone number.");
+    }
+
     onSubmit({
-      patientName: patientName.trim(),
+      patientName: cleanPatient,
       hospital: finalHospital,
-      contactPerson: contactPerson.trim() || patientName.trim(),
-      contactPhone: contactPhone.trim(),
+      contactPerson: cleanPerson || cleanPatient,
+      contactPhone: phoneValidation.sanitized,
       bloodGroup,
       isPlasma,
-      totalBags: Math.max(1, Number(totalBags)),
+      totalBags: Math.min(20, Math.max(1, Number(totalBags) || 1)),
       urgency,
       dateNeeded,
-      reason: reason.trim(),
-      notes: notes.trim(),
+      reason: cleanReason,
+      notes: cleanNotes,
     });
 
     onClose();

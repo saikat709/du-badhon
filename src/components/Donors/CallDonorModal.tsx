@@ -2,6 +2,7 @@
 
 import { useBadhon } from "@/context/badhon-context";
 import { CallOutcome, Donor } from "@/types/badhon";
+import { getSafeTelUri, sanitizeInputText } from "@/utils/security";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -151,7 +152,8 @@ export function CallDonorModal({
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!comment.trim()) {
+    const cleanComment = sanitizeInputText(comment, 500);
+    if (!cleanComment) {
       return alert("Please enter a brief comment describing the call feedback.");
     }
 
@@ -161,7 +163,7 @@ export function CallDonorModal({
     logCallOutcome(
       donor.id,
       outcome,
-      comment.trim(),
+      cleanComment,
       shouldAssign ? selectedRequestId : undefined,
       shouldAssign ? selectedBagNumber : undefined,
     );
@@ -243,7 +245,7 @@ export function CallDonorModal({
             </div>
 
             <a
-              href={`tel:${donor.phone}`}
+              href={getSafeTelUri(donor.phone)}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition active:scale-95"
             >
               <PhoneCall className="size-4" />

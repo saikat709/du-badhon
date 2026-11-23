@@ -1,6 +1,7 @@
 "use client";
 
 import { BloodRequest } from "@/types/badhon";
+import { getSafeTelUri } from "@/utils/security";
 import {
   AlertCircle,
   Building2,
@@ -105,7 +106,7 @@ export function RequestDetailsModal({
                 <span>Attendant Phone</span>
               </span>
               <a
-                href={`tel:${request.contactPhone}`}
+                href={getSafeTelUri(request.contactPhone)}
                 className="font-bold text-rose-600 dark:text-rose-400 text-sm hover:underline block mt-0.5"
               >
                 {request.contactPhone}
@@ -206,7 +207,7 @@ export function RequestDetailsModal({
                             </span>
                           </p>
                           <a
-                            href={`tel:${bag.donorPhone}`}
+                            href={getSafeTelUri(bag.donorPhone || "")}
                             className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-medium hover:underline mt-0.5"
                           >
                             <PhoneCall className="size-3" />

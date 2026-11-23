@@ -20,6 +20,7 @@ import {
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useBadhon } from "@/context/badhon-context";
 import { HallUnit, VolunteerMember } from "@/types/badhon";
+import { getSafeTelUri, getSafeWhatsAppUri } from "@/utils/security";
 
 export default function HallUnitsPage() {
   const { volunteers, currentVolunteer, switchVolunteer } = useBadhon();
@@ -278,7 +279,7 @@ export default function HallUnitsPage() {
                       <div className="pt-4 mt-4 border-t border-slate-200/60 dark:border-slate-800 flex items-center gap-2">
                         {/* 1-Tap Call Button */}
                         <a
-                          href={`tel:${member.phone}`}
+                          href={getSafeTelUri(member.phone)}
                           title={`Call ${member.name} (${member.phone})`}
                           className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition active:scale-95"
                         >
@@ -288,7 +289,7 @@ export default function HallUnitsPage() {
 
                         {/* WhatsApp Message */}
                         <a
-                          href={`https://wa.me/88${member.phone}`}
+                          href={getSafeWhatsAppUri(member.phone)}
                           target="_blank"
                           rel="noopener noreferrer"
                           title="Message on WhatsApp"

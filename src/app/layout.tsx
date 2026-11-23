@@ -38,6 +38,7 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: true,
   },
+  referrer: "strict-origin-when-cross-origin",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [

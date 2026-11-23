@@ -44,8 +44,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
-  // Skip cross-origin or non-GET requests
-  if (request.method !== 'GET' || !request.url.startsWith(self.location.origin)) {
+  // Skip cross-origin, non-GET requests, or large binary downloads
+  if (
+    request.method !== 'GET' ||
+    !request.url.startsWith(self.location.origin) ||
+    request.url.includes('/downloads/') ||
+    request.url.endsWith('.apk')
+  ) {
     return;
   }
 

@@ -8,8 +8,8 @@ import { Checkbox } from "../FormElements/checkbox";
 
 export default function SigninWithPassword() {
   const [data, setData] = useState({
-    number: process.env.NEXT_PUBLIC_DEMO_USER_NUMBER || "",
-    password: process.env.NEXT_PUBLIC_DEMO_USER_PASS || "",
+    number: "",
+    password: "",
     remember: false,
   });
 
@@ -25,7 +25,6 @@ export default function SigninWithPassword() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // You can remove this code block
     setLoading(true);
 
     setTimeout(() => {
@@ -37,10 +36,10 @@ export default function SigninWithPassword() {
     <form onSubmit={handleSubmit}>
       <InputGroup
         type="tel"
-        label="Number"
+        label="Phone Number"
         className="mb-4 [&_input]:py-[15px]"
-        placeholder="Enter your email"
-        name="email"
+        placeholder="Enter your phone number (01XXXXXXXXX)"
+        name="number"
         handleChange={handleChange}
         value={data.number}
         icon={<CallIcon />}

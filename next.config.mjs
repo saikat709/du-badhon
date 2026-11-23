@@ -3,29 +3,44 @@ const isMobileExport = process.env.BUILD_TARGET === "mobile" || process.env.NEXT
 
 const nextConfig = {
   ...(isMobileExport ? { output: "export" } : {}),
+  ...(!isMobileExport ? {
+    async headers() {
+      return [
+        {
+          source: '/:path*',
+          headers: [
+            {
+              key: 'X-DNS-Prefetch-Control',
+              value: 'on',
+            },
+            {
+              key: 'Strict-Transport-Security',
+              value: 'max-age=63072000; includeSubDomains; preload',
+            },
+            {
+              key: 'X-Frame-Options',
+              value: 'SAMEORIGIN',
+            },
+            {
+              key: 'X-Content-Type-Options',
+              value: 'nosniff',
+            },
+            {
+              key: 'Referrer-Policy',
+              value: 'strict-origin-when-cross-origin',
+            },
+            {
+              key: 'Permissions-Policy',
+              value: 'camera=(), microphone=(), geolocation=(), payment=()',
+            },
+          ],
+        },
+      ];
+    },
+  } : {}),
   images: {
     unoptimized: isMobileExport,
     remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: ""
-      },
-      {
-        protocol: "https",
-        hostname: "cdn.sanity.io",
-        port: ""
-      },
-      {
-        protocol: "https",
-        hostname: "avatar.iran.liara.run",
-        port: ""
-      },
-      {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-        port: ""
-      },
       {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
@@ -33,7 +48,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "pub-b7fd9c30cdbf439183b75041f5f71b92.r2.dev",
+        hostname: "lh3.googleusercontent.com",
         port: ""
       }
     ]

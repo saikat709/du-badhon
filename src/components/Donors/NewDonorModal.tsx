@@ -1,6 +1,7 @@
 "use client";
 
 import { BloodGroup, HallUnit } from "@/types/badhon";
+import { sanitizeInputText, validateAndSanitizePhone } from "@/utils/security";
 import {
   Building2,
   Calendar,
@@ -72,20 +73,29 @@ export function NewDonorModal({ isOpen, onClose, onSubmit }: NewDonorModalProps)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return alert("Please enter donor name");
-    if (!phone.trim()) return alert("Please enter donor phone number");
-    if (!department.trim()) return alert("Please enter department");
+    const cleanName = sanitizeInputText(name, 100);
+    const cleanDept = sanitizeInputText(department, 100);
+    const cleanSession = sanitizeInputText(session, 30);
+    const cleanNotes = sanitizeInputText(notes, 500);
+
+    if (!cleanName) return alert("Please enter a valid donor name");
+    if (!cleanDept) return alert("Please enter department");
+
+    const phoneValidation = validateAndSanitizePhone(phone);
+    if (!phoneValidation.valid) {
+      return alert(phoneValidation.error || "Please enter a valid mobile number.");
+    }
 
     onSubmit({
-      name: name.trim(),
-      phone: phone.trim(),
+      name: cleanName,
+      phone: phoneValidation.sanitized,
       bloodGroup,
       hallUnit,
-      department: department.trim(),
-      session: session.trim(),
+      department: cleanDept,
+      session: cleanSession,
       lastDonationDate: lastDonationDate || null,
       isAvailable: true,
-      notes: notes.trim(),
+      notes: cleanNotes,
     });
 
     onClose();
