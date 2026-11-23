@@ -145,10 +145,10 @@ export function Sidebar() {
                         ) : (
                           (() => {
                             const href =
-                              "url" in item
-                                ? item.url + ""
+                              "url" in item && typeof item.url === "string"
+                                ? item.url
                                 : "/" +
-                                  item.title.toLowerCase().split(" ").join("-");
+                                  ((item as { title?: string }).title || "").toLowerCase().split(" ").join("-");
 
                             return (
                               <MenuItem

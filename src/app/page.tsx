@@ -1,128 +1,145 @@
-const Page = async () => {
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
 
-    return (
-    <main className="min-h-screen bg-white dark:bg-dark-2 flex flex-col font-sans relative">
-            {/* Animated Hero Section */}
-            <section className="relative flex flex-col items-center justify-center py-24 bg-gray-1 dark:bg-dark-3 text-dark dark:text-white overflow-hidden">
-                <img src="/images/logo/logo.png" alt="DU Badhon Logo" className="w-24 h-24 mb-4 z-10" />
-                <h1 className="text-heading-2 font-bold mb-2 text-center z-10">DU Badhon</h1>
-                <p className="text-body-2xlg mb-8 text-center max-w-xl text-dark-5 dark:text-dark-6 z-10">
-                    Connecting blood donors and seekers across the community. Donate blood, save lives, or find donors in urgent need.
-                </p>
-                <div className="flex gap-4 z-10">
-                    <a href="/search-blood" className="px-8 py-4 rounded-xl font-bold shadow-card bg-primary text-white text-lg hover:bg-primary/80 transition border-2 border-primary">Search Blood</a>
-                    <a href="/blood-requests" className="px-8 py-4 rounded-xl font-bold shadow-card bg-white text-primary text-lg hover:bg-gray-2 transition border-2 border-primary">Request Blood</a>
-                </div>
-            </section>
+export default function HomePage() {
+  return (
+    <main className="min-h-screen bg-white dark:bg-dark-2 flex flex-col font-sans relative text-dark dark:text-white">
+      {/* Top Navbar */}
+      <header className="w-full border-b border-stroke dark:border-dark-3 bg-white/95 dark:bg-dark-2/95 backdrop-blur-md sticky top-0 z-40 px-6 py-3.5">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src="/images/logo/logo-icon.svg"
+              width={32}
+              height={34}
+              alt="Badhon Logo"
+              priority
+            />
+            <div>
+              <span className="text-xl font-black text-rose-600 tracking-wider block leading-none">
+                BADHON
+              </span>
+              <span className="text-[10px] font-bold text-gray-5 uppercase tracking-widest">
+                DU Blood Donors&apos; Org
+              </span>
+            </div>
+          </Link>
 
-            {/* Info Section with Icons */}
-            <section className="py-16 px-4 max-w-4xl mx-auto text-center bg-white dark:bg-dark-2 rounded-xl shadow-card">
-                <h2 className="text-heading-4 font-bold mb-4 text-primary dark:text-primary">Why DU Badhon?</h2>
-                <p className="text-dark-5 mb-8 dark:text-dark-6">
-                    Our platform makes it easy to find blood donors or request blood in emergencies. Join our growing network and make a difference today.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-                    <div className="bg-white dark:bg-dark-2 rounded-lg shadow-card p-8 flex flex-col items-center">
-                        <span className="mb-3 text-primary text-4xl"><svg width="32" height="32" fill="currentColor"><circle cx="16" cy="16" r="16" fill="#F23030" /><text x="16" y="22" textAnchor="middle" fontSize="18" fill="white">🔍</text></svg></span>
-                        <h3 className="font-semibold text-primary mb-2">Fast Search</h3>
-                        <p className="text-dark-6 dark:text-dark-6">Quickly locate donors by blood group and location.</p>
-                    </div>
-                    <div className="bg-white dark:bg-dark-2 rounded-lg shadow-card p-8 flex flex-col items-center">
-                        <span className="mb-3 text-primary text-4xl"><svg width="32" height="32" fill="currentColor"><circle cx="16" cy="16" r="16" fill="#5750F1" /><text x="16" y="22" textAnchor="middle" fontSize="18" fill="white">🔒</text></svg></span>
-                        <h3 className="font-semibold text-primary mb-2">Secure & Private</h3>
-                        <p className="text-dark-6 dark:text-dark-6">Your information is protected and only shared when needed.</p>
-                    </div>
-                    <div className="bg-white dark:bg-dark-2 rounded-lg shadow-card p-8 flex flex-col items-center">
-                        <span className="mb-3 text-primary text-4xl"><svg width="32" height="32" fill="currentColor"><circle cx="16" cy="16" r="16" fill="#22AD5C" /><text x="16" y="22" textAnchor="middle" fontSize="18" fill="white">🤝</text></svg></span>
-                        <h3 className="font-semibold text-primary mb-2">Community Driven</h3>
-                        <p className="text-dark-6 dark:text-dark-6">Join a trusted network of donors and volunteers.</p>
-                    </div>
-                </div>
-            </section>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/search-blood"
+              className="text-xs font-bold text-dark dark:text-white hover:text-rose-600 dark:hover:text-rose-400 transition hidden sm:inline-block"
+            >
+              Search Blood
+            </Link>
+            <Link
+              href="/blood-requests"
+              className="text-xs font-bold text-dark dark:text-white hover:text-rose-600 dark:hover:text-rose-400 transition hidden sm:inline-block"
+            >
+              Blood Requests
+            </Link>
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition active:scale-95"
+            >
+              Go to Dashboard &rarr;
+            </Link>
+          </div>
+        </div>
+      </header>
 
-            {/* Steps Section with Icons */}
-            <section className="py-12 px-4 bg-gray-1 dark:bg-dark-3 rounded-xl shadow-card mx-4">
-                <h2 className="text-heading-5 font-bold text-center text-primary mb-8 dark:text-primary">How It Works</h2>
-                <div className="flex flex-col md:flex-row justify-center gap-8 mt-8">
-                    <div className="flex-1 bg-white dark:bg-dark-2 rounded-lg shadow-card p-8 flex flex-col items-center">
-                        <span className="mb-3 text-primary text-4xl"><svg width="32" height="32" fill="currentColor"><circle cx="16" cy="16" r="16" fill="#5750F1" /><text x="16" y="22" textAnchor="middle" fontSize="18" fill="white">📝</text></svg></span>
-                        <h4 className="font-semibold mt-2 mb-1">Sign Up</h4>
-                        <p className="text-dark-6 dark:text-dark-6">Create your account as a donor or seeker.</p>
-                    </div>
-                    <div className="flex-1 bg-white dark:bg-dark-2 rounded-lg shadow-card p-8 flex flex-col items-center">
-                        <span className="mb-3 text-primary text-4xl"><svg width="32" height="32" fill="currentColor"><circle cx="16" cy="16" r="16" fill="#F23030" /><text x="16" y="22" textAnchor="middle" fontSize="18" fill="white">🔎</text></svg></span>
-                        <h4 className="font-semibold mt-2 mb-1">Search or Request</h4>
-                        <p className="text-dark-6 dark:text-dark-6">Find donors or post a blood request easily.</p>
-                    </div>
-                    <div className="flex-1 bg-white dark:bg-dark-2 rounded-lg shadow-card p-8 flex flex-col items-center">
-                        <span className="mb-3 text-primary text-4xl"><svg width="32" height="32" fill="currentColor"><circle cx="16" cy="16" r="16" fill="#22AD5C" /><text x="16" y="22" textAnchor="middle" fontSize="18" fill="white">❤️</text></svg></span>
-                        <h4 className="font-semibold mt-2 mb-1">Connect & Donate</h4>
-                        <p className="text-dark-6 dark:text-dark-6">Reach out, coordinate, and save lives together.</p>
-                    </div>
-                </div>
-            </section>
+      {/* Hero Section */}
+      <section className="relative flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-b from-rose-50/60 via-white to-gray-1 dark:from-dark-3 dark:via-dark-2 dark:to-dark-2 overflow-hidden text-center">
+        <div className="max-w-3xl mx-auto space-y-6 relative z-10">
+          <div className="inline-flex items-center gap-2 rounded-full bg-rose-100 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-900 px-3.5 py-1 text-xs font-bold text-rose-700 dark:text-rose-300">
+            <span className="size-2 rounded-full bg-rose-600 animate-ping" />
+            <span>Dhaka University Central Management Platform</span>
+          </div>
 
-            {/* Testimonial Carousel */}
-            <section className="py-12 px-4 max-w-3xl mx-auto bg-white dark:bg-dark-2 rounded-xl shadow-card">
-                <h2 className="text-heading-5 font-bold text-primary mb-6 text-center dark:text-primary">What People Say</h2>
-                <div className="relative">
-                    <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
-                        <div className="bg-white dark:bg-dark-2 rounded-lg shadow-card p-6 flex-1">
-                            <p className="italic text-dark-6 dark:text-dark-6 mb-2">“I found a donor within minutes. DU Badhon truly saves lives!”</p>
-                            <div className="flex items-center gap-2">
-                                <img src="/images/user/user1.png" alt="User" className="w-8 h-8 rounded-full" />
-                                <span className="font-semibold text-primary">Ayesha, Dhaka</span>
-                            </div>
-                        </div>
-                        <div className="bg-white dark:bg-dark-2 rounded-lg shadow-card p-6 flex-1">
-                            <p className="italic text-dark-6 dark:text-dark-6 mb-2">“The platform is easy, secure, and community-driven.”</p>
-                            <div className="flex items-center gap-2">
-                                <img src="/images/user/user2.png" alt="User" className="w-8 h-8 rounded-full" />
-                                <span className="font-semibold text-primary">Rahim, Chattogram</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+            Eka Noy, Sobai Mile <br />
+            <span className="text-rose-600">Rokto Diye Bachai Pran</span>
+          </h1>
 
-            {/* Recent Requests Section */}
-            <section className="py-12 px-4 max-w-4xl mx-auto bg-white dark:bg-dark-2 rounded-xl shadow-card">
-                <h2 className="text-heading-5 font-bold text-primary mb-6 text-center dark:text-primary">Recent Blood Requests</h2>
-                {/* Example static requests, replace with dynamic data if available */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                    <div className="bg-white dark:bg-dark-2 rounded-lg shadow-card p-4">
-                        <h4 className="font-semibold text-primary">A+ Needed</h4>
-                        <p className="text-dark-5 dark:text-dark-6">Location: Dhaka Medical College</p>
-                        <p className="text-dark-6 text-sm dark:text-dark-6">Urgent • Posted 2 hours ago</p>
-                    </div>
-                    <div className="bg-white dark:bg-dark-2 rounded-lg shadow-card p-4">
-                        <h4 className="font-semibold text-primary">O- Needed</h4>
-                        <p className="text-dark-5 dark:text-dark-6">Location: BSMMU Hospital</p>
-                        <p className="text-dark-6 text-sm dark:text-dark-6">Urgent • Posted 1 hour ago</p>
-                    </div>
-                </div>
-                <div className="text-center mt-6">
-                    <a href="/blood-requests" className="text-primary underline font-semibold dark:text-primary">View All Requests</a>
-                </div>
-            </section>
+          <p className="text-sm sm:text-base text-dark-5 dark:text-dark-6 max-w-xl mx-auto leading-relaxed">
+            Connecting voluntary blood donors and seekers across 16 Dhaka University halls.
+            Track emergency requests, coordinate volunteer calls without conflicts, and save lives.
+          </p>
 
-            {/* Footer */}
-            <footer className="mt-auto py-6 bg-gray-1 dark:bg-dark-3 text-dark-5 dark:text-dark-6 text-center border-t border-gray-3 dark:border-dark-3">
-                <p className="mb-2">&copy; {new Date().getFullYear()} DU Badhon. All rights reserved.</p>
-                <div className="flex justify-center gap-4">
-                    <a href="mailto:contact@dubadhon.com" className="underline text-primary dark:text-primary">Contact</a>
-                    <a href="https://facebook.com/dubadhon" target="_blank" rel="noopener" className="underline text-primary dark:text-primary">Facebook</a>
-                </div>
-            </footer>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <Link
+              href="/search-blood"
+              className="px-7 py-3.5 rounded-xl font-bold bg-rose-600 hover:bg-rose-700 text-white text-sm shadow-md transition active:scale-95 flex items-center gap-2"
+            >
+              <span>🔍 Search Donors</span>
+            </Link>
 
-            {/* Floating Help Button */}
-            <a href="mailto:contact@dubadhon.com" className="fixed bottom-8 right-8 z-50 bg-primary text-white px-5 py-3 rounded-full shadow-lg font-semibold hover:bg-primary/80 transition flex items-center gap-2">
-                <svg width="20" height="20" fill="currentColor" className="inline-block"><circle cx="10" cy="10" r="10" fill="#5750F1" /><text x="10" y="15" textAnchor="middle" fontSize="14" fill="#fff">?</text></svg>
-                Need Help?
-            </a>
-        </main>
-    );
+            <Link
+              href="/blood-requests?new=true"
+              className="px-7 py-3.5 rounded-xl font-bold bg-white dark:bg-dark-3 hover:bg-gray-2 dark:hover:bg-dark-4 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-900 text-sm shadow-xs transition active:scale-95 flex items-center gap-2"
+            >
+              <span>+ Record Blood Request</span>
+            </Link>
 
+            <Link
+              href="/dashboard"
+              className="px-6 py-3.5 rounded-xl font-bold bg-blue-700 hover:bg-blue-800 text-white text-sm shadow-md transition active:scale-95"
+            >
+              Operations Center &rarr;
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Highlights Grid */}
+      <section className="py-16 px-4 max-w-5xl mx-auto w-full">
+        <h2 className="text-2xl font-black text-center mb-2">
+          Why Badhon Platform?
+        </h2>
+        <p className="text-xs text-dark-5 dark:text-dark-6 text-center max-w-md mx-auto mb-10">
+          Built specifically for Badhon club members and hall unit coordinators.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white dark:bg-dark-3 rounded-2xl p-6 border border-stroke dark:border-dark-4 shadow-xs space-y-2.5">
+            <span className="size-12 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center text-xl font-bold">
+              🔒
+            </span>
+            <h3 className="font-bold text-base">Member Call Conflict Prevention</h3>
+            <p className="text-xs text-dark-5 dark:text-dark-6 leading-relaxed">
+              When one member calls a donor, other members see &ldquo;Saikat is calling this donor&rdquo;.
+              Prevents bothering donors with multiple simultaneous calls.
+            </p>
+          </div>
+
+          <div className="bg-white dark:bg-dark-3 rounded-2xl p-6 border border-stroke dark:border-dark-4 shadow-xs space-y-2.5">
+            <span className="size-12 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xl font-bold">
+              🩸
+            </span>
+            <h3 className="font-bold text-base">Multi-Bag & Plasma Fulfillment</h3>
+            <p className="text-xs text-dark-5 dark:text-dark-6 leading-relaxed">
+              Track requests requiring 1 to 5+ bags. Assign donors to individual bag slots and track whole blood or plasma requirements.
+            </p>
+          </div>
+
+          <div className="bg-white dark:bg-dark-3 rounded-2xl p-6 border border-stroke dark:border-dark-4 shadow-xs space-y-2.5">
+            <span className="size-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xl font-bold">
+              🏛️
+            </span>
+            <h3 className="font-bold text-base">16 DU Hall Units Connected</h3>
+            <p className="text-xs text-dark-5 dark:text-dark-6 leading-relaxed">
+              Fazlul Huq, Shahidullah, Amar Ekushey, Jagannath, Sufia Kamal and all residential halls indexed by session, batch, and blood group.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="mt-auto border-t border-stroke dark:border-dark-3 py-6 px-4 text-center text-xs text-dark-5 dark:text-dark-6">
+        <p>© 2026 Badhon (Voluntary Blood Donors&apos; Organization) - Dhaka University.</p>
+        <p className="mt-1">Dedicated to humanity, voluntary blood donation, and life saving.</p>
+      </footer>
+    </main>
+  );
 }
-
-export default Page;

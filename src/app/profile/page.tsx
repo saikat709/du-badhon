@@ -1,155 +1,168 @@
 "use client";
 
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import Image from "next/image";
+import { useBadhon } from "@/context/badhon-context";
 import Link from "next/link";
+import React, { useMemo } from "react";
 
-import { useState } from "react";
-import { CameraIcon } from "./_components/icons";
-import { SocialAccounts } from "./_components/social-accounts";
+export default function ProfilePage() {
+  const { currentVolunteer, volunteers, switchVolunteer, bloodRequests, donors } =
+    useBadhon();
 
-export default function Page() {
-  const [data, setData] = useState({
-    name: "Danish Heilium",
-    profilePhoto: "/images/user/user-03.png",
-    coverPhoto: "/images/cover/cover-01.png",
-  });
+  // Requests created by this volunteer
+  const coordinatedRequests = useMemo(() => {
+    return bloodRequests.filter((r) => r.createdByVolunteerName === currentVolunteer.name);
+  }, [bloodRequests, currentVolunteer]);
 
-  const handleChange = (e: any) => {
-    if (e.target.name === "profilePhoto" ) {
-      const file = e.target?.files[0];
+  // Calls logged by this volunteer
+  const myCallLogs = useMemo(() => {
+    const logs: Array<{
+      id: string;
+      donorName: string;
+      donorPhone: string;
+      bloodGroup: string;
+      outcome: string;
+      comment: string;
+      timestamp: string;
+    }> = [];
 
-      setData({
-        ...data,
-        profilePhoto: file && URL.createObjectURL(file),
+    donors.forEach((donor) => {
+      donor.callHistory.forEach((c) => {
+        if (c.volunteerId === currentVolunteer.id) {
+          logs.push({
+            id: c.id,
+            donorName: donor.name,
+            donorPhone: donor.phone,
+            bloodGroup: donor.bloodGroup,
+            outcome: c.outcome,
+            comment: c.comment,
+            timestamp: c.timestamp,
+          });
+        }
       });
-    } else if (e.target.name === "coverPhoto") {
-      const file = e.target?.files[0];
+    });
 
-      setData({
-        ...data,
-        coverPhoto: file && URL.createObjectURL(file),
-      });
-    } else {
-      setData({
-        ...data,
-        [e.target.name]: e.target.value,
-      });
-    }
-  };
+    return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [donors, currentVolunteer]);
 
   return (
-    <div className="mx-auto w-full max-w-[970px]">
-      <Breadcrumb pageName="Profile" />
+    <div className="mx-auto w-full max-w-4xl space-y-6">
+      <Breadcrumb pageName="Volunteer Profile" />
 
-      <div className="overflow-hidden rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
-        <div className="relative z-20 h-35 md:h-65">
-          <Image
-            src={data?.coverPhoto}
-            alt="profile cover"
-            className="h-full w-full rounded-tl-[10px] rounded-tr-[10px] object-cover object-center"
-            width={970}
-            height={260}
-            style={{
-              width: "auto",
-              height: "auto",
-            }}
-          />
-          <div className="absolute bottom-1 right-1 z-10 xsm:bottom-4 xsm:right-4">
-            <label
-              htmlFor="cover"
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-[15px] py-[5px] text-body-sm font-medium text-white hover:bg-opacity-90"
-            >
-              <input
-                type="file"
-                name="coverPhoto"
-                id="coverPhoto"
-                className="sr-only"
-                onChange={handleChange}
-                accept="image/png, image/jpg, image/jpeg"
-              />
-
-              <CameraIcon />
-
-              <span>Edit</span>
-            </label>
-          </div>
+      {/* Profile Card */}
+      <div className="overflow-hidden rounded-2xl bg-white dark:bg-dark-2 shadow-xs border border-stroke dark:border-dark-3">
+        {/* Cover / Header Banner */}
+        <div className="h-36 bg-gradient-to-r from-rose-700 via-rose-800 to-red-950 p-6 flex items-end justify-between text-white">
+          <span className="text-xs font-bold uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full backdrop-blur-xs">
+            Badhon Active Executive Member
+          </span>
         </div>
-        <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
-          <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-[176px] sm:p-3">
-            <div className="relative drop-shadow-2">
-              {data?.profilePhoto && (
-                <>
-                  <Link href={data?.profilePhoto}>
-                    <Image
-                      src={data?.profilePhoto}
-                      width={160}
-                      height={160}
-                      className="overflow-hidden rounded-full"
-                      alt="profile"
-                    />
-                  </Link>
 
-                  <label
-                    htmlFor="profilePhoto"
-                    className="absolute bottom-0 right-0 flex size-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
-                  >
-                    <CameraIcon />
+        <div className="px-6 pb-6 pt-0 relative">
+          {/* Avatar */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between -mt-12 mb-4 gap-4">
+            <div className="flex items-end gap-4">
+              <div
+                className="size-24 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg ring-4 ring-white dark:ring-dark-2"
+                style={{ backgroundColor: currentVolunteer.avatarBg }}
+              >
+                {currentVolunteer.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .slice(0, 2)
+                  .join("")}
+              </div>
+              <div className="space-y-0.5">
+                <h2 className="text-2xl font-black text-dark dark:text-white">
+                  {currentVolunteer.name}
+                </h2>
+                <p className="text-xs text-rose-600 dark:text-rose-400 font-bold">
+                  {currentVolunteer.role} • {currentVolunteer.hallUnit}
+                </p>
+                <p className="text-xs text-dark-5 dark:text-dark-6">
+                  Student ID: {currentVolunteer.studentId} • Phone: {currentVolunteer.phone}
+                </p>
+              </div>
+            </div>
 
-                    <input
-                      type="file"
-                      name="profilePhoto"
-                      id="profilePhoto"
-                      className="sr-only"
-                      onChange={handleChange}
-                      accept="image/png, image/jpg, image/jpeg"
-                    />
-                  </label>
-                </>
-              )}
+            {/* Volunteer Switcher */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-dark-5 dark:text-dark-6 font-semibold">
+                Switch Role:
+              </span>
+              <select
+                value={currentVolunteer.id}
+                onChange={(e) => switchVolunteer(e.target.value)}
+                className="rounded-xl border border-stroke dark:border-dark-3 bg-gray-1 dark:bg-dark-3 px-3 py-1.5 text-xs font-bold text-dark dark:text-white outline-none focus:border-rose-600"
+              >
+                {volunteers.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name} ({v.hallUnit.split(" ")[0]})
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
-          <div className="mt-4">
-            <h3 className="mb-1 text-heading-6 font-bold text-dark dark:text-white">
-              {data?.name}
-            </h3>
-            <p className="font-medium"> You are a brave warrior to us... </p>
-            <div className="mx-auto mb-5.5 mt-5 grid max-w-[370px] grid-cols-2 rounded-[5px] border border-stroke py-[9px] shadow-1 dark:border-dark-3 dark:bg-dark-2 dark:shadow-card">
-              <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-dark-3 xsm:flex-row">
-                <span className="font-medium text-dark dark:text-white">
-                  12
-                </span>
-                <span className="text-body-sm">Intrests</span>
-              </div>
-              <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-dark-3 xsm:flex-row">
-                <span className="font-medium text-dark dark:text-white">
-                  12
-                </span>
-                <span className="text-body-sm">Donations</span>
-              </div>
-              {/* <div className="flex flex-col items-center justify-center gap-1 px-4 xsm:flex-row">
-                <span className="font-medium text-dark dark:text-white">
-                  2K
-                </span>
-                <span className="text-body-sm-sm"></span>
-              </div> */}
-            </div>
 
-            <div className="mx-auto max-w-[720px]">
-              <h4 className="font-medium text-dark dark:text-white">
-                About Me
-              </h4>
-              <p className="mt-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Pellentesque posuere fermentum urna, eu condimentum mauris
-                tempus ut. Donec fermentum blandit aliquet. Etiam dictum dapibus
-                ultricies. Sed vel aliquet libero. Nunc a augue fermentum,
-                pharetra ligula sed, aliquam lacus.
+          {/* Stats Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-stroke dark:border-dark-3">
+            <div className="p-3 rounded-xl bg-gray-1 dark:bg-dark-3 text-center">
+              <p className="text-xs text-dark-5 dark:text-dark-6">Coordinated Requests</p>
+              <p className="text-xl font-black text-rose-600 dark:text-rose-400 mt-0.5">
+                {coordinatedRequests.length}
               </p>
             </div>
 
+            <div className="p-3 rounded-xl bg-gray-1 dark:bg-dark-3 text-center">
+              <p className="text-xs text-dark-5 dark:text-dark-6">Calls & Inquiries Logged</p>
+              <p className="text-xl font-black text-blue-600 dark:text-blue-400 mt-0.5">
+                {myCallLogs.length}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-gray-1 dark:bg-dark-3 text-center col-span-2 sm:col-span-1">
+              <p className="text-xs text-dark-5 dark:text-dark-6">Assigned Unit</p>
+              <p className="text-sm font-bold text-dark dark:text-white mt-1 truncate">
+                {currentVolunteer.hallUnit.split(" ")[0]} Hall
+              </p>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Recent Calls by this Volunteer */}
+      <div className="rounded-2xl bg-white dark:bg-dark-2 p-6 border border-stroke dark:border-dark-3 shadow-xs space-y-4">
+        <h3 className="text-base font-bold text-dark dark:text-white">
+          My Call History & Donor Feedback ({myCallLogs.length})
+        </h3>
+
+        {myCallLogs.length > 0 ? (
+          <div className="space-y-2.5">
+            {myCallLogs.map((c) => (
+              <div
+                key={c.id}
+                className="p-3.5 rounded-xl bg-gray-1 dark:bg-dark-3 border border-stroke dark:border-dark-4 text-xs space-y-1"
+              >
+                <div className="flex justify-between items-center text-dark-5 dark:text-dark-6 text-[11px]">
+                  <span className="font-bold text-dark dark:text-white">
+                    {c.donorName} ({c.bloodGroup}) • {c.donorPhone}
+                  </span>
+                  <span>{new Date(c.timestamp).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-rose-600 dark:text-rose-400 uppercase text-[10px] bg-rose-50 dark:bg-rose-950 px-2 py-0.5 rounded-md">
+                    {c.outcome}
+                  </span>
+                  <p className="text-dark dark:text-white font-medium">{c.comment}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-dark-5 dark:text-dark-6 italic">
+            You have not logged any donor calls yet. Go to <Link href="/search-blood" className="text-rose-600 font-bold hover:underline">Search Blood</Link> to call donors.
+          </p>
+        )}
       </div>
     </div>
   );

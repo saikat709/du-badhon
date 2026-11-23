@@ -1,42 +1,28 @@
-'use client'
+"use client";
 
-import { Select } from '@/components/FormElements/select';
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
 
-function SearchBloodContent() {
-    const searchParams = useSearchParams();
-    const id = searchParams.get('id');
+function RedirectContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-    return (
-        <div>
-            <p className="title font-sans font-bold text-xl md:text-2xl">Searching for blood</p>
-            <hr/>
-            <form className='grid grid-cols-1 md:grid-cols-2 md:gap-6'>
-                <Select
-                    placeholder='Select'
-                    items={[
-                        {value:"A+", label:"a+"},
-                        {value:"B+", label:"b+"}
-                        ]}
-                    label='Blood Group'
-                    defaultValue='None'
-                    disabled={id != null}
-                    className='flex justify-between items-center'
-                />
-                <p className='flex justify-between items-center text-dark dark:text-white'>
-                   <span> Unit</span>
-                   <span className='font-bold'> FH HALL UNIT </span>
-                </p>
-            </form>
-        </div>
-    );
+  useEffect(() => {
+    const qs = searchParams.toString();
+    router.replace(`/search-blood${qs ? `?${qs}` : ""}`);
+  }, [router, searchParams]);
+
+  return (
+    <div className="flex h-64 items-center justify-center">
+      <p className="text-sm text-dark-5">Redirecting to Search Blood...</p>
+    </div>
+  );
 }
 
-export default function SearchBlood() {
-    return (
-        <Suspense>
-            <SearchBloodContent />
-        </Suspense>
-    );
+export default function SearchBloodLegacyRedirect() {
+  return (
+    <Suspense>
+      <RedirectContent />
+    </Suspense>
+  );
 }
