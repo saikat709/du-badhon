@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useSidebarContext } from "../sidebar/sidebar-context";
 import { ThemeToggleSwitch } from "./theme-toggle";
 import { UserInfo } from "./user-info";
-import { HeaderInstallButton } from "@/components/PWA/PWAInstaller";
+import { SmartAppButton } from "@/components/PWA/PWAInstaller";
 import { useBadhon } from "@/context/badhon-context";
 
 export function Header() {
@@ -53,16 +53,7 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-2.5 sm:gap-3">
-        <Link
-          href="/download-app"
-          title="Download DU Badhon Android App (APK & PWA)"
-          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-xs font-bold border border-rose-200 dark:border-rose-900/50 transition active:scale-95 shadow-2xs"
-        >
-          <Smartphone className="size-3.5" />
-          <span className="hidden xs:inline">Get App</span>
-        </Link>
-
-        <HeaderInstallButton />
+        <SmartAppButton />
 
         <Link
           href="/blood-requests?new=true"
