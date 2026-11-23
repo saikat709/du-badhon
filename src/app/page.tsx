@@ -4,7 +4,6 @@ import { SmartAppButton } from "@/components/PWA/PWAInstaller";
 import { ThemeToggleSwitch } from "@/components/Layouts/header/theme-toggle";
 import { useBadhon, isDonorEligible } from "@/context/badhon-context";
 import { BloodGroup, HallUnit } from "@/types/badhon";
-import { getSafeTelUri } from "@/utils/security";
 import {
   AlertCircle,
   ArrowRight,
@@ -649,13 +648,13 @@ export default function HomePage() {
                       </div>
 
                       {leadVol ? (
-                        <a
-                          href={getSafeTelUri(leadVol.phone)}
-                          className="size-8 rounded-xl bg-white dark:bg-dark-2 border border-stroke dark:border-dark-4 flex items-center justify-center text-rose-600 hover:bg-rose-600 hover:text-white transition shrink-0"
-                          title={`Call ${leadVol.name}`}
+                        <Link
+                          href={`/hall-units?unit=${encodeURIComponent(hallName)}`}
+                          className="size-8 rounded-xl bg-white dark:bg-dark-2 border border-stroke dark:border-dark-4 flex items-center justify-center text-dark-5 hover:text-rose-600 transition shrink-0"
+                          title={`View ${hallName} Unit Coordinator`}
                         >
-                          <Phone className="size-3.5" />
-                        </a>
+                          <ChevronRight className="size-4" />
+                        </Link>
                       ) : (
                         <Link
                           href="/hall-units"
@@ -815,7 +814,7 @@ export default function HomePage() {
                 University of Dhaka, Dhaka-1000.
               </p>
               <p className="text-xs pt-1">
-                Emergency Hotline: <strong>01729-000001</strong>
+                Volunteer Help Desk: <strong>Available via Portal</strong>
               </p>
             </div>
 
