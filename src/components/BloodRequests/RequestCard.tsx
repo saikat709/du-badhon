@@ -1,6 +1,6 @@
 "use client";
 
-import { BloodRequest } from "@/types/badhon";
+import { BloodRequest, getShortHallUnit } from "@/types/badhon";
 import {
   AlertCircle,
   Building2,
@@ -204,14 +204,50 @@ export function RequestCard({
             </span>
           </div>
 
-          {(request.managedByVolunteerName || request.createdByVolunteerName) && (
-            <div className="text-[10px] text-rose-200/90 flex items-center justify-between pt-0.5">
-              <span>Managed by: <strong>{request.managedByVolunteerName || request.createdByVolunteerName}</strong></span>
-              {request.managedByVolunteerHall && (
-                <span className="text-[9px] opacity-75">{request.managedByVolunteerHall.split(" ")[0]}</span>
-              )}
+          {/* Creator & Hall Unit Info */}
+          <div
+            className={`pt-2 border-t text-[11px] space-y-1 ${
+              isCompleted || isCancelled
+                ? "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+                : "border-white/10 text-slate-300"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-1.5">
+              <span className="inline-flex items-center gap-1 min-w-0">
+                <User className="size-3 text-rose-400 shrink-0" />
+                <span className="text-[11px]">Created by:</span>
+                <strong
+                  className={`truncate ${
+                    isCompleted || isCancelled
+                      ? "text-slate-800 dark:text-slate-200"
+                      : "text-white"
+                  }`}
+                >
+                  {request.createdByVolunteerName}
+                </strong>
+              </span>
+
+              <span
+                className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
+                  isCompleted || isCancelled
+                    ? "bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-200 dark:border-rose-900"
+                    : "bg-rose-500/25 text-rose-200 border border-rose-400/30"
+                }`}
+              >
+                {getShortHallUnit(request.createdByVolunteerHall || "DU Central")}
+              </span>
             </div>
-          )}
+
+            {request.managedByVolunteerName &&
+              request.managedByVolunteerName !== request.createdByVolunteerName && (
+                <div className="flex items-center justify-between gap-1 text-[10px] opacity-75">
+                  <span>Managed by: {request.managedByVolunteerName}</span>
+                  {request.managedByVolunteerHall && (
+                    <span>({getShortHallUnit(request.managedByVolunteerHall)})</span>
+                  )}
+                </div>
+              )}
+          </div>
         </div>
       </div>
 
@@ -256,8 +292,8 @@ export function RequestCard({
                 <span>Mark Donation Done</span>
               </button>
             ) : (
-              <span className="italic">
-                Coord: {request.createdByVolunteerName}
+              <span className="italic truncate max-w-[200px]">
+                {request.createdByVolunteerName} ({getShortHallUnit(request.createdByVolunteerHall || "DU Central")})
               </span>
             )}
 

@@ -3,13 +3,17 @@
 import { BloodGroup, UrgencyLevel } from "@/types/badhon";
 import { sanitizeInputText, validateAndSanitizePhone } from "@/utils/security";
 import {
+  AlertCircle,
   AlertTriangle,
   Building2,
   Calendar,
+  CheckCircle2,
   Clock,
   Droplet,
   FileText,
+  Minus,
   Phone,
+  Plus,
   Sparkles,
   User,
   X,
@@ -57,7 +61,8 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
   const [bloodGroup, setBloodGroup] = useState<BloodGroup>("A+");
   const [isPlasma, setIsPlasma] = useState(false);
   const [totalBags, setTotalBags] = useState(1);
-  const [urgency, setUrgency] = useState<UrgencyLevel>("Emergency (Immediate)");
+  const [isEmergency, setIsEmergency] = useState(false);
+  const [urgency, setUrgency] = useState<UrgencyLevel>("Scheduled");
   const [dateNeeded, setDateNeeded] = useState(
     new Date().toISOString().split("T")[0],
   );
@@ -103,7 +108,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
       bloodGroup,
       isPlasma,
       totalBags: Math.min(20, Math.max(1, Number(totalBags) || 1)),
-      urgency,
+      urgency: isEmergency ? urgency : "Scheduled",
       dateNeeded,
       reason: cleanReason,
       notes: cleanNotes,
@@ -216,14 +221,29 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
                 <label className="block text-xs font-bold text-dark dark:text-white mb-1">
                   Bags Needed <span className="text-rose-500">*</span>
                 </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="10"
-                  value={totalBags}
-                  onChange={(e) => setTotalBags(parseInt(e.target.value) || 1)}
-                  className="w-full rounded-xl border border-stroke bg-transparent px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
-                />
+                <div className="flex items-center rounded-xl border border-stroke dark:border-dark-3 bg-white dark:bg-dark-2 overflow-hidden shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setTotalBags((prev) => Math.max(1, prev - 1))}
+                    disabled={totalBags <= 1}
+                    aria-label="Decrease bags"
+                    className="px-3.5 py-2 text-dark dark:text-white hover:bg-gray-2 dark:hover:bg-dark-3 disabled:opacity-30 disabled:hover:bg-transparent font-bold transition flex items-center justify-center"
+                  >
+                    <Minus className="size-3.5" />
+                  </button>
+                  <div className="flex-1 text-center font-black text-xs text-dark dark:text-white select-none py-2 bg-gray-1/40 dark:bg-dark-3/40 border-x border-stroke dark:border-dark-3">
+                    {totalBags} {totalBags === 1 ? "Bag" : "Bags"}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setTotalBags((prev) => Math.min(20, prev + 1))}
+                    disabled={totalBags >= 20}
+                    aria-label="Increase bags"
+                    className="px-3.5 py-2 text-dark dark:text-white hover:bg-gray-2 dark:hover:bg-dark-3 disabled:opacity-30 disabled:hover:bg-transparent font-bold transition flex items-center justify-center"
+                  >
+                    <Plus className="size-3.5" />
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -287,32 +307,108 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-dark dark:text-white mb-1">
-                Urgency Level
-              </label>
-              <select
-                value={urgency}
-                onChange={(e) => setUrgency(e.target.value as UrgencyLevel)}
-                className="w-full rounded-xl border border-stroke bg-white px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+          {/* Emergency Toggle and Conditional Urgency Level */}
+          <div className="space-y-3">
+            <div
+              onClick={() => {
+                const next = !isEmergency;
+                setIsEmergency(next);
+                setUrgency(next ? "Emergency (Immediate)" : "Scheduled");
+              }}
+              className={`flex items-center justify-between p-3.5 rounded-xl border cursor-pointer select-none transition ${
+                isEmergency
+                  ? "bg-rose-50/80 dark:bg-rose-950/40 border-rose-300 dark:border-rose-900 shadow-xs"
+                  : "bg-gray-1/50 dark:bg-dark-3/50 border-stroke dark:border-dark-3 hover:border-gray-3"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`flex size-8.5 items-center justify-center rounded-xl transition ${
+                    isEmergency
+                      ? "bg-rose-600 text-white shadow-sm animate-pulse"
+                      : "bg-gray-2 dark:bg-dark-2 text-dark-5 dark:text-dark-6"
+                  }`}
+                >
+                  <AlertTriangle className="size-4.5" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-dark dark:text-white flex items-center gap-1.5">
+                    <span>Is this an Emergency Request?</span>
+                    {isEmergency && (
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-rose-600 text-white px-1.5 py-0.2 rounded-full">
+                        Emergency
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-[11px] text-dark-5 dark:text-dark-6 block">
+                    Toggle on if blood is required urgently today or within hours
+                  </span>
+                </div>
+              </div>
+
+              <div
+                className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                  isEmergency ? "bg-rose-600" : "bg-gray-3 dark:bg-dark-2"
+                }`}
               >
-                <option value="Emergency (Immediate)">Emergency (Within 2 Hours)</option>
-                <option value="Urgent (Today)">Urgent (Today)</option>
-                <option value="Scheduled">Scheduled / Advance</option>
-              </select>
+                <span
+                  className={`pointer-events-none inline-block size-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
+                    isEmergency ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-dark dark:text-white mb-1">
-                Date Needed
-              </label>
+            {/* Urgency Level: Rendered ONLY if isEmergency is true */}
+            {isEmergency && (
+              <div className="p-3.5 rounded-xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                <label className="block text-xs font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1.5">
+                  <AlertCircle className="size-3.5 text-rose-600" />
+                  <span>Urgency Level <span className="text-rose-500">*</span></span>
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setUrgency("Emergency (Immediate)")}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-left flex items-center justify-between ${
+                      urgency === "Emergency (Immediate)"
+                        ? "bg-rose-600 border-rose-600 text-white shadow-xs"
+                        : "bg-white dark:bg-dark-2 border-stroke dark:border-dark-3 text-dark dark:text-white hover:border-rose-300"
+                    }`}
+                  >
+                    <span>Immediate (&lt; 2 hrs)</span>
+                    {urgency === "Emergency (Immediate)" && <CheckCircle2 className="size-3.5" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUrgency("Urgent (Today)")}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-left flex items-center justify-between ${
+                      urgency === "Urgent (Today)"
+                        ? "bg-rose-600 border-rose-600 text-white shadow-xs"
+                        : "bg-white dark:bg-dark-2 border-stroke dark:border-dark-3 text-dark dark:text-white hover:border-rose-300"
+                    }`}
+                  >
+                    <span>Urgent (Today)</span>
+                    {urgency === "Urgent (Today)" && <CheckCircle2 className="size-3.5" />}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-dark dark:text-white mb-1">
+              Date Needed <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative">
               <input
                 type="date"
+                required
                 value={dateNeeded}
                 onChange={(e) => setDateNeeded(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-transparent px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+                className="w-full rounded-xl border border-stroke bg-transparent pl-9 pr-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
               />
+              <Calendar className="size-4 text-gray-4 absolute left-3 top-2.5" />
             </div>
           </div>
 

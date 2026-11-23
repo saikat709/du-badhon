@@ -1,6 +1,6 @@
 "use client";
 
-import { BloodRequest } from "@/types/badhon";
+import { BloodRequest, getShortHallUnit } from "@/types/badhon";
 import { getSafeTelUri } from "@/utils/security";
 import {
   AlertCircle,
@@ -76,8 +76,8 @@ export function RequestDetailsModal({
                   {request.bloodGroup} {request.isPlasma ? "Plasma" : "Blood"}
                 </span>
               </span>
-              <span className="text-xs font-medium text-white/80">
-                Created by {request.createdByVolunteerName}
+              <span className="text-xs font-medium text-white/90 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/20">
+                Created by {request.createdByVolunteerName} ({getShortHallUnit(request.createdByVolunteerHall || "DU Central")})
               </span>
             </div>
             <h2 className="text-xl font-bold flex items-center gap-2">
@@ -147,31 +147,54 @@ export function RequestDetailsModal({
             </div>
           </div>
 
-          {(request.managedByVolunteerName || request.createdByVolunteerName) && (
-            <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-rose-700 dark:text-rose-300">Managed By:</span>
-                <span className="font-bold text-dark dark:text-white">
-                  {request.managedByVolunteerName || request.createdByVolunteerName}
-                </span>
-                <span className="text-dark-5 dark:text-dark-6 text-[11px]">
-                  ({request.managedByVolunteerHall || "DU Central"})
+          <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 rounded-xl bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <User className="size-3.5 text-rose-600 shrink-0" />
+                  <span className="text-dark-5 dark:text-dark-6">Created by:</span>
+                  <span className="font-bold text-dark dark:text-white truncate">
+                    {request.createdByVolunteerName}
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-200/70 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300 shrink-0">
+                  {getShortHallUnit(request.createdByVolunteerHall || "DU Central")}
                 </span>
               </div>
-              {request.status === "completed" && (
-                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
-                  <CheckCircle2 className="size-3" />
-                  <span>Completed {request.completedAt ? `(${request.completedAt.split("T")[0]})` : ""}</span>
-                </span>
-              )}
-              {request.status === "cancelled" && (
-                <span className="inline-flex items-center gap-1 text-[11px] text-rose-600 dark:text-rose-400 font-bold">
-                  <XCircle className="size-3" />
-                  <span>Cancelled {request.cancelledAt ? `(${request.cancelledAt.split("T")[0]})` : ""}</span>
-                </span>
-              )}
+
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0" />
+                  <span className="text-dark-5 dark:text-dark-6">Managed by:</span>
+                  <span className="font-bold text-dark dark:text-white truncate">
+                    {request.managedByVolunteerName || "In Coordination"}
+                  </span>
+                </div>
+                {request.managedByVolunteerHall && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 shrink-0">
+                    {getShortHallUnit(request.managedByVolunteerHall)}
+                  </span>
+                )}
+              </div>
             </div>
-          )}
+
+            {(request.status === "completed" || request.status === "cancelled") && (
+              <div className="flex items-center justify-end px-1 text-xs">
+                {request.status === "completed" && (
+                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
+                    <CheckCircle2 className="size-3" />
+                    <span>Fulfillment Completed {request.completedAt ? `(${request.completedAt.split("T")[0]})` : ""}</span>
+                  </span>
+                )}
+                {request.status === "cancelled" && (
+                  <span className="inline-flex items-center gap-1 text-[11px] text-rose-600 dark:text-rose-400 font-bold">
+                    <XCircle className="size-3" />
+                    <span>Cancelled {request.cancelledAt ? `(${request.cancelledAt.split("T")[0]})` : ""}</span>
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
 
           {request.notes && (
             <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-xl text-xs text-amber-900 dark:text-amber-300">

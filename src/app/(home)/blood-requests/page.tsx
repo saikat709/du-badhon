@@ -64,7 +64,17 @@ function BloodRequestsContent() {
         const matchesReason = req.reason.toLowerCase().includes(q);
         const matchesPhone = req.contactPhone.includes(q);
         const matchesId = req.id.toLowerCase().includes(q);
-        if (!matchesHospital && !matchesPatient && !matchesReason && !matchesPhone && !matchesId) {
+        const matchesCreator = req.createdByVolunteerName.toLowerCase().includes(q);
+        const matchesCreatorUnit = (req.createdByVolunteerHall || "").toLowerCase().includes(q);
+        if (
+          !matchesHospital &&
+          !matchesPatient &&
+          !matchesReason &&
+          !matchesPhone &&
+          !matchesId &&
+          !matchesCreator &&
+          !matchesCreatorUnit
+        ) {
           return false;
         }
       }

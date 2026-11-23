@@ -92,12 +92,42 @@ export interface BloodRequest {
   assignedBags: BagSlot[];
   createdAt: string;
   createdByVolunteerName: string;
+  createdByVolunteerHall?: string;
   managedByVolunteerId?: string;
   managedByVolunteerName?: string;
   managedByVolunteerHall?: string;
   managedAt?: string;
   completedAt?: string;
   cancelledAt?: string;
+}
+
+export function getShortHallUnit(hall?: string): string {
+  if (!hall) return "";
+  const map: Record<string, string> = {
+    "Fazlul Huq Muslim Hall": "FH Hall",
+    "Shahidullah Hall": "Shahidullah",
+    "Dr. Muhammad Shahidullah Hall": "Shahidullah",
+    "Salimullah Muslim Hall": "SM Hall",
+    "Jagannath Hall": "JN Hall",
+    "Surja Sen Hall": "Surja Sen",
+    "Haji Muhammad Mohsin Hall": "Mohsin Hall",
+    "Kabi Jasimuddin Hall": "Jasimuddin",
+    "Sir A. F. Rahman Hall": "AF Rahman",
+    "Bangabandhu Sheikh Mujibur Rahman Hall": "Bangabandhu",
+    "Ziaur Rahman Hall": "Zia Hall",
+    "Bijoy Ekattor Hall": "Bijoy 71",
+    "Amar Ekushey Hall": "Amar Ekushey",
+    "Ruqayyah Hall": "Rokeya Hall",
+    "Rokeya Hall": "Rokeya Hall",
+    "Shamsun Nahar Hall": "SN Hall",
+    "Kabi Sufia Kamal Hall": "Sufia Kamal",
+    "Bangladesh-Kuwait Maitree Hall": "Maitree Hall",
+    "Fazilatunnesa Mujib Hall": "Fazilatunnesa",
+    "Bangamata Sheikh Fazilatunnesa Mujib Hall": "Fazilatunnesa",
+    "Central Office / TSC": "TSC",
+  };
+  if (map[hall]) return map[hall];
+  return hall.replace(/ Hall$/, "").split(" ").slice(0, 2).join(" ");
 }
 
 export interface VolunteerMember {

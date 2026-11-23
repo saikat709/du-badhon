@@ -265,6 +265,7 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
       assignedBags,
       createdAt: new Date().toISOString(),
       createdByVolunteerName: currentVolunteer.name,
+      createdByVolunteerHall: currentVolunteer.hallUnit,
     };
 
     setBloodRequests((prev) => [newRequest, ...prev]);
