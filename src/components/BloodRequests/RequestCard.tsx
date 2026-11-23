@@ -1,6 +1,17 @@
 "use client";
 
 import { BloodRequest } from "@/types/badhon";
+import {
+  AlertCircle,
+  Building2,
+  Calendar,
+  CheckCircle2,
+  Droplet,
+  Search,
+  Sparkles,
+  User,
+  XCircle,
+} from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -31,7 +42,7 @@ export function RequestCard({
             : "bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white border-blue-600 shadow-blue-500/10"
       }`}
     >
-      {/* Top Badges: Blood Group & Donation Type */}
+      {/* Top Badges: Blood Group Badge */}
       <div className="absolute -top-3.5 -right-2 flex items-center gap-1.5 z-10">
         <span
           className={`flex size-11 items-center justify-center rounded-full text-base font-black shadow-md border-2 ${
@@ -46,11 +57,11 @@ export function RequestCard({
         </span>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3.5">
         {/* Header Tags */}
-        <div className="flex flex-wrap items-center gap-1.5 pr-10">
+        <div className="flex flex-wrap items-center gap-1.5 pr-12">
           <span
-            className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+            className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
               request.isPlasma
                 ? "bg-amber-400 text-amber-950 font-black"
                 : isCompleted || isCancelled
@@ -58,27 +69,40 @@ export function RequestCard({
                   : "bg-white/20 text-white backdrop-blur-xs"
             }`}
           >
-            {request.isPlasma ? "🟡 Plasma" : "🩸 Whole Blood"}
+            {request.isPlasma ? (
+              <>
+                <Sparkles className="size-3" />
+                <span>Plasma / Platelet</span>
+              </>
+            ) : (
+              <>
+                <Droplet className="size-3 text-rose-300" />
+                <span>Whole Blood</span>
+              </>
+            )}
           </span>
 
           <span
-            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+            className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
               request.urgency.includes("Emergency")
                 ? "bg-rose-500/30 text-rose-200 border border-rose-400/40"
                 : "bg-black/20 text-white/90"
             }`}
           >
-            {request.urgency.split(" ")[0]}
+            <AlertCircle className="size-3" />
+            <span>{request.urgency.split(" ")[0]}</span>
           </span>
 
           {isCompleted && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white">
-              ✓ Completed
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white">
+              <CheckCircle2 className="size-3" />
+              <span>Completed</span>
             </span>
           )}
           {isCancelled && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-600 text-white">
-              ✕ Cancelled
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-600 text-white">
+              <XCircle className="size-3" />
+              <span>Cancelled</span>
             </span>
           )}
         </div>
@@ -86,7 +110,7 @@ export function RequestCard({
         {/* Hospital Name & Reason */}
         <div>
           <div className="flex items-start gap-2">
-            <span className="text-lg">🏥</span>
+            <Building2 className={`size-5 shrink-0 mt-0.5 ${isCompleted || isCancelled ? "text-rose-600 dark:text-rose-400" : "text-blue-200"}`} />
             <h3
               className={`font-bold text-base leading-snug line-clamp-2 ${
                 isCompleted || isCancelled
@@ -98,7 +122,7 @@ export function RequestCard({
             </h3>
           </div>
           <p
-            className={`text-xs mt-1 font-medium ${
+            className={`text-xs mt-1.5 font-medium ${
               isCompleted || isCancelled
                 ? "text-dark-5 dark:text-dark-6"
                 : "text-blue-100"
@@ -110,18 +134,21 @@ export function RequestCard({
 
         {/* Patient & Bag Fulfillment */}
         <div
-          className={`rounded-xl p-3 text-xs space-y-1.5 ${
+          className={`rounded-xl p-3 text-xs space-y-2 ${
             isCompleted || isCancelled
               ? "bg-gray-2 dark:bg-dark-3 text-dark dark:text-white"
               : "bg-black/20 backdrop-blur-xs text-white"
           }`}
         >
           <div className="flex justify-between items-center font-bold">
-            <span>
-              {request.totalBags} bag ({request.managedBags} Managed)
+            <span className="inline-flex items-center gap-1.5">
+              <Droplet className="size-3.5 text-rose-400" />
+              <span>
+                {request.totalBags} bag ({request.managedBags} Managed)
+              </span>
             </span>
             <span
-              className={`text-[11px] px-2 py-0.5 rounded-md ${
+              className={`text-[11px] px-2 py-0.5 rounded-md font-semibold ${
                 isManaged
                   ? "bg-emerald-500/30 text-emerald-300 font-bold"
                   : "text-amber-300"
@@ -147,8 +174,14 @@ export function RequestCard({
           </div>
 
           <div className="flex justify-between items-center text-[11px] pt-1 text-white/80 dark:text-dark-6">
-            <span>Patient: {request.patientName}</span>
-            <span>Needed: {request.dateNeeded}</span>
+            <span className="inline-flex items-center gap-1">
+              <User className="size-3 text-gray-4" />
+              <span>{request.patientName}</span>
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Calendar className="size-3 text-gray-4" />
+              <span>{request.dateNeeded}</span>
+            </span>
           </div>
         </div>
 
@@ -183,7 +216,8 @@ export function RequestCard({
               )}`}
               className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white text-blue-900 font-bold text-xs shadow-md hover:bg-blue-50 transition active:scale-95"
             >
-              <span>🔍 Start Search</span>
+              <Search className="size-3.5 text-blue-800" />
+              <span>Start Search</span>
             </Link>
           )}
 
@@ -191,7 +225,7 @@ export function RequestCard({
             onClick={() => onOpenDetails(request)}
             className={`py-2 px-3 rounded-xl text-xs font-bold transition ${
               isCompleted || isCancelled || isManaged
-                ? "flex-1 bg-primary text-white hover:bg-primary/90"
+                ? "flex-1 bg-rose-600 hover:bg-rose-700 text-white"
                 : "bg-white/20 text-white hover:bg-white/30"
             }`}
           >
@@ -203,15 +237,17 @@ export function RequestCard({
           <div className="flex items-center justify-between text-[11px] px-1">
             <button
               onClick={() => onMarkCompleted(request.id)}
-              className="text-emerald-300 hover:text-emerald-200 font-bold"
+              className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 font-bold transition"
             >
-              ✓ Mark Completed
+              <CheckCircle2 className="size-3" />
+              <span>Mark Completed</span>
             </button>
             <button
               onClick={() => onCancelRequest(request.id)}
-              className="text-rose-300 hover:text-rose-200 font-medium"
+              className="inline-flex items-center gap-1 text-rose-300 hover:text-rose-200 font-medium transition"
             >
-              Cancel Request
+              <XCircle className="size-3" />
+              <span>Cancel Request</span>
             </button>
           </div>
         )}

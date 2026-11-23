@@ -1,7 +1,19 @@
 "use client";
 
 import { useBadhon } from "@/context/badhon-context";
-import { BloodRequest, CallOutcome, Donor } from "@/types/badhon";
+import { CallOutcome, Donor } from "@/types/badhon";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Lock,
+  MessageSquare,
+  PhoneCall,
+  PhoneOff,
+  Timer,
+  X,
+  XCircle,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface CallDonorModalProps {
@@ -11,35 +23,40 @@ interface CallDonorModalProps {
   onClose: () => void;
 }
 
-const OUTCOMES: { id: CallOutcome; label: string; icon: string; color: string }[] = [
+const OUTCOMES: {
+  id: CallOutcome;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+}[] = [
   {
     id: "agreed",
     label: "Agreed to Donate",
-    icon: "✅",
+    icon: CheckCircle2,
     color: "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300",
   },
   {
     id: "refused",
     label: "Refused / Unavailable",
-    icon: "❌",
+    icon: XCircle,
     color: "border-rose-500 bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300",
   },
   {
     id: "unreachable",
     label: "No Answer / Unreachable",
-    icon: "📵",
+    icon: PhoneOff,
     color: "border-amber-500 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300",
   },
   {
     id: "busy",
     label: "Busy / Call Later",
-    icon: "⏳",
+    icon: Clock,
     color: "border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300",
   },
   {
     id: "ineligible",
     label: "Temporarily Ineligible",
-    icon: "⚠️",
+    icon: AlertTriangle,
     color: "border-purple-500 bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300",
   },
 ];
@@ -136,20 +153,22 @@ export function CallDonorModal({
         <div className="bg-gradient-to-r from-rose-600 via-rose-700 to-red-800 p-5 text-white">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-2">
-              <span className="flex size-3 rounded-full bg-emerald-400 animate-ping" />
-              <span className="text-xs font-bold uppercase tracking-wider bg-black/20 px-2.5 py-0.5 rounded-full">
-                Active Call Lock
+              <span className="flex size-2.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider bg-black/25 px-2.5 py-0.5 rounded-full">
+                <Lock className="size-3" />
+                <span>Active Call Lock</span>
               </span>
-              <span className="text-xs font-mono font-bold bg-white/20 px-2 py-0.5 rounded-md">
-                ⏱ {formatTimer(callDuration)}
+              <span className="inline-flex items-center gap-1 text-xs font-mono font-bold bg-white/20 px-2.5 py-0.5 rounded-md">
+                <Timer className="size-3" />
+                <span>{formatTimer(callDuration)}</span>
               </span>
             </div>
 
             <button
               onClick={handleCancelAndRelease}
-              className="text-white/80 hover:text-white text-2xl font-bold leading-none p-1"
+              className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition"
             >
-              &times;
+              <X className="size-5" />
             </button>
           </div>
 
@@ -169,7 +188,7 @@ export function CallDonorModal({
         {/* Lock Announcement Notice */}
         <div className="bg-amber-50 dark:bg-amber-950/30 px-5 py-2.5 border-b border-amber-200 dark:border-amber-900/40 flex items-center justify-between text-xs text-amber-900 dark:text-amber-300">
           <span className="flex items-center gap-1.5 font-medium">
-            <span>🔒</span>
+            <Lock className="size-3.5 text-amber-600 shrink-0" />
             <span>
               Locked by <strong>{currentVolunteer.name}</strong> ({currentVolunteer.hallUnit.split(" ")[0]} Hall). Other members see this donor as currently in-call.
             </span>
@@ -190,8 +209,8 @@ export function CallDonorModal({
               href={`tel:${donor.phone}`}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition active:scale-95"
             >
-              <span className="text-sm">📞</span>
-              <span>Click to Call Donor</span>
+              <PhoneCall className="size-4" />
+              <span>Click to Dial Donor</span>
             </a>
           </div>
 
@@ -201,21 +220,24 @@ export function CallDonorModal({
               Call Outcome / Status: <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {OUTCOMES.map((item) => (
-                <button
-                  type="button"
-                  key={item.id}
-                  onClick={() => setOutcome(item.id)}
-                  className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-bold transition text-left ${
-                    outcome === item.id
-                      ? `${item.color} shadow-sm ring-2 ring-primary/40`
-                      : "border-stroke dark:border-dark-3 text-dark dark:text-white hover:bg-gray-1 dark:hover:bg-dark-3"
-                  }`}
-                >
-                  <span className="text-base">{item.icon}</span>
-                  <span>{item.label}</span>
-                </button>
-              ))}
+              {OUTCOMES.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <button
+                    type="button"
+                    key={item.id}
+                    onClick={() => setOutcome(item.id)}
+                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-bold transition text-left ${
+                      outcome === item.id
+                        ? `${item.color} shadow-sm ring-2 ring-rose-500/40`
+                        : "border-stroke dark:border-dark-3 text-dark dark:text-white hover:bg-gray-1 dark:hover:bg-dark-3"
+                    }`}
+                  >
+                    <IconComponent className="size-4 shrink-0" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -287,7 +309,7 @@ export function CallDonorModal({
               rows={3}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="e.g. Donor is ready, will arrive at DMCH 10:30 AM tomorrow. Requested vehicle fare support or informed attendant..."
+              placeholder="e.g. Donor is ready, will arrive at DMCH 10:30 AM tomorrow. Informed attendant Kamal..."
               className="w-full rounded-xl border border-stroke bg-transparent p-3 text-xs text-dark dark:text-white outline-none focus:border-rose-600 dark:border-dark-3"
             />
           </div>
@@ -295,23 +317,24 @@ export function CallDonorModal({
           {/* Past Call History Trail */}
           {donor.callHistory.length > 0 && (
             <div className="pt-2 border-t border-stroke dark:border-dark-3">
-              <p className="text-xs font-bold text-dark dark:text-white mb-2">
-                Previous Call History ({donor.callHistory.length}):
+              <p className="text-xs font-bold text-dark dark:text-white mb-2 flex items-center gap-1.5">
+                <MessageSquare className="size-3.5 text-rose-600" />
+                <span>Previous Call History ({donor.callHistory.length}):</span>
               </p>
               <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
                 {donor.callHistory.map((call) => (
                   <div
                     key={call.id}
-                    className="p-2.5 rounded-lg bg-gray-1 dark:bg-dark-3 text-xs space-y-1"
+                    className="p-2.5 rounded-xl bg-gray-1 dark:bg-dark-3 text-xs space-y-1 border border-stroke dark:border-dark-4"
                   >
                     <div className="flex justify-between items-center text-[10px] text-dark-5 dark:text-dark-6">
-                      <span className="font-semibold text-primary">
+                      <span className="font-semibold text-rose-600 dark:text-rose-400">
                         {call.volunteerName} ({call.volunteerHall.split(" ")[0]})
                       </span>
                       <span>{new Date(call.timestamp).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold capitalize text-rose-600 dark:text-rose-400">
+                      <span className="font-bold capitalize text-dark-5 dark:text-dark-6 text-[10px]">
                         [{call.outcome}]
                       </span>
                       <p className="text-dark dark:text-white">{call.comment}</p>

@@ -1,6 +1,18 @@
 "use client";
 
-import { BloodGroup, BloodRequest, UrgencyLevel } from "@/types/badhon";
+import { BloodGroup, UrgencyLevel } from "@/types/badhon";
+import {
+  AlertTriangle,
+  Building2,
+  Calendar,
+  Clock,
+  Droplet,
+  FileText,
+  Phone,
+  Sparkles,
+  User,
+  X,
+} from "lucide-react";
 import React, { useState } from "react";
 
 interface NewRequestModalProps {
@@ -84,16 +96,19 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
       <div className="w-full max-w-2xl bg-white dark:bg-dark-2 rounded-2xl shadow-2xl border border-stroke dark:border-dark-3 my-8 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="bg-gradient-to-r from-rose-600 to-rose-700 px-6 py-4 text-white flex justify-between items-center">
           <div>
-            <h2 className="text-lg font-bold">Record New Blood Request</h2>
+            <h2 className="text-lg font-bold flex items-center gap-2">
+              <Droplet className="size-5 text-white" />
+              <span>Record New Blood Request</span>
+            </h2>
             <p className="text-xs text-rose-100">
               Enter patient requirements to search and coordinate donors across DU halls
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-white/80 hover:text-white text-2xl font-bold leading-none p-1"
+            className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition"
           >
-            &times;
+            <X className="size-5" />
           </button>
         </div>
 
@@ -103,14 +118,17 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
               <label className="block text-xs font-bold text-dark dark:text-white mb-1">
                 Patient Name <span className="text-rose-500">*</span>
               </label>
-              <input
-                type="text"
-                required
-                value={patientName}
-                onChange={(e) => setPatientName(e.target.value)}
-                placeholder="e.g. Md. Rafiqul Islam"
-                className="w-full rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  value={patientName}
+                  onChange={(e) => setPatientName(e.target.value)}
+                  placeholder="e.g. Md. Rafiqul Islam"
+                  className="w-full rounded-xl border border-stroke bg-transparent pl-9 pr-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+                />
+                <User className="size-4 text-gray-4 absolute left-3 top-2.5" />
+              </div>
             </div>
 
             <div>
@@ -123,7 +141,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
                     type="button"
                     key={bg}
                     onClick={() => setBloodGroup(bg)}
-                    className={`py-1.5 rounded-lg text-xs font-bold border transition ${
+                    className={`py-1.5 rounded-lg text-xs font-black border transition ${
                       bloodGroup === bg
                         ? "bg-rose-600 border-rose-600 text-white shadow-xs"
                         : "border-stroke text-dark hover:border-rose-400 dark:border-dark-3 dark:text-white"
@@ -144,7 +162,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
               <select
                 value={hospital}
                 onChange={(e) => setHospital(e.target.value)}
-                className="w-full rounded-lg border border-stroke bg-white px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                className="w-full rounded-xl border border-stroke bg-white px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:bg-dark-2 dark:text-white"
               >
                 {COMMON_HOSPITALS.map((h) => (
                   <option key={h} value={h}>
@@ -161,7 +179,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
                   value={customHospital}
                   onChange={(e) => setCustomHospital(e.target.value)}
                   placeholder="Enter hospital name & address"
-                  className="mt-2 w-full rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+                  className="mt-2 w-full rounded-xl border border-stroke bg-transparent px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
                 />
               )}
             </div>
@@ -177,7 +195,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
                   max="10"
                   value={totalBags}
                   onChange={(e) => setTotalBags(parseInt(e.target.value) || 1)}
-                  className="w-full rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+                  className="w-full rounded-xl border border-stroke bg-transparent px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
                 />
               </div>
 
@@ -188,13 +206,23 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
                 <button
                   type="button"
                   onClick={() => setIsPlasma(!isPlasma)}
-                  className={`w-full py-2 px-3 rounded-lg text-xs font-bold border flex items-center justify-center gap-1.5 transition ${
+                  className={`w-full py-2 px-3 rounded-xl text-xs font-bold border flex items-center justify-center gap-1.5 transition ${
                     isPlasma
                       ? "bg-amber-500 border-amber-500 text-white shadow-xs"
                       : "bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/40 dark:text-rose-400"
                   }`}
                 >
-                  <span>{isPlasma ? "🟡 Plasma / Platelet" : "🩸 Whole Blood"}</span>
+                  {isPlasma ? (
+                    <>
+                      <Sparkles className="size-3.5" />
+                      <span>Plasma</span>
+                    </>
+                  ) : (
+                    <>
+                      <Droplet className="size-3.5 text-rose-500" />
+                      <span>Whole Blood</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -210,7 +238,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
                 value={contactPerson}
                 onChange={(e) => setContactPerson(e.target.value)}
                 placeholder="e.g. Kamal Hossain (Brother)"
-                className="w-full rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+                className="w-full rounded-xl border border-stroke bg-transparent px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
               />
             </div>
 
@@ -218,14 +246,17 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
               <label className="block text-xs font-bold text-dark dark:text-white mb-1">
                 Contact Phone <span className="text-rose-500">*</span>
               </label>
-              <input
-                type="tel"
-                required
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value)}
-                placeholder="01XXXXXXXXX"
-                className="w-full rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
-              />
+              <div className="relative">
+                <input
+                  type="tel"
+                  required
+                  value={contactPhone}
+                  onChange={(e) => setContactPhone(e.target.value)}
+                  placeholder="01XXXXXXXXX"
+                  className="w-full rounded-xl border border-stroke bg-transparent pl-9 pr-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+                />
+                <Phone className="size-4 text-gray-4 absolute left-3 top-2.5" />
+              </div>
             </div>
           </div>
 
@@ -237,11 +268,11 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
               <select
                 value={urgency}
                 onChange={(e) => setUrgency(e.target.value as UrgencyLevel)}
-                className="w-full rounded-lg border border-stroke bg-white px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                className="w-full rounded-xl border border-stroke bg-white px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:bg-dark-2 dark:text-white"
               >
-                <option value="Emergency (Immediate)">🚨 Emergency (Within 2 Hours)</option>
-                <option value="Urgent (Today)">⚡ Urgent (Today)</option>
-                <option value="Scheduled">📅 Scheduled / Advance</option>
+                <option value="Emergency (Immediate)">Emergency (Within 2 Hours)</option>
+                <option value="Urgent (Today)">Urgent (Today)</option>
+                <option value="Scheduled">Scheduled / Advance</option>
               </select>
             </div>
 
@@ -253,7 +284,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
                 type="date"
                 value={dateNeeded}
                 onChange={(e) => setDateNeeded(e.target.value)}
-                className="w-full rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+                className="w-full rounded-xl border border-stroke bg-transparent px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
               />
             </div>
           </div>
@@ -268,7 +299,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. Critical Burn Surgery, Thalassemia transfusion, Cesarean"
-              className="w-full rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+              className="w-full rounded-xl border border-stroke bg-transparent px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
             />
           </div>
 
@@ -281,7 +312,7 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ward number, cabin, doctor recommendations, cross-match details..."
-              className="w-full rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
+              className="w-full rounded-xl border border-stroke bg-transparent px-3 py-2 text-xs text-dark outline-none focus:border-rose-600 dark:border-dark-3 dark:text-white"
             />
           </div>
 
@@ -289,13 +320,13 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-stroke text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white text-sm font-semibold transition"
+              className="px-4 py-2 rounded-xl border border-stroke text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white text-xs font-semibold transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold shadow-sm transition"
+              className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition"
             >
               Save Blood Request
             </button>

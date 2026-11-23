@@ -1,4 +1,11 @@
-import * as Icons from "../icons";
+import {
+  ClipboardList,
+  HeartHandshake,
+  LayoutDashboard,
+  Search,
+  User,
+  Users,
+} from "lucide-react";
 
 export const NAV_DATA = [
   {
@@ -6,7 +13,7 @@ export const NAV_DATA = [
     items: [
       {
         title: "Dashboard",
-        icon: Icons.HomeIcon,
+        icon: LayoutDashboard,
         url: "/dashboard",
         items: [
           {
@@ -34,31 +41,31 @@ export const NAV_DATA = [
       {
         title: "Blood Requests",
         url: "/blood-requests",
-        icon: Icons.FourCircle,
+        icon: HeartHandshake,
         items: [],
       },
       {
         title: "Search Blood",
         url: "/search-blood",
-        icon: Icons.Alphabet,
+        icon: Search,
         items: [],
       },
       {
         title: "Donors Directory",
         url: "/donors",
-        icon: Icons.User,
+        icon: Users,
         items: [],
       },
       {
         title: "Donation Records",
         url: "/donations",
-        icon: Icons.Table,
+        icon: ClipboardList,
         items: [],
       },
       {
         title: "Your Profile",
         url: "/profile",
-        icon: Icons.User,
+        icon: User,
         items: [],
       },
     ],

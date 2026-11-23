@@ -2,6 +2,16 @@
 
 import { useBadhon } from "@/context/badhon-context";
 import { Donor } from "@/types/badhon";
+import {
+  Clock,
+  Droplet,
+  GraduationCap,
+  Lock,
+  MessageSquare,
+  Phone,
+  PhoneCall,
+  ShieldCheck,
+} from "lucide-react";
 import React from "react";
 
 interface DonorCardProps {
@@ -20,7 +30,7 @@ export function DonorCard({ donor, onCall, onQuickAssign, activeRequestId }: Don
   const lockedByHall = donor.currentLock?.lockedByVolunteerHall?.split(" ")[0];
 
   // Calculate days since last donation
-  let eligibilityText = "Never donated before (First-time ready)";
+  let eligibilityText = "First-time donor (Ready)";
   let isEligible = true;
 
   if (donor.lastDonationDate) {
@@ -29,10 +39,10 @@ export function DonorCard({ donor, onCall, onQuickAssign, activeRequestId }: Don
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays >= 90) {
-      eligibilityText = `Eligible (${diffDays} days since last donation)`;
+      eligibilityText = `Eligible (${diffDays}d since last donation)`;
       isEligible = true;
     } else {
-      eligibilityText = `Cooldown: ${90 - diffDays} days remaining (Donated ${diffDays}d ago)`;
+      eligibilityText = `Cooldown: ${90 - diffDays}d left (${diffDays}d ago)`;
       isEligible = false;
     }
   }
@@ -51,8 +61,8 @@ export function DonorCard({ donor, onCall, onQuickAssign, activeRequestId }: Don
     >
       {/* Top Bar: Blood Group & Lock Indicator */}
       <div className="flex items-start justify-between gap-2 mb-3">
-        <div className="flex items-center gap-2.5">
-          <span className="flex size-11 items-center justify-center rounded-xl bg-rose-600 text-white font-black text-lg shadow-sm">
+        <div className="flex items-center gap-3">
+          <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white font-black text-lg shadow-sm">
             {donor.bloodGroup}
           </span>
           <div>
@@ -74,33 +84,46 @@ export function DonorCard({ donor, onCall, onQuickAssign, activeRequestId }: Don
                 : "bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-300 dark:border-amber-800"
             }`}
           >
-            <span>🔒</span>
+            <Lock className="size-3" />
             <span>{isLockedByMe ? "You are calling" : `${lockedByName} calling`}</span>
           </span>
         ) : (
           <span
-            className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
               isEligible
                 ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
                 : "bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6"
             }`}
           >
-            {isEligible ? "Ready to Donate" : "Cooldown"}
+            {isEligible ? (
+              <>
+                <ShieldCheck className="size-3 text-emerald-600" />
+                <span>Ready to Donate</span>
+              </>
+            ) : (
+              <>
+                <Clock className="size-3 text-amber-600" />
+                <span>Cooldown</span>
+              </>
+            )}
           </span>
         )}
       </div>
 
       {/* Details Box */}
-      <div className="space-y-2 text-xs py-2 border-y border-stroke dark:border-dark-3">
+      <div className="space-y-2.5 text-xs py-2.5 border-y border-stroke dark:border-dark-3">
         <div className="grid grid-cols-2 gap-2 text-dark-5 dark:text-dark-6">
-          <div>
-            <span className="block text-[11px]">Department:</span>
-            <span className="font-semibold text-dark dark:text-white">
-              {donor.department}
-            </span>
+          <div className="flex items-start gap-1.5">
+            <GraduationCap className="size-3.5 mt-0.5 text-gray-4 shrink-0" />
+            <div>
+              <span className="block text-[10px] text-gray-5">Department</span>
+              <span className="font-semibold text-dark dark:text-white truncate block">
+                {donor.department}
+              </span>
+            </div>
           </div>
           <div>
-            <span className="block text-[11px]">Session / Batch:</span>
+            <span className="block text-[10px] text-gray-5">Session / Batch</span>
             <span className="font-semibold text-dark dark:text-white">
               {donor.session}
             </span>
@@ -108,14 +131,17 @@ export function DonorCard({ donor, onCall, onQuickAssign, activeRequestId }: Don
         </div>
 
         <div className="flex justify-between items-center text-[11px] pt-1">
-          <span className="text-dark-5 dark:text-dark-6">Donation Count:</span>
+          <span className="inline-flex items-center gap-1 text-dark-5 dark:text-dark-6">
+            <Droplet className="size-3 text-rose-500" />
+            <span>Total Donations:</span>
+          </span>
           <span className="font-bold text-rose-600 dark:text-rose-400">
-            🩸 {donor.totalDonations} times
+            {donor.totalDonations} times
           </span>
         </div>
 
-        <div className="text-[11px] text-dark-5 dark:text-dark-6">
-          <span>Status: </span>
+        <div className="flex items-center justify-between text-[11px]">
+          <span className="text-dark-5 dark:text-dark-6">Status:</span>
           <span className={isEligible ? "text-emerald-600 font-semibold" : "text-amber-600 font-semibold"}>
             {eligibilityText}
           </span>
@@ -123,9 +149,12 @@ export function DonorCard({ donor, onCall, onQuickAssign, activeRequestId }: Don
 
         {/* Latest Call Feedback / Comment */}
         {latestCall && (
-          <div className="p-2 bg-gray-1 dark:bg-dark-3 rounded-lg text-[11px] space-y-0.5">
+          <div className="p-2.5 bg-gray-1 dark:bg-dark-3 rounded-xl text-[11px] space-y-1">
             <div className="flex justify-between items-center text-[10px] text-gray-5">
-              <span className="font-bold text-primary">{latestCall.volunteerName}</span>
+              <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                <MessageSquare className="size-2.5" />
+                <span>{latestCall.volunteerName}</span>
+              </span>
               <span>{new Date(latestCall.timestamp).toLocaleDateString()}</span>
             </div>
             <p className="text-dark dark:text-white line-clamp-2 italic">
@@ -141,33 +170,35 @@ export function DonorCard({ donor, onCall, onQuickAssign, activeRequestId }: Don
           isLockedByMe ? (
             <button
               onClick={() => onCall(donor)}
-              className="w-full py-2 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition active:scale-95"
+              className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition active:scale-95"
             >
-              Resume Call & Log Feedback
+              <PhoneCall className="size-3.5" />
+              <span>Resume Call & Log Feedback</span>
             </button>
           ) : (
             <button
               disabled
               title={`Locked by ${lockedByName} (${lockedByHall} Hall)`}
-              className="w-full py-2 px-3 rounded-xl bg-amber-200/80 dark:bg-amber-950/40 text-amber-900 dark:text-amber-400 font-bold text-xs cursor-not-allowed border border-amber-300 dark:border-amber-800/50 flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 px-3 rounded-xl bg-amber-200/80 dark:bg-amber-950/40 text-amber-900 dark:text-amber-400 font-bold text-xs cursor-not-allowed border border-amber-300 dark:border-amber-800/50 flex items-center justify-center gap-1.5"
             >
-              <span>🔒 In-Call with {lockedByName}</span>
+              <Lock className="size-3.5 text-amber-800 dark:text-amber-300" />
+              <span>In-Call with {lockedByName}</span>
             </button>
           )
         ) : (
           <div className="w-full flex items-center gap-2">
             <button
               onClick={() => onCall(donor)}
-              className="flex-1 py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5"
+              className="flex-1 py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5"
             >
-              <span>📞</span>
+              <Phone className="size-3.5" />
               <span>Call Donor</span>
             </button>
 
             {onQuickAssign && activeRequestId && isEligible && (
               <button
                 onClick={() => onQuickAssign(donor)}
-                className="py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition"
+                className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition"
               >
                 Assign
               </button>
