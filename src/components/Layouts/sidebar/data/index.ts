@@ -1,4 +1,3 @@
-import { url } from "inspector";
 import * as Icons from "../icons";
 
 export const NAV_DATA = [

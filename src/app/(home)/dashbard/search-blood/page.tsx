@@ -1,12 +1,12 @@
 'use client'
 
 import { Select } from '@/components/FormElements/select';
-import { useParams, usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function SearchBlood(){
+function SearchBloodContent() {
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
-
 
     return (
         <div>
@@ -21,7 +21,7 @@ export default function SearchBlood(){
                         ]}
                     label='Blood Group'
                     defaultValue='None'
-                    disabled={id != undefined}
+                    disabled={id != null}
                     className='flex justify-between items-center'
                 />
                 <p className='flex justify-between items-center text-dark dark:text-white'>
@@ -30,5 +30,13 @@ export default function SearchBlood(){
                 </p>
             </form>
         </div>
+    );
+}
+
+export default function SearchBlood() {
+    return (
+        <Suspense>
+            <SearchBloodContent />
+        </Suspense>
     );
 }
