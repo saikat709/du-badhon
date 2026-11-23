@@ -5,7 +5,6 @@ import type { Metadata, Viewport } from "next";
 import NextTopLoader from "nextjs-toploader";
 import type { PropsWithChildren } from "react";
 import { Providers } from "./providers";
-import { Header } from "@/components/Layouts/header";
 import { PWAInstaller } from "@/components/PWA/PWAInstaller";
 
 export const viewport: Viewport = {
