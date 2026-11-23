@@ -72,13 +72,38 @@ export function CallDonorModal({
 
   const [outcome, setOutcome] = useState<CallOutcome>("agreed");
   const [comment, setComment] = useState("");
-  const [selectedRequestId, setSelectedRequestId] = useState<string>(
-    activeRequestId || "",
-  );
-  const [selectedBagNumber, setSelectedBagNumber] = useState<number>(
-    activeBagNumber || 1,
-  );
+  const [selectedRequestId, setSelectedRequestId] = useState<string>(() => {
+    if (activeRequestId) return activeRequestId;
+    if (donor) {
+      const match = bloodRequests.find(
+        (r) =>
+          r.bloodGroup === donor.bloodGroup &&
+          (r.status === "active" || r.status === "partially_managed"),
+      );
+      return match?.id || "";
+    }
+    return "";
+  });
+
+  const [selectedBagNumber, setSelectedBagNumber] = useState<number>(() => {
+    if (activeBagNumber) return activeBagNumber;
+    if (donor) {
+      const match = bloodRequests.find(
+        (r) =>
+          r.bloodGroup === donor.bloodGroup &&
+          (r.status === "active" || r.status === "partially_managed"),
+      );
+      const firstEmptyBag = match?.assignedBags.find((b) => !b.donorId);
+      return firstEmptyBag?.bagNumber || 1;
+    }
+    return 1;
+  });
+
   const [callDuration, setCallDuration] = useState(0);
+
+  // Track submission to prevent releasing lock when saved
+  const isSubmittedRef = React.useRef(false);
+  const donorId = donor?.id;
 
   // Call timer
   useEffect(() => {
@@ -89,24 +114,26 @@ export function CallDonorModal({
     return () => clearInterval(interval);
   }, [donor]);
 
-  // Set default matching request if available
+  // Clean unmount & Escape key listener
   useEffect(() => {
-    if (activeRequestId) {
-      setSelectedRequestId(activeRequestId);
-      if (activeBagNumber) setSelectedBagNumber(activeBagNumber);
-    } else if (donor) {
-      const match = bloodRequests.find(
-        (r) =>
-          r.bloodGroup === donor.bloodGroup &&
-          (r.status === "active" || r.status === "partially_managed"),
-      );
-      if (match) {
-        setSelectedRequestId(match.id);
-        const firstEmptyBag = match.assignedBags.find((b) => !b.donorId);
-        if (firstEmptyBag) setSelectedBagNumber(firstEmptyBag.bagNumber);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (donorId && !isSubmittedRef.current) {
+          releaseCallingDonor(donorId);
+        }
+        onClose();
       }
-    }
-  }, [donor, activeRequestId, activeBagNumber, bloodRequests]);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      // If modal unmounts unexpectedly before completion, safely release caller lock
+      if (donorId && !isSubmittedRef.current) {
+        releaseCallingDonor(donorId);
+      }
+    };
+  }, [donorId, releaseCallingDonor, onClose]);
 
   if (!donor) return null;
 
@@ -128,6 +155,7 @@ export function CallDonorModal({
       return alert("Please enter a brief comment describing the call feedback.");
     }
 
+    isSubmittedRef.current = true;
     const shouldAssign = outcome === "agreed" && selectedRequestId;
 
     logCallOutcome(
@@ -142,13 +170,22 @@ export function CallDonorModal({
   };
 
   const handleCancelAndRelease = () => {
-    releaseCallingDonor(donor.id);
+    if (donor) {
+      isSubmittedRef.current = true;
+      releaseCallingDonor(donor.id);
+    }
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="w-full max-w-xl bg-white dark:bg-dark-2 rounded-2xl shadow-2xl border border-stroke dark:border-dark-3 my-8 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto"
+      onClick={handleCancelAndRelease}
+    >
+      <div
+        className="w-full max-w-xl bg-white dark:bg-dark-2 rounded-2xl shadow-2xl border border-stroke dark:border-dark-3 my-8 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header with Call Lock Banner */}
         <div className="bg-gradient-to-r from-rose-600 via-rose-700 to-red-800 p-5 text-white">
           <div className="flex justify-between items-start">

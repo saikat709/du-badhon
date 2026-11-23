@@ -1,6 +1,6 @@
 "use client";
 
-import { useBadhon } from "@/context/badhon-context";
+import { useBadhon, isLockActive } from "@/context/badhon-context";
 import { Donor } from "@/types/badhon";
 import {
   Clock,
@@ -24,26 +24,29 @@ interface DonorCardProps {
 export function DonorCard({ donor, onCall, onQuickAssign, activeRequestId }: DonorCardProps) {
   const { currentVolunteer } = useBadhon();
 
-  const isLocked = !!donor.currentLock;
-  const isLockedByMe = donor.currentLock?.lockedByVolunteerId === currentVolunteer.id;
+  const isLocked = isLockActive(donor.currentLock);
+  const isLockedByMe = isLocked && donor.currentLock?.lockedByVolunteerId === currentVolunteer.id;
   const lockedByName = donor.currentLock?.lockedByVolunteerName;
   const lockedByHall = donor.currentLock?.lockedByVolunteerHall?.split(" ")[0];
 
-  // Calculate days since last donation
+  // Calculate days since last donation with defensive checks
   let eligibilityText = "First-time donor (Ready)";
   let isEligible = true;
 
   if (donor.lastDonationDate) {
     const lastDate = new Date(donor.lastDonationDate);
-    const diffTime = Math.abs(Date.now() - lastDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const lastTime = lastDate.getTime();
+    if (!isNaN(lastTime)) {
+      const diffTime = Math.max(0, Date.now() - lastTime);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays >= 90) {
-      eligibilityText = `Eligible (${diffDays}d since last donation)`;
-      isEligible = true;
-    } else {
-      eligibilityText = `Cooldown: ${90 - diffDays}d left (${diffDays}d ago)`;
-      isEligible = false;
+      if (diffDays >= 90) {
+        eligibilityText = `Eligible (${diffDays}d since last donation)`;
+        isEligible = true;
+      } else {
+        eligibilityText = `Cooldown: ${90 - diffDays}d left (${diffDays}d ago)`;
+        isEligible = false;
+      }
     }
   }
 

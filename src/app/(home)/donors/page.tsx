@@ -3,7 +3,7 @@
 import { CallDonorModal } from "@/components/Donors/CallDonorModal";
 import { DonorCard } from "@/components/Donors/DonorCard";
 import { NewDonorModal } from "@/components/Donors/NewDonorModal";
-import { useBadhon } from "@/context/badhon-context";
+import { useBadhon, isDonorEligible, isLockActive } from "@/context/badhon-context";
 import { BloodGroup, Donor, HallUnit } from "@/types/badhon";
 import {
   Droplet,
@@ -49,15 +49,8 @@ function DonorsContent() {
   const stats = useMemo(() => {
     const total = donors.length;
     const totalDonations = donors.reduce((sum, d) => sum + d.totalDonations, 0);
-    const readyCount = donors.filter((d) => {
-      if (!d.lastDonationDate) return true;
-      const diffDays = Math.ceil(
-        Math.abs(Date.now() - new Date(d.lastDonationDate).getTime()) /
-          (1000 * 60 * 60 * 24),
-      );
-      return diffDays >= 90;
-    }).length;
-    const currentlyCalling = donors.filter((d) => d.currentLock != null).length;
+    const readyCount = donors.filter((d) => isDonorEligible(d.lastDonationDate)).length;
+    const currentlyCalling = donors.filter((d) => isLockActive(d.currentLock)).length;
 
     return { total, totalDonations, readyCount, currentlyCalling };
   }, [donors]);

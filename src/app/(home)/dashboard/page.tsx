@@ -2,7 +2,7 @@
 
 import { RequestCard } from "@/components/BloodRequests/RequestCard";
 import { RequestDetailsModal } from "@/components/BloodRequests/RequestDetailsModal";
-import { useBadhon } from "@/context/badhon-context";
+import { useBadhon, isDonorEligible, isLockActive } from "@/context/badhon-context";
 import { BloodGroup, BloodRequest } from "@/types/badhon";
 import {
   Activity,
@@ -58,25 +58,13 @@ function DashboardContent() {
   const groupStats = useMemo(() => {
     const stats: Record<string, { ready: number; needed: number; hallReady: number }> = {};
     BLOOD_GROUPS.forEach((bg) => {
-      const ready = donors.filter((d) => {
-        if (d.bloodGroup !== bg) return false;
-        if (!d.lastDonationDate) return true;
-        const diffDays = Math.ceil(
-          Math.abs(Date.now() - new Date(d.lastDonationDate).getTime()) /
-            (1000 * 60 * 60 * 24),
-        );
-        return diffDays >= 90;
-      }).length;
+      const ready = donors.filter(
+        (d) => d.bloodGroup === bg && isDonorEligible(d.lastDonationDate),
+      ).length;
 
-      const hallReady = hallDonors.filter((d) => {
-        if (d.bloodGroup !== bg) return false;
-        if (!d.lastDonationDate) return true;
-        const diffDays = Math.ceil(
-          Math.abs(Date.now() - new Date(d.lastDonationDate).getTime()) /
-            (1000 * 60 * 60 * 24),
-        );
-        return diffDays >= 90;
-      }).length;
+      const hallReady = hallDonors.filter(
+        (d) => d.bloodGroup === bg && isDonorEligible(d.lastDonationDate),
+      ).length;
 
       const needed = activeRequests
         .filter((r) => r.bloodGroup === bg)
@@ -93,17 +81,10 @@ function DashboardContent() {
     0,
   );
   const totalBagsManaged = activeRequests.reduce((sum, r) => sum + r.managedBags, 0);
-  const activeInCallDonors = donors.filter((d) => d.currentLock != null);
+  const activeInCallDonors = donors.filter((d) => isLockActive(d.currentLock));
 
   const readyDonorsCount = useMemo(() => {
-    return activeDonorsList.filter((d) => {
-      if (!d.lastDonationDate) return true;
-      const diffDays = Math.ceil(
-        Math.abs(Date.now() - new Date(d.lastDonationDate).getTime()) /
-          (1000 * 60 * 60 * 24),
-      );
-      return diffDays >= 90;
-    }).length;
+    return activeDonorsList.filter((d) => isDonorEligible(d.lastDonationDate)).length;
   }, [activeDonorsList]);
 
   return (

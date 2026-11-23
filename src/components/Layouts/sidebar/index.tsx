@@ -25,9 +25,9 @@ export function Sidebar() {
       return section.items.some((item: NavItem) => {
         return item.items?.some((subItem: NavSubItem) => {
           if (subItem.url === pathname) {
-            if (!expandedItems.includes(item.title)) {
-              setExpandedItems([item.title]);
-            }
+            setExpandedItems((prev) =>
+              prev.includes(item.title) ? prev : [item.title],
+            );
             return true;
           }
         });

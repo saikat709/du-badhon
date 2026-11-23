@@ -2,7 +2,7 @@
 
 import { CallDonorModal } from "@/components/Donors/CallDonorModal";
 import { DonorCard } from "@/components/Donors/DonorCard";
-import { useBadhon } from "@/context/badhon-context";
+import { useBadhon, isDonorEligible } from "@/context/badhon-context";
 import { BloodGroup, Donor, HallUnit } from "@/types/badhon";
 import {
   ArrowLeft,
@@ -79,12 +79,7 @@ function SearchBloodContent() {
 
       // Eligibility
       if (eligibilityFilter === "ready") {
-        if (!donor.lastDonationDate) return true;
-        const diffDays = Math.ceil(
-          Math.abs(Date.now() - new Date(donor.lastDonationDate).getTime()) /
-            (1000 * 60 * 60 * 24),
-        );
-        if (diffDays < 90) return false;
+        if (!isDonorEligible(donor.lastDonationDate)) return false;
       }
 
       // Search Query

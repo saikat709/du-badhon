@@ -11,12 +11,13 @@ import {
   Plus,
   Search,
 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 
 const BLOOD_GROUPS: BloodGroup[] = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 function BloodRequestsContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const {
     bloodRequests,
@@ -26,18 +27,20 @@ function BloodRequestsContent() {
     markRequestCancelled,
   } = useBadhon();
 
-  const [isNewModalOpen, setIsNewModalOpen] = useState(false);
+  const [isNewModalOpen, setIsNewModalOpen] = useState(
+    () => searchParams.get("new") === "true",
+  );
   const [selectedRequest, setSelectedRequest] = useState<BloodRequest | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [groupFilter, setGroupFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Auto-open modal if ?new=true query parameter is present
-  useEffect(() => {
+  const handleCloseNewModal = () => {
+    setIsNewModalOpen(false);
     if (searchParams.get("new") === "true") {
-      setIsNewModalOpen(true);
+      router.replace("/blood-requests", { scroll: false });
     }
-  }, [searchParams]);
+  };
 
   // Derived filtered requests
   const filteredRequests = useMemo(() => {
@@ -259,9 +262,10 @@ function BloodRequestsContent() {
       {/* New Request Modal */}
       <NewRequestModal
         isOpen={isNewModalOpen}
-        onClose={() => setIsNewModalOpen(false)}
+        onClose={handleCloseNewModal}
         onSubmit={(data) => {
           addBloodRequest(data);
+          handleCloseNewModal();
         }}
       />
 

@@ -67,45 +67,66 @@ const STORAGE_KEYS = {
   REQUESTS: "badhon_requests_v1",
 };
 
+// Maximum lock duration before a donor lock automatically expires (10 minutes)
+export const LOCK_TTL_MS = 10 * 60 * 1000;
+
+export function isLockActive(lock: Donor["currentLock"]): boolean {
+  if (!lock) return false;
+  const lockTime = new Date(lock.lockedAt).getTime();
+  if (isNaN(lockTime)) return false;
+  return Date.now() - lockTime < LOCK_TTL_MS;
+}
+
+export function getDaysSinceDonation(lastDonationDate: string | null | undefined): number | null {
+  if (!lastDonationDate) return null;
+  const time = new Date(lastDonationDate).getTime();
+  if (isNaN(time)) return null;
+  return Math.floor(Math.max(0, Date.now() - time) / (1000 * 60 * 60 * 24));
+}
+
+export function isDonorEligible(lastDonationDate: string | null | undefined): boolean {
+  const days = getDaysSinceDonation(lastDonationDate);
+  if (days === null) return true; // First time donor is ready
+  return days >= 90;
+}
+
+function getStored<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function getInitialVolunteers(): VolunteerMember[] {
+  const stored = getStored<VolunteerMember[] | null>(STORAGE_KEYS.VOLUNTEERS, null);
+  if (!stored) return SAMPLE_VOLUNTEERS;
+  const existingIds = new Set(stored.map((v) => v.id));
+  return [...stored, ...SAMPLE_VOLUNTEERS.filter((v) => !existingIds.has(v.id))];
+}
+
+function getInitialCurrentVolunteer(): VolunteerMember {
+  const stored = getStored<VolunteerMember | null>(STORAGE_KEYS.CURRENT_VOLUNTEER, null);
+  if (!stored) return SAMPLE_VOLUNTEERS[0];
+  return SAMPLE_VOLUNTEERS.find((v) => v.id === stored.id) || SAMPLE_VOLUNTEERS[0];
+}
+
 export function BadhonProvider({ children }: { children: React.ReactNode }) {
-  const [volunteers, setVolunteers] = useState<VolunteerMember[]>(SAMPLE_VOLUNTEERS);
+  const [volunteers, setVolunteers] = useState<VolunteerMember[]>(getInitialVolunteers);
   const [currentVolunteer, setCurrentVolunteer] = useState<VolunteerMember>(
-    SAMPLE_VOLUNTEERS[0],
+    getInitialCurrentVolunteer,
   );
-  const [donors, setDonors] = useState<Donor[]>(SAMPLE_DONORS);
-  const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>(
-    SAMPLE_BLOOD_REQUESTS,
+  const [donors, setDonors] = useState<Donor[]>(() =>
+    getStored<Donor[]>(STORAGE_KEYS.DONORS, SAMPLE_DONORS),
   );
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Initialize from LocalStorage
-  useEffect(() => {
-    try {
-      const storedVolunteers = localStorage.getItem(STORAGE_KEYS.VOLUNTEERS);
-      const storedCurVol = localStorage.getItem(STORAGE_KEYS.CURRENT_VOLUNTEER);
-      const storedDonors = localStorage.getItem(STORAGE_KEYS.DONORS);
-      const storedRequests = localStorage.getItem(STORAGE_KEYS.REQUESTS);
-
-      if (storedVolunteers) setVolunteers(JSON.parse(storedVolunteers));
-      if (storedCurVol) {
-        const parsed = JSON.parse(storedCurVol);
-        const match = (storedVolunteers ? JSON.parse(storedVolunteers) : SAMPLE_VOLUNTEERS).find(
-          (v: VolunteerMember) => v.id === parsed.id,
-        );
-        if (match) setCurrentVolunteer(match);
-      }
-      if (storedDonors) setDonors(JSON.parse(storedDonors));
-      if (storedRequests) setBloodRequests(JSON.parse(storedRequests));
-    } catch (e) {
-      console.error("Failed to load Badhon data from storage:", e);
-    } finally {
-      setIsLoaded(true);
-    }
-  }, []);
+  const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>(() =>
+    getStored<BloodRequest[]>(STORAGE_KEYS.REQUESTS, SAMPLE_BLOOD_REQUESTS),
+  );
 
   // Save to LocalStorage on changes
   useEffect(() => {
-    if (!isLoaded) return;
     try {
       localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(volunteers));
       localStorage.setItem(STORAGE_KEYS.CURRENT_VOLUNTEER, JSON.stringify(currentVolunteer));
@@ -114,7 +135,7 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.error("Failed to persist Badhon data:", e);
     }
-  }, [volunteers, currentVolunteer, donors, bloodRequests, isLoaded]);
+  }, [volunteers, currentVolunteer, donors, bloodRequests]);
 
   const switchVolunteer = (id: string) => {
     const found = volunteers.find((v) => v.id === id);
@@ -127,10 +148,11 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
     const target = donors.find((d) => d.id === donorId);
     if (!target) return { success: false, message: "Donor not found." };
 
-    // Check if locked by another volunteer
+    // Check if active lock is held by another volunteer (respecting TTL)
     if (
       target.currentLock &&
-      target.currentLock.lockedByVolunteerId !== currentVolunteer.id
+      target.currentLock.lockedByVolunteerId !== currentVolunteer.id &&
+      isLockActive(target.currentLock)
     ) {
       const lockedTime = new Date(target.currentLock.lockedAt).toLocaleTimeString([], {
         hour: "2-digit",
@@ -138,7 +160,7 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
       });
       return {
         success: false,
-        message: `${target.currentLock.lockedByVolunteerName} is already calling this donor (since ${lockedTime})!`,
+        message: `${target.currentLock.lockedByVolunteerName} is currently calling this donor (locked at ${lockedTime})!`,
       };
     }
 
