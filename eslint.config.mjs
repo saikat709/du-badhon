@@ -5,6 +5,7 @@ const eslintConfig = [
   {
     rules: {
       "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/purity": "off",
     },
   },
 ];
