@@ -127,6 +127,7 @@ function DonationsContent() {
   const [clubStatusFilter, setClubStatusFilter] = useState<string>("all");
   const [clubSearchQuery, setClubSearchQuery] = useState("");
   const [isExportingClubPdf, setIsExportingClubPdf] = useState(false);
+  const [downloadingMonthKey, setDownloadingMonthKey] = useState<string | null>(null);
 
   // Extract all available months present in the blood requests
   const availableMonths = useMemo(() => {
@@ -373,7 +374,116 @@ function DonationsContent() {
     return Array.from(dateMap.values()).sort((a, b) => b.date.localeCompare(a.date));
   }, [clubFilteredRequests]);
 
-  // Export Tab 2 Club Ledger to Server-Generated PDF
+  // Per-month summary for the selected club (enables downloading PDF for any month)
+  const clubMonthlySummaryList = useMemo(() => {
+    return availableMonths.map((m) => {
+      const monthRequests = bloodRequests.filter((req) => {
+        if (clubHallFilter !== "all") {
+          const matchHall =
+            req.managedByVolunteerHall === clubHallFilter ||
+            req.assignedBags.some((b) => b.donorHall === clubHallFilter);
+          if (!matchHall) return false;
+        }
+        const reqDate = req.dateNeeded || req.createdAt?.split("T")[0];
+        return reqDate && reqDate.startsWith(m);
+      });
+
+      const completed = monthRequests.filter((r) => r.status === "completed");
+      const cancelled = monthRequests.filter((r) => r.status === "cancelled");
+      const bagsDonated = completed.reduce((sum, r) => sum + r.managedBags, 0);
+
+      return {
+        month: m,
+        label: formatMonthLabel(m),
+        totalRequests: monthRequests.length,
+        completedCount: completed.length,
+        cancelledCount: cancelled.length,
+        bagsDonated,
+      };
+    });
+  }, [availableMonths, bloodRequests, clubHallFilter]);
+
+  // Download Club Ledger for any specified month directly
+  const handleDownloadClubMonthLedger = async (targetMonth: string) => {
+    try {
+      setDownloadingMonthKey(targetMonth);
+      const clubLabel = clubHallFilter === "all" ? "All DU Halls (Central)" : clubHallFilter;
+      const monthLabel = formatMonthLabel(targetMonth);
+
+      // Filter requests specifically for this club and targeted month
+      const monthRequests = bloodRequests.filter((req) => {
+        if (clubHallFilter !== "all") {
+          const matchHall =
+            req.managedByVolunteerHall === clubHallFilter ||
+            req.assignedBags.some((b) => b.donorHall === clubHallFilter);
+          if (!matchHall) return false;
+        }
+
+        if (targetMonth !== "all") {
+          const reqDate = req.dateNeeded || req.createdAt?.split("T")[0];
+          if (!reqDate || !reqDate.startsWith(targetMonth)) return false;
+        }
+
+        return true;
+      });
+
+      const totalBags = monthRequests
+        .filter((r) => r.status === "completed")
+        .reduce((sum, r) => sum + r.managedBags, 0);
+
+      const headers = [
+        "Req ID",
+        "Date",
+        "Patient Name",
+        "Blood",
+        "Hospital",
+        "Reason/Notes",
+        "Type",
+        "Bags Done",
+        "Total",
+        "Volunteer",
+        "Hall Unit",
+        "Status",
+      ];
+
+      const rows = monthRequests.map((req) => [
+        req.id,
+        req.dateNeeded || req.createdAt.split("T")[0],
+        req.patientName,
+        req.bloodGroup,
+        req.hospital,
+        req.reason || req.notes || "N/A",
+        req.isPlasma ? "Plasma" : "Whole",
+        req.managedBags,
+        req.totalBags,
+        req.managedByVolunteerName || req.createdByVolunteerName || "Unassigned",
+        req.managedByVolunteerHall || "DU Central",
+        req.status,
+      ]);
+
+      const safeFilename = `badhon_${clubHallFilter.replace(/\s+/g, "_")}_ledger_${targetMonth}.pdf`;
+
+      await requestServerPdfDownload(
+        {
+          title: "DU Badhon Club Monthly Donations Ledger",
+          subtitle: `Month: ${monthLabel}  •  Completed Bags: ${totalBags}`,
+          scope: clubLabel,
+          month: monthLabel,
+          headers,
+          rows,
+          generatedAt: new Date().toLocaleString(),
+        },
+        safeFilename
+      );
+    } catch (err) {
+      console.error("PDF download for month failed:", err);
+      alert("Failed to download PDF ledger for this month. Please try again.");
+    } finally {
+      setDownloadingMonthKey(null);
+    }
+  };
+
+  // Export current filtered view of Tab 2 Club Ledger to Server-Generated PDF
   const handleDownloadClubLedger = async () => {
     try {
       setIsExportingClubPdf(true);
@@ -895,6 +1005,84 @@ function DonationsContent() {
                 </span>
                 <span className="text-xs font-bold text-dark-5 dark:text-dark-6">executives</span>
               </div>
+            </div>
+          </div>
+
+          {/* Monthly Archives & Per-Month PDF Downloads */}
+          <div className="bg-white dark:bg-dark-2 rounded-2xl border border-stroke dark:border-dark-3 p-5 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="font-black text-base text-dark dark:text-white flex items-center gap-2">
+                  <Calendar className="size-4.5 text-rose-600" />
+                  <span>Monthly Archives & Downloadable Reports ({clubHallFilter === "all" ? "Central DU" : clubHallFilter})</span>
+                </h2>
+                <p className="text-xs text-dark-5 dark:text-dark-6">
+                  Select and download official server-rendered PDF monthly ledgers for any month.
+                </p>
+              </div>
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 self-start sm:self-auto">
+                {clubMonthlySummaryList.length} Recorded Months
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {clubMonthlySummaryList.map((mItem) => {
+                const isDownloadingThis = downloadingMonthKey === mItem.month;
+                const isCurrentFilter = clubMonthFilter === mItem.month;
+
+                return (
+                  <div
+                    key={mItem.month}
+                    className={`p-4 rounded-xl border transition flex flex-col justify-between gap-3 ${
+                      isCurrentFilter
+                        ? "border-rose-500 bg-rose-50/20 dark:bg-rose-950/20 shadow-xs"
+                        : "border-stroke dark:border-dark-4 bg-gray-1/40 dark:bg-dark-3/40 hover:border-stroke-dark dark:hover:border-dark-5"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h3 className="font-bold text-sm text-dark dark:text-white">
+                          {mItem.label}
+                        </h3>
+                        <p className="text-[11px] text-dark-5 dark:text-dark-6 mt-0.5">
+                          {mItem.bagsDonated} Bags Donated • {mItem.completedCount} Completed
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => setClubMonthFilter(mItem.month)}
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition ${
+                          isCurrentFilter
+                            ? "bg-rose-600 text-white"
+                            : "bg-gray-2 dark:bg-dark-4 text-dark-5 dark:text-dark-6 hover:text-dark dark:hover:text-white"
+                        }`}
+                      >
+                        {isCurrentFilter ? "Viewing" : "Filter View"}
+                      </button>
+                    </div>
+
+                    <div className="pt-2 border-t border-stroke dark:border-dark-4 flex items-center justify-between">
+                      <span className="text-[11px] font-medium text-dark-5 dark:text-dark-6">
+                        {mItem.totalRequests} Total Requests
+                      </span>
+
+                      <button
+                        onClick={() => handleDownloadClubMonthLedger(mItem.month)}
+                        disabled={isDownloadingThis}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 disabled:opacity-70 text-white text-xs font-bold shadow-xs transition active:scale-95"
+                        title={`Download PDF ledger for ${mItem.label}`}
+                      >
+                        {isDownloadingThis ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          <FileText className="size-3.5" />
+                        )}
+                        <span>{isDownloadingThis ? "Generating..." : "Download PDF"}</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
