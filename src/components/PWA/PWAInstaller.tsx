@@ -104,7 +104,7 @@ export function SmartAppButton() {
     return (
       <span
         title="DU Badhon is installed and running in App Mode"
-        className="hidden md:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 text-[10px] font-bold border border-emerald-200 dark:border-emerald-900/50"
+        className="hidden md:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 text-[10px] font-bold border border-emerald-200 dark:border-emerald-900/50 shrink-0"
       >
         <CheckCircle2 className="size-3 text-emerald-600 dark:text-emerald-400" />
         <span>App Active</span>
@@ -124,18 +124,19 @@ export function SmartAppButton() {
     <Link
       href="/download-app"
       onClick={handleClick}
+      aria-label={isInstallable ? "Install DU Badhon App" : "Get DU Badhon App"}
       title={isInstallable ? "Install DU Badhon to your device (1-Click)" : "Get DU Badhon App (Instant Web App or APK)"}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-xs font-bold border border-rose-200 dark:border-rose-900/50 transition active:scale-95 shadow-2xs group"
+      className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-xs font-bold border border-rose-200 dark:border-rose-900/50 transition active:scale-95 shadow-2xs group shrink-0 whitespace-nowrap"
     >
       {isInstallable ? (
         <>
-          <Download className="size-3.5 group-hover:animate-bounce" />
-          <span>Install App</span>
+          <Download className="size-3.5 group-hover:animate-bounce shrink-0 text-rose-600 dark:text-rose-400" />
+          <span className="hidden sm:inline">Install App</span>
         </>
       ) : (
         <>
-          <Smartphone className="size-3.5" />
-          <span>Get App</span>
+          <Smartphone className="size-3.5 shrink-0 text-rose-600 dark:text-rose-400" />
+          <span className="hidden sm:inline">Get App</span>
         </>
       )}
     </Link>

@@ -196,7 +196,7 @@ export default function HomePage() {
           </nav>
 
           {/* Action Cluster */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <SmartAppButton />
             <ThemeToggleSwitch />
 

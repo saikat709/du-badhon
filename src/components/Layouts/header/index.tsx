@@ -14,27 +14,27 @@ export function Header() {
   const { currentVolunteer } = useBadhon();
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white/90 backdrop-blur-md px-4 py-2.5 shadow-xs dark:border-stroke-dark dark:bg-gray-dark/90 md:px-6 2xl:px-10">
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white/90 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-2.5 shadow-xs dark:border-stroke-dark dark:bg-gray-dark/90 md:px-6 2xl:px-10">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         <button
           onClick={toggleSidebar}
-          className="rounded-xl border border-stroke p-2 text-dark dark:border-stroke-dark dark:bg-[#020D1A] dark:text-white hover:bg-gray-2 dark:hover:bg-dark-3 lg:hidden transition"
+          className="rounded-xl border border-stroke p-2 text-dark dark:border-stroke-dark dark:bg-[#020D1A] dark:text-white hover:bg-gray-2 dark:hover:bg-dark-3 lg:hidden transition shrink-0"
         >
           <Menu className="size-5" />
           <span className="sr-only">Toggle Sidebar</span>
         </button>
 
         {isMobile && (
-          <Link href={"/dashboard"} className="flex items-center gap-2">
+          <Link href={"/dashboard"} className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <Image
               src={"/images/logo/logo-icon.svg"}
-              width={28}
-              height={28}
+              width={26}
+              height={26}
               alt="Badhon Logo"
               style={{ width: "auto", height: "auto" }}
               priority
             />
-            <span className="font-black text-rose-600 text-lg tracking-wider">BADHON</span>
+            <span className="font-black text-rose-600 text-base sm:text-lg tracking-wider">BADHON</span>
           </Link>
         )}
 
@@ -53,7 +53,7 @@ export function Header() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2.5 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
         <SmartAppButton />
 
         <Link

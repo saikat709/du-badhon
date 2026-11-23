@@ -31,25 +31,25 @@ export function ThemeToggleSwitch() {
   return (
     <button
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="group rounded-full bg-gray-3 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-[#020D1A] dark:text-current"
+      className="group rounded-full bg-gray-3 p-1 sm:p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-[#020D1A] dark:text-current shrink-0"
     >
       <span className="sr-only">
         Switch to {theme === "light" ? "dark" : "light"} mode
       </span>
 
-      <span aria-hidden className="relative flex gap-2.5">
+      <span aria-hidden className="relative flex gap-1.5 sm:gap-2.5">
         {/* Indicator */}
-        <span className="absolute size-[38px] rounded-full border border-gray-200 bg-white transition-all dark:translate-x-[48px] dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3" />
+        <span className="absolute size-7 sm:size-[38px] rounded-full border border-gray-200 bg-white transition-all dark:translate-x-[34px] sm:dark:translate-x-[48px] dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3" />
 
         {THEMES.map(({ name, Icon }) => (
           <span
             key={name}
             className={cn(
-              "relative grid size-[38px] place-items-center rounded-full text-dark-5 transition-colors dark:text-dark-6",
+              "relative grid size-7 sm:size-[38px] place-items-center rounded-full text-dark-5 transition-colors dark:text-dark-6",
               name === "dark" && "dark:text-white",
             )}
           >
-            <Icon className="size-4" />
+            <Icon className="size-3.5 sm:size-4" />
           </span>
         ))}
       </span>
