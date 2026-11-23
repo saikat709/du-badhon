@@ -7,9 +7,11 @@ import { useSidebarContext } from "../sidebar/sidebar-context";
 import { ThemeToggleSwitch } from "./theme-toggle";
 import { UserInfo } from "./user-info";
 import { HeaderInstallButton } from "@/components/PWA/PWAInstaller";
+import { useBadhon } from "@/context/badhon-context";
 
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
+  const { currentVolunteer } = useBadhon();
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white/90 backdrop-blur-md px-4 py-2.5 shadow-xs dark:border-stroke-dark dark:bg-gray-dark/90 md:px-6 2xl:px-10">
@@ -38,10 +40,10 @@ export function Header() {
         <div className="max-md:hidden">
           <div className="flex items-center gap-2">
             <h1 className="text-sm font-bold text-dark dark:text-white leading-tight">
-              DU Badhon Management
+              DU Badhon
             </h1>
-            <span className="rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
-              DU Unit
+            <span className="rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 px-2.5 py-0.5 text-[10px] font-black tracking-wider truncate max-w-[200px]">
+              {currentVolunteer.hallUnit}
             </span>
           </div>
           <p className="text-[11px] text-dark-5 dark:text-dark-6">

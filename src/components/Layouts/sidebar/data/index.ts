@@ -1,79 +1,85 @@
 import {
+  Building2,
   ClipboardList,
   HeartHandshake,
   LayoutDashboard,
+  LucideIcon,
   Search,
   Smartphone,
   User,
   Users,
 } from "lucide-react";
 
-export const NAV_DATA = [
+export interface NavSubItem {
+  title: string;
+  url: string;
+}
+
+export interface NavItem {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  items?: NavSubItem[];
+}
+
+export interface NavSection {
+  label: string;
+  items: NavItem[];
+}
+
+export const NAV_DATA: NavSection[] = [
   {
-    label: "MAIN MENU",
+    label: "OPERATIONS",
     items: [
       {
         title: "Dashboard",
-        icon: LayoutDashboard,
         url: "/dashboard",
-        items: [
-          {
-            title: "All Units Overview",
-            url: "/dashboard",
-          },
-          {
-            title: "FH Hall Unit",
-            url: "/dashboard?unit=Fazlul+Huq+Muslim+Hall",
-          },
-          {
-            title: "Shahidullah Hall Unit",
-            url: "/dashboard?unit=Shahidullah+Hall",
-          },
-          {
-            title: "Sufia Kamal Hall Unit",
-            url: "/dashboard?unit=Kabi+Sufia+Kamal+Hall",
-          },
-          {
-            title: "Jagannath Hall Unit",
-            url: "/dashboard?unit=Jagannath+Hall",
-          },
-        ],
+        icon: LayoutDashboard,
       },
       {
         title: "Blood Requests",
         url: "/blood-requests",
         icon: HeartHandshake,
-        items: [],
       },
       {
-        title: "Search Blood",
+        title: "Search Donors",
         url: "/search-blood",
         icon: Search,
-        items: [],
       },
       {
         title: "Donors Directory",
         url: "/donors",
         icon: Users,
-        items: [],
+      },
+    ],
+  },
+  {
+    label: "COMMUNITY & DIRECTORY",
+    items: [
+      {
+        title: "Hall Units & Executives",
+        url: "/hall-units",
+        icon: Building2,
       },
       {
         title: "Donation Records",
         url: "/donations",
         icon: ClipboardList,
-        items: [],
+      },
+    ],
+  },
+  {
+    label: "ACCOUNT & MOBILE",
+    items: [
+      {
+        title: "Download App",
+        url: "/download-app",
+        icon: Smartphone,
       },
       {
         title: "Your Profile",
         url: "/profile",
         icon: User,
-        items: [],
-      },
-      {
-        title: "Download App",
-        url: "/download-app",
-        icon: Smartphone,
-        items: [],
       },
     ],
   },

@@ -58,19 +58,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased">
+      <body className="antialiased bg-gray-2 dark:bg-[#020d1a] text-slate-800 dark:text-slate-100 min-h-screen">
         <Providers>
-          <NextTopLoader showSpinner={false} />
-
-          <div className="flex min-h-screen">
-            <div className="w-full bg-gray-200 dark:bg-[#020d1a] min-h-screen flex flex-col justify-between">
-              <Header />
-              <main className="isolate mx-auto w-full max-w-screen overflow-hidden flex-grow">
-                {children}
-              </main>
-            </div>
-          </div>
-
+          <NextTopLoader color="#E11D48" showSpinner={false} />
+          {children}
           <PWAInstaller />
         </Providers>
       </body>

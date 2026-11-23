@@ -98,6 +98,16 @@ export interface VolunteerMember {
   studentId: string;
   hallUnit: HallUnit;
   phone: string;
-  role: "President" | "General Secretary" | "Executive Member" | "Active Volunteer";
+  role:
+    | "President"
+    | "General Secretary"
+    | "Blood Affairs Secretary"
+    | "Organizing Secretary"
+    | "Executive Member"
+    | "Active Volunteer";
   avatarBg: string;
+  department?: string;
+  session?: string;
+  bloodGroup?: BloodGroup;
+  roomNo?: string;
 }

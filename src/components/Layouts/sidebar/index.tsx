@@ -1,53 +1,46 @@
 "use client";
 
-import { Logo } from "@/components/logo";
-import { cn } from "@/lib/utils";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { NAV_DATA } from "./data";
-import { ArrowLeftIcon, ChevronUp } from "./icons";
-import { MenuItem } from "./menu-item";
+import { cn } from "@/lib/utils";
+import { useBadhon } from "@/context/badhon-context";
+import { NavItem, NavSection, NavSubItem, NAV_DATA } from "./data";
 import { useSidebarContext } from "./sidebar-context";
+import { ArrowLeft, ChevronUp, Droplet } from "lucide-react";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
+  const { currentVolunteer } = useBadhon();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => (prev.includes(title) ? [] : [title]));
-
-    // Uncomment the following line to enable multiple expanded items
-    // setExpandedItems((prev) =>
-    //   prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
-    // );
   };
 
   useEffect(() => {
-    // Keep collapsible open, when it's subpage is active
-    NAV_DATA.some((section) => {
-      return section.items.some((item) => {
-        return item.items?.some((subItem) => {
+    NAV_DATA.some((section: NavSection) => {
+      return section.items.some((item: NavItem) => {
+        return item.items?.some((subItem: NavSubItem) => {
           if (subItem.url === pathname) {
             if (!expandedItems.includes(item.title)) {
-              toggleExpanded(item.title);
+              setExpandedItems([item.title]);
             }
-
-            // Break the loop
             return true;
           }
         });
       });
     });
-  }, [ pathname ] );
+  }, [pathname]);
 
   return (
     <>
-      {/* Mobile Overlay */}
-      { isMobile && isOpen && (
+      {/* Mobile Overlay Backdrop */}
+      {isMobile && isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 transition-opacity duration-300"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
           onClick={() => setIsOpen(false)}
           aria-hidden="true"
         />
@@ -55,124 +48,182 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          "max-w-[290px] overflow-hidden border-r border-gray-200 bg-white transition-[width] duration-200 ease-linear dark:border-gray-800 dark:bg-gray-dark",
-          isMobile ? "fixed bottom-0 top-0 z-50" : "sticky top-0 h-screen",
-          isOpen ? "w-full" : "w-0",
+          "shrink-0 border-r border-stroke bg-white transition-[width] duration-200 ease-linear dark:border-stroke-dark dark:bg-[#020d1a]",
+          isMobile
+            ? "fixed inset-y-0 left-0 z-50 shadow-2xl"
+            : "sticky top-0 h-screen",
+          isOpen ? "w-72" : "w-0 overflow-hidden",
         )}
         aria-label="Main navigation"
         aria-hidden={!isOpen}
-        inert={!isOpen}
       >
-        <div className="flex h-full flex-col py-10 pl-[25px] pr-[7px]">
-          <div className="relative pr-4.5">
-            <Link
-              href={ "/" }
-              onClick={ () => isMobile && toggleSidebar() }
-              className="px-0 py-2.5 min-[850px]:py-0"
-            >
-             <h1 className="mb-0.5 text-heading-5 font-bold text-dark dark:text-white"> Badhon </h1>
-             <hr/>
-            </Link>
-
-            { isMobile && (
-              <button
-                onClick={ toggleSidebar }
-                className="absolute left-3/4 right-4.5 top-1/2 -translate-y-1/2 text-right"
+        <div className="flex h-full flex-col justify-between py-5 px-4 overflow-y-auto custom-scrollbar">
+          <div>
+            {/* Logo and Brand Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-stroke dark:border-stroke-dark/80">
+              <Link
+                href="/dashboard"
+                onClick={() => isMobile && toggleSidebar()}
+                className="flex items-center gap-3 group"
               >
-                <span className="sr-only">Close Menu</span>
+                <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-600 via-rose-500 to-red-600 p-0.5 shadow-md shadow-rose-600/30 group-hover:scale-105 transition-transform">
+                  <div className="w-full h-full rounded-[14px] bg-slate-900 flex items-center justify-center">
+                    <Image
+                      src="/images/logo/logo-icon.svg"
+                      width={24}
+                      height={26}
+                      alt="Badhon Logo"
+                      priority
+                    />
+                  </div>
+                </div>
 
-                <ArrowLeftIcon className="ml-auto size-7" />
-              </button>
-            ) }
-          </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-black text-rose-600 dark:text-rose-500 text-lg tracking-wider">
+                      BADHON
+                    </span>
+                    <span className="rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 px-1.5 py-0.2 text-[9px] font-black uppercase tracking-wider border border-rose-500/20">
+                      DU
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-tight">
+                    University of Dhaka
+                  </p>
+                </div>
+              </Link>
 
-          {/* Navigation */}
-          <div className="custom-scrollbar mt-6 flex-1 overflow-y-auto pr-3 min-[850px]:mt-10">
-            {NAV_DATA.map((section) => (
-              <div key={section.label} className="mb-6">
-                <h2 className="mb-5 text-sm font-medium text-dark-4 dark:text-dark-6">
-                  {section.label}
-                </h2>
+              {isMobile && (
+                <button
+                  onClick={toggleSidebar}
+                  className="rounded-xl border border-stroke p-1.5 text-slate-600 dark:border-stroke-dark dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  aria-label="Close menu"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+              )}
+            </div>
 
-                <nav role="navigation" aria-label={section.label}>
-                  <ul className="space-y-2">
-                    {section.items.map((item) => (
-                      <li key={item.title}>
-                        {item.items?.length ? (
-                          <div>
-                            <MenuItem
-                              isActive={item.items?.some(
-                                ({ url }) => url === pathname,
-                              )}
+            {/* Active Volunteer Hall Unit Card */}
+            <div className="my-4 p-3 rounded-2xl bg-gradient-to-r from-rose-50 to-red-50 dark:from-rose-950/30 dark:to-slate-900/40 border border-rose-200/80 dark:border-rose-900/40 shadow-xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1">
+                  <Droplet className="w-3 h-3 fill-rose-500 text-rose-500" />
+                  Your Hall Unit
+                </span>
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-600 text-white shadow-2xs">
+                  {currentVolunteer.role}
+                </span>
+              </div>
+              <p className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate leading-snug">
+                {currentVolunteer.hallUnit}
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                Logged as: <strong className="font-medium text-slate-700 dark:text-slate-300">{currentVolunteer.name}</strong>
+              </p>
+            </div>
+
+            {/* Navigation Sections */}
+            <nav className="space-y-6 pt-2">
+              {NAV_DATA.map((section) => (
+                <div key={section.label} className="space-y-1">
+                  <p className="px-3 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    {section.label}
+                  </p>
+
+                  <ul className="space-y-1 pt-1">
+                    {section.items.map((item) => {
+                      const isActive = pathname === item.url;
+                      const hasChildren = Boolean(item.items?.length);
+
+                      if (hasChildren) {
+                        const isExpanded = expandedItems.includes(item.title);
+                        const isChildActive = item.items?.some((sub) => sub.url === pathname);
+
+                        return (
+                          <li key={item.title}>
+                            <button
                               onClick={() => toggleExpanded(item.title)}
+                              className={cn(
+                                "w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all",
+                                isChildActive
+                                  ? "bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400"
+                                  : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60",
+                              )}
                             >
-                              <item.icon
-                                className="size-6 shrink-0"
-                                aria-hidden="true"
-                              />
-
-                              <span>{item.title}</span>
-
+                              <div className="flex items-center gap-3">
+                                <item.icon className="w-4 h-4 text-slate-500 group-hover:text-rose-500 shrink-0" />
+                                <span>{item.title}</span>
+                              </div>
                               <ChevronUp
                                 className={cn(
-                                  "ml-auto rotate-180 transition-transform duration-200",
-                                  expandedItems.includes(item.title) &&
-                                    "rotate-0",
+                                  "w-3.5 h-3.5 transition-transform duration-200",
+                                  isExpanded ? "rotate-0" : "rotate-180",
                                 )}
-                                aria-hidden="true"
                               />
-                            </MenuItem>
+                            </button>
 
-                            {expandedItems.includes(item.title) && (
-                              <ul
-                                className="ml-9 mr-0 space-y-1.5 pb-[15px] pr-0 pt-2"
-                                role="menu"
-                              >
-                                {item.items.map((subItem) => (
-                                  <li key={subItem.title} role="none">
-                                    <MenuItem
-                                      as="link"
-                                      href={subItem.url}
-                                      isActive={pathname === subItem.url}
+                            {isExpanded && (
+                              <ul className="ml-7 pl-2 border-l border-rose-200 dark:border-rose-900/40 space-y-1 pt-1">
+                                {item.items?.map((sub) => (
+                                  <li key={sub.title}>
+                                    <Link
+                                      href={sub.url}
+                                      onClick={() => isMobile && toggleSidebar()}
+                                      className={cn(
+                                        "block px-3 py-1.5 rounded-lg text-xs font-medium transition",
+                                        pathname === sub.url
+                                          ? "text-rose-600 dark:text-rose-400 font-bold bg-rose-50 dark:bg-rose-950/30"
+                                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
+                                      )}
                                     >
-                                      <span>{subItem.title}</span>
-                                    </MenuItem>
+                                      {sub.title}
+                                    </Link>
                                   </li>
                                 ))}
                               </ul>
                             )}
-                          </div>
-                        ) : (
-                          (() => {
-                            const href =
-                              "url" in item && typeof item.url === "string"
-                                ? item.url
-                                : "/" +
-                                  ((item as { title?: string }).title || "").toLowerCase().split(" ").join("-");
+                          </li>
+                        );
+                      }
 
-                            return (
-                              <MenuItem
-                                className="flex items-center gap-3 py-3"
-                                as="link"
-                                href={href}
-                                isActive={pathname === href}
-                              >
-                                <item.icon
-                                  className="size-6 shrink-0"
-                                  aria-hidden="true"
-                                />
-
-                                <span>{item.title}</span>
-                              </MenuItem>
-                            );
-                          })()
-                        )}
-                      </li>
-                    ))}
+                      return (
+                        <li key={item.title}>
+                          <Link
+                            href={item.url}
+                            onClick={() => isMobile && toggleSidebar()}
+                            className={cn(
+                              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all",
+                              isActive
+                                ? "bg-rose-600 text-white shadow-sm shadow-rose-600/30 font-bold"
+                                : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white",
+                            )}
+                          >
+                            <item.icon
+                              className={cn(
+                                "w-4 h-4 shrink-0",
+                                isActive ? "text-white" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200",
+                              )}
+                            />
+                            <span>{item.title}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
                   </ul>
-                </nav>
-              </div>
-            ))}
+                </div>
+              ))}
+            </nav>
+          </div>
+
+          {/* Footer Motto and Version */}
+          <div className="pt-4 mt-6 border-t border-stroke dark:border-stroke-dark/80 text-center">
+            <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 italic">
+              &ldquo;রক্তই হোক আত্মার বাঁধন&rdquo;
+            </p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+              DU Badhon v1.2.0 • PWA & APK
+            </p>
           </div>
         </div>
       </aside>
