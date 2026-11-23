@@ -1,6 +1,10 @@
 /** @type {import("next").NextConfig} */
+const isMobileExport = process.env.BUILD_TARGET === "mobile" || process.env.NEXT_EXPORT === "true";
+
 const nextConfig = {
+  ...(isMobileExport ? { output: "export" } : {}),
   images: {
+    unoptimized: isMobileExport,
     remotePatterns: [
       {
         protocol: "http",

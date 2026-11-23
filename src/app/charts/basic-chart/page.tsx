@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   title: "Basic Chart",
 };
 
+export const dynamic = "force-static";
+
 type PropsType = {
   searchParams: Promise<{
     selected_time_frame?: string;
