@@ -56,6 +56,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html:
+              '#nl-badge,[id="nl-badge"],.netlify-badge{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}',
+          }}
+        />
+      </head>
       <body className="antialiased bg-gray-2 dark:bg-[#020d1a] text-slate-800 dark:text-slate-100 min-h-screen">
         <Providers>
           <NextTopLoader color="#E11D48" showSpinner={false} />
