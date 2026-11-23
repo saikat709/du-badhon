@@ -67,7 +67,7 @@ export default function HallUnitsPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb pageName="Hall Units & Executives" />
+      <Breadcrumb pageName="Hall Units" crumbName="Hall Units" hideTitle />
 
       {/* Hero Header */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-900 via-rose-950 to-slate-900 p-6 md:p-8 text-white border border-rose-500/30 shadow-xl">
@@ -78,8 +78,8 @@ export default function HallUnitsPage() {
               <span>Inter-Hall Coordination Directory</span>
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-black tracking-tight">
-              DU Badhon Executive Committee & Hall Members
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight">
+              DU Badhon Hall Units & Executives
             </h1>
 
             <p className="text-xs md:text-sm text-slate-300 leading-relaxed">

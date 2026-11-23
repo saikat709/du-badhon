@@ -70,7 +70,7 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
-      <Breadcrumb pageName="Volunteer Profile" />
+      <Breadcrumb pageName="Volunteer Profile" crumbName="My Profile" hideTitle />
 
       {/* Profile Card */}
       <div className="overflow-hidden rounded-3xl bg-white dark:bg-dark-2 shadow-xs border border-stroke dark:border-dark-3">

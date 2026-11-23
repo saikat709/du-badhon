@@ -390,18 +390,18 @@ function DonationsContent() {
   return (
     <div className="space-y-6">
       {/* Breadcrumb Navigation */}
-      <Breadcrumb pageName="Donations Ledger & Member Performance" />
+      <Breadcrumb pageName="Donations Ledger" crumbName="Donations Ledger" hideTitle />
 
       {/* Hero Title & View Switcher */}
       <div className="bg-white dark:bg-dark-2 rounded-3xl p-6 border border-stroke dark:border-dark-3 shadow-xs space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="size-9 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center">
+              <span className="size-9 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center shrink-0">
                 <ClipboardList className="size-5" />
               </span>
-              <h1 className="text-xl sm:text-2xl font-black text-dark dark:text-white">
-                Badhon Donation Records & Management Ledger
+              <h1 className="text-lg sm:text-xl md:text-2xl font-black text-dark dark:text-white">
+                Donations & Performance Ledger
               </h1>
             </div>
             <p className="text-xs text-dark-5 dark:text-dark-6 max-w-2xl">

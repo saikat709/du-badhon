@@ -31,7 +31,7 @@ export default function DownloadAppPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 md:px-6">
-      <Breadcrumb pageName="Get DU Badhon App" />
+      <Breadcrumb pageName="Mobile App" crumbName="Mobile App" hideTitle />
 
       {/* Hero Header */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-rose-950 to-slate-900 border border-rose-500/30 p-6 md:p-10 shadow-2xl text-white mb-8">
