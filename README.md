@@ -1,6 +1,9 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/9abf088b-ba1f-403d-ae01-5a21c352d318/deploy-status)](https://app.netlify.com/projects/dubadhon/deploys)
+
 <p align="center">
   <img src="./_readme_assets/badhon-hero-banner.jpg" alt="Badhon - University of Dhaka Voluntary Blood Donors' Organization" width="100%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);" />
 </p>
+
 
 <p align="center">
   <strong>বাঁধন (স্বেচ্ছায় রক্তদাতাদের সংগঠন) — ঢাকা বিশ্ববিদ্যালয়</strong><br>
