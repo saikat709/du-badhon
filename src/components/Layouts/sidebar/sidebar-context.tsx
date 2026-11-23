@@ -1,7 +1,7 @@
 "use client";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 type SidebarState = "expanded" | "collapsed";
 
@@ -30,19 +30,17 @@ export function SidebarProvider({
   children: React.ReactNode;
   defaultOpen?: boolean;
 }) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
   const isMobile = useIsMobile();
+  const [openOverride, setOpenOverride] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    if (isMobile) {
-      setIsOpen(false);
-    } else {
-      setIsOpen(true);
-    }
-  }, [isMobile]);
+  const isOpen = openOverride !== null ? openOverride : (isMobile ? false : defaultOpen);
+
+  function setIsOpen(open: boolean) {
+    setOpenOverride(open);
+  }
 
   function toggleSidebar() {
-    setIsOpen((prev) => !prev);
+    setOpenOverride(!isOpen);
   }
 
   return (

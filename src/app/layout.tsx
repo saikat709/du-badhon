@@ -1,9 +1,6 @@
 import "@/css/satoshi.css";
 import "@/css/style.css";
 
-import "flatpickr/dist/flatpickr.min.css";
-import "jsvectormap/dist/jsvectormap.css";
-
 import type { Metadata, Viewport } from "next";
 import NextTopLoader from "nextjs-toploader";
 import type { PropsWithChildren } from "react";

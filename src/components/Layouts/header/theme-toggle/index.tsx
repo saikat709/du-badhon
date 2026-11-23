@@ -1,7 +1,9 @@
+"use client";
+
 import { cn } from "@/lib/utils";
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { Moon, Sun } from "./icons";
+import { useSyncExternalStore } from "react";
 
 const THEMES = [
   {
@@ -16,11 +18,11 @@ const THEMES = [
 
 export function ThemeToggleSwitch() {
   const { setTheme, theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   if (!mounted) {
     return null;
@@ -43,11 +45,11 @@ export function ThemeToggleSwitch() {
           <span
             key={name}
             className={cn(
-              "relative grid size-[38px] place-items-center rounded-full",
+              "relative grid size-[38px] place-items-center rounded-full text-dark-5 transition-colors dark:text-dark-6",
               name === "dark" && "dark:text-white",
             )}
           >
-            <Icon />
+            <Icon className="size-4" />
           </span>
         ))}
       </span>
