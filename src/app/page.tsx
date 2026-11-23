@@ -1,7 +1,7 @@
 "use client";
 
 import { SmartAppButton } from "@/components/PWA/PWAInstaller";
-import { ThemeToggleSwitch } from "@/components/Layouts/header";
+import { ThemeToggleSwitch } from "@/components/Layouts/header/theme-toggle";
 import { useBadhon, isDonorEligible } from "@/context/badhon-context";
 import { BloodGroup, HallUnit } from "@/types/badhon";
 import { getSafeTelUri } from "@/utils/security";

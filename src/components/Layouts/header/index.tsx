@@ -9,8 +9,6 @@ import { UserInfo } from "./user-info";
 import { SmartAppButton } from "@/components/PWA/PWAInstaller";
 import { useBadhon } from "@/context/badhon-context";
 
-export { ThemeToggleSwitch } from "./theme-toggle";
-
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
   const { currentVolunteer } = useBadhon();
