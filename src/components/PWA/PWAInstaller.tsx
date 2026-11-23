@@ -37,7 +37,9 @@ if (typeof window !== "undefined") {
   // Register service worker in background
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
+      navigator.serviceWorker.register("/sw.js").catch((err) => {
+        console.debug("Service worker registration skipped:", err);
+      });
     });
   }
 }

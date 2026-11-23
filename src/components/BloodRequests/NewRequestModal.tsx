@@ -70,7 +70,9 @@ function getCachedTargetUnits(ownUnit: HallUnit): HallUnit[] {
         return valid;
       }
     }
-  } catch {}
+  } catch (error) {
+    console.warn("Failed to retrieve cached target units:", error);
+  }
   return [ownUnit];
 }
 
@@ -159,7 +161,9 @@ export function NewRequestModal({ isOpen, onClose, onSubmit }: NewRequestModalPr
     const finalVisibleUnits = Array.from(new Set([ownUnit, ...selectedUnits]));
     try {
       localStorage.setItem(TARGET_UNITS_CACHE_KEY, JSON.stringify(finalVisibleUnits));
-    } catch {}
+    } catch (error) {
+      console.warn("Failed to cache target units:", error);
+    }
 
     onSubmit({
       patientName: cleanPatient,
