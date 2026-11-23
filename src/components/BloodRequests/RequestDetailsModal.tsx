@@ -147,6 +147,32 @@ export function RequestDetailsModal({
             </div>
           </div>
 
+          {(request.managedByVolunteerName || request.createdByVolunteerName) && (
+            <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-rose-700 dark:text-rose-300">Managed By:</span>
+                <span className="font-bold text-dark dark:text-white">
+                  {request.managedByVolunteerName || request.createdByVolunteerName}
+                </span>
+                <span className="text-dark-5 dark:text-dark-6 text-[11px]">
+                  ({request.managedByVolunteerHall || "DU Central"})
+                </span>
+              </div>
+              {request.status === "completed" && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
+                  <CheckCircle2 className="size-3" />
+                  <span>Completed {request.completedAt ? `(${request.completedAt.split("T")[0]})` : ""}</span>
+                </span>
+              )}
+              {request.status === "cancelled" && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-rose-600 dark:text-rose-400 font-bold">
+                  <XCircle className="size-3" />
+                  <span>Cancelled {request.cancelledAt ? `(${request.cancelledAt.split("T")[0]})` : ""}</span>
+                </span>
+              )}
+            </div>
+          )}
+
           {request.notes && (
             <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-xl text-xs text-amber-900 dark:text-amber-300">
               <span className="font-bold block mb-0.5">Special Notes / Ward:</span>

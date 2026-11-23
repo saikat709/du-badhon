@@ -68,6 +68,8 @@ export interface BagSlot {
   donorPhone?: string;
   donorHall?: string;
   assignedAt?: string;
+  managedByVolunteerId?: string;
+  managedByVolunteerName?: string;
   status: "pending" | "assigned" | "donated";
 }
 
@@ -90,6 +92,12 @@ export interface BloodRequest {
   assignedBags: BagSlot[];
   createdAt: string;
   createdByVolunteerName: string;
+  managedByVolunteerId?: string;
+  managedByVolunteerName?: string;
+  managedByVolunteerHall?: string;
+  managedAt?: string;
+  completedAt?: string;
+  cancelledAt?: string;
 }
 
 export interface VolunteerMember {

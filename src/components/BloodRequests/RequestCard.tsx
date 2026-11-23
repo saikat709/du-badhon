@@ -196,13 +196,22 @@ export function RequestCard({
           <div className="flex justify-between items-center text-[11px] pt-1 text-slate-400">
             <span className="inline-flex items-center gap-1">
               <User className="size-3" />
-              <span className="text-slate-300 font-medium">{request.patientName}</span>
+              <span className="text-slate-300 font-medium truncate max-w-[150px]">{request.patientName}</span>
             </span>
             <span className="inline-flex items-center gap-1">
               <Calendar className="size-3" />
               <span className="text-slate-300 font-medium">{request.dateNeeded}</span>
             </span>
           </div>
+
+          {(request.managedByVolunteerName || request.createdByVolunteerName) && (
+            <div className="text-[10px] text-rose-200/90 flex items-center justify-between pt-0.5">
+              <span>Managed by: <strong>{request.managedByVolunteerName || request.createdByVolunteerName}</strong></span>
+              {request.managedByVolunteerHall && (
+                <span className="text-[9px] opacity-75">{request.managedByVolunteerHall.split(" ")[0]}</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

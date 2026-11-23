@@ -52,8 +52,16 @@ interface BadhonContextType {
     donorId: string,
   ) => { success: boolean; message?: string };
   unassignDonorFromBag: (requestId: string, bagNumber: number) => void;
-  markRequestCompleted: (requestId: string, notes?: string) => void;
-  markRequestCancelled: (requestId: string, reason: string) => void;
+  markRequestCompleted: (
+    requestId: string,
+    notes?: string,
+    managedBy?: { id: string; name: string; hall: string },
+  ) => void;
+  markRequestCancelled: (
+    requestId: string,
+    reason: string,
+    managedBy?: { id: string; name: string; hall: string },
+  ) => void;
   addDonor: (donor: Omit<Donor, "id" | "callHistory" | "totalDonations" | "currentLock">) => Donor;
   resetToSampleData: () => void;
 }
@@ -113,6 +121,13 @@ function getInitialCurrentVolunteer(): VolunteerMember {
   return SAMPLE_VOLUNTEERS.find((v) => v.id === stored.id) || SAMPLE_VOLUNTEERS[0];
 }
 
+function getInitialRequests(): BloodRequest[] {
+  const stored = getStored<BloodRequest[] | null>(STORAGE_KEYS.REQUESTS, null);
+  if (!stored) return SAMPLE_BLOOD_REQUESTS;
+  const existingIds = new Set(stored.map((r) => r.id));
+  return [...stored, ...SAMPLE_BLOOD_REQUESTS.filter((r) => !existingIds.has(r.id))];
+}
+
 export function BadhonProvider({ children }: { children: React.ReactNode }) {
   const [volunteers, setVolunteers] = useState<VolunteerMember[]>(getInitialVolunteers);
   const [currentVolunteer, setCurrentVolunteer] = useState<VolunteerMember>(
@@ -121,9 +136,7 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
   const [donors, setDonors] = useState<Donor[]>(() =>
     getStored<Donor[]>(STORAGE_KEYS.DONORS, SAMPLE_DONORS),
   );
-  const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>(() =>
-    getStored<BloodRequest[]>(STORAGE_KEYS.REQUESTS, SAMPLE_BLOOD_REQUESTS),
-  );
+  const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>(getInitialRequests);
 
   // Save to LocalStorage on changes
   useEffect(() => {
@@ -279,6 +292,8 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
               donorPhone: donor.phone,
               donorHall: donor.hallUnit,
               assignedAt: new Date().toISOString(),
+              managedByVolunteerId: currentVolunteer.id,
+              managedByVolunteerName: currentVolunteer.name,
               status: "assigned" as const,
             };
           }
@@ -298,6 +313,10 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
           assignedBags: updatedBags,
           managedBags: managedCount,
           status: newStatus,
+          managedByVolunteerId: req.managedByVolunteerId || currentVolunteer.id,
+          managedByVolunteerName: req.managedByVolunteerName || currentVolunteer.name,
+          managedByVolunteerHall: req.managedByVolunteerHall || currentVolunteer.hallUnit,
+          managedAt: req.managedAt || new Date().toISOString(),
         };
       }),
     );
@@ -338,12 +357,21 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const markRequestCompleted = (requestId: string, notes?: string) => {
+  const markRequestCompleted = (
+    requestId: string,
+    notes?: string,
+    managedBy?: { id: string; name: string; hall: string },
+  ) => {
     const target = bloodRequests.find((r) => r.id === requestId);
     if (!target) return;
 
+    const now = new Date().toISOString();
+    const volunteerId = managedBy?.id || currentVolunteer.id;
+    const volunteerName = managedBy?.name || currentVolunteer.name;
+    const volunteerHall = managedBy?.hall || currentVolunteer.hallUnit;
+
     // Update donors who donated
-    const today = new Date().toISOString().split("T")[0];
+    const today = now.split("T")[0];
     const donorIds = target.assignedBags
       .map((b) => b.donorId)
       .filter((id): id is string => id != null);
@@ -370,15 +398,36 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
           ...req,
           status: "completed",
           notes: notes ? `${req.notes || ""}\n${notes}` : req.notes,
+          completedAt: now,
+          managedAt: req.managedAt || now,
+          managedByVolunteerId: req.managedByVolunteerId || volunteerId,
+          managedByVolunteerName: req.managedByVolunteerName || volunteerName,
+          managedByVolunteerHall: req.managedByVolunteerHall || volunteerHall,
           assignedBags: req.assignedBags.map((b) =>
-            b.donorId ? { ...b, status: "donated" } : b,
+            b.donorId
+              ? {
+                  ...b,
+                  status: "donated" as const,
+                  managedByVolunteerId: b.managedByVolunteerId || volunteerId,
+                  managedByVolunteerName: b.managedByVolunteerName || volunteerName,
+                }
+              : b,
           ),
         };
       }),
     );
   };
 
-  const markRequestCancelled = (requestId: string, reason: string) => {
+  const markRequestCancelled = (
+    requestId: string,
+    reason: string,
+    managedBy?: { id: string; name: string; hall: string },
+  ) => {
+    const now = new Date().toISOString();
+    const volunteerId = managedBy?.id || currentVolunteer.id;
+    const volunteerName = managedBy?.name || currentVolunteer.name;
+    const volunteerHall = managedBy?.hall || currentVolunteer.hallUnit;
+
     setBloodRequests((prev) =>
       prev.map((req) => {
         if (req.id !== requestId) return req;
@@ -386,6 +435,11 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
           ...req,
           status: "cancelled",
           cancellationReason: reason,
+          cancelledAt: now,
+          managedAt: req.managedAt || now,
+          managedByVolunteerId: req.managedByVolunteerId || volunteerId,
+          managedByVolunteerName: req.managedByVolunteerName || volunteerName,
+          managedByVolunteerHall: req.managedByVolunteerHall || volunteerHall,
         };
       }),
     );
