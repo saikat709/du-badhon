@@ -12,8 +12,10 @@ import {
   Download,
   Droplet,
   FileSpreadsheet,
+  FileText,
   Filter,
   HeartHandshake,
+  Loader2,
   Search,
   Sparkles,
   TrendingUp,
@@ -71,9 +73,7 @@ function formatDateDisplay(dateStr: string): string {
   }
 }
 
-function triggerCSVDownload(filename: string, csvContent: string) {
-  // UTF-8 BOM (\uFEFF) ensures Bengali and special characters render cleanly in Excel
-  const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+function triggerFileDownload(filename: string, blob: Blob) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
@@ -82,6 +82,31 @@ function triggerCSVDownload(filename: string, csvContent: string) {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+async function requestServerPdfDownload(endpointPayload: {
+  title: string;
+  subtitle?: string;
+  scope?: string;
+  month?: string;
+  headers: string[];
+  rows: (string | number)[][];
+  generatedAt?: string;
+}, filename: string) {
+  const res = await fetch("/api/donations/export-pdf", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(endpointPayload),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to generate PDF: ${res.statusText}`);
+  }
+
+  const blob = await res.blob();
+  triggerFileDownload(filename, blob);
 }
 
 function DonationsContent() {
@@ -93,6 +118,7 @@ function DonationsContent() {
   // Filters for Tab 1 (Members Monthly Report)
   const [memberMonthFilter, setMemberMonthFilter] = useState<string>("2026-01");
   const [memberHallFilter, setMemberHallFilter] = useState<string>("all");
+  const [isExportingMembersPdf, setIsExportingMembersPdf] = useState(false);
 
   // Filters for Tab 2 (Club Donations Ledger)
   const [clubHallFilter, setClubHallFilter] = useState<string>(currentVolunteer.hallUnit);
@@ -100,6 +126,7 @@ function DonationsContent() {
   const [clubBloodGroupFilter, setClubBloodGroupFilter] = useState<string>("all");
   const [clubStatusFilter, setClubStatusFilter] = useState<string>("all");
   const [clubSearchQuery, setClubSearchQuery] = useState("");
+  const [isExportingClubPdf, setIsExportingClubPdf] = useState(false);
 
   // Extract all available months present in the blood requests
   const availableMonths = useMemo(() => {
@@ -176,47 +203,57 @@ function DonationsContent() {
       });
   }, [volunteers, bloodRequests, memberMonthFilter, memberHallFilter]);
 
-  // Export Tab 1 Members Report to CSV
-  const handleDownloadMembersReport = () => {
-    const monthLabel = formatMonthLabel(memberMonthFilter);
-    const hallLabel = memberHallFilter === "all" ? "DU Campus Central" : memberHallFilter;
+  // Export Tab 1 Members Report to Server-Generated PDF
+  const handleDownloadMembersReport = async () => {
+    try {
+      setIsExportingMembersPdf(true);
+      const monthLabel = formatMonthLabel(memberMonthFilter);
+      const hallLabel = memberHallFilter === "all" ? "DU Campus Central" : memberHallFilter;
 
-    const headers = [
-      "Rank",
-      "Member Name",
-      "Hall Unit",
-      "Student ID",
-      "Role",
-      "Completed Blood Donations",
-      "Cancelled Requests",
-      "Total Requests Managed",
-      "Completion Rate (%)",
-    ];
+      const headers = [
+        "Rank",
+        "Member Name",
+        "Hall Unit",
+        "Student ID",
+        "Role",
+        "Completed Bags",
+        "Cancelled",
+        "Total Handled",
+        "Success Rate",
+      ];
 
-    const rows = memberReportData.map((item, idx) => [
-      idx + 1,
-      `"${item.volunteer.name}"`,
-      `"${item.volunteer.hallUnit}"`,
-      `"${item.volunteer.studentId}"`,
-      `"${item.volunteer.role}"`,
-      item.completedCount,
-      item.cancelledCount,
-      item.totalProcessed,
-      `${item.successRate}%`,
-    ]);
+      const rows = memberReportData.map((item, idx) => [
+        idx + 1,
+        item.volunteer.name,
+        item.volunteer.hallUnit,
+        item.volunteer.studentId,
+        item.volunteer.role,
+        item.completedCount,
+        item.cancelledCount,
+        item.totalProcessed,
+        `${item.successRate}%`,
+      ]);
 
-    const csvString = [
-      `"BADHON - Dhaka University Voluntary Blood Donors' Organization"`,
-      `"Monthly Member Blood Management Report: ${monthLabel}"`,
-      `"Scope: ${hallLabel}"`,
-      `"Generated At: ${new Date().toLocaleString()}"`,
-      "",
-      headers.join(","),
-      ...rows.map((r) => r.join(",")),
-    ].join("\n");
+      const safeFilename = `badhon_members_donation_report_${memberMonthFilter}_${memberHallFilter.replace(/\s+/g, "_")}.pdf`;
 
-    const safeFilename = `badhon_members_donation_report_${memberMonthFilter}_${memberHallFilter.replace(/\s+/g, "_")}.csv`;
-    triggerCSVDownload(safeFilename, csvString);
+      await requestServerPdfDownload(
+        {
+          title: "Monthly Member Blood Management Report",
+          subtitle: "Volunteer Performance & Transfusion Records",
+          scope: hallLabel,
+          month: monthLabel,
+          headers,
+          rows,
+          generatedAt: new Date().toLocaleString(),
+        },
+        safeFilename
+      );
+    } catch (err) {
+      console.error("PDF download failed:", err);
+      alert("Failed to download PDF report. Please try again.");
+    } finally {
+      setIsExportingMembersPdf(false);
+    }
   };
 
   // ==========================================
@@ -336,55 +373,63 @@ function DonationsContent() {
     return Array.from(dateMap.values()).sort((a, b) => b.date.localeCompare(a.date));
   }, [clubFilteredRequests]);
 
-  // Export Tab 2 Club Ledger to CSV
-  const handleDownloadClubLedger = () => {
-    const clubLabel = clubHallFilter === "all" ? "All DU Halls" : clubHallFilter;
-    const monthLabel = formatMonthLabel(clubMonthFilter);
+  // Export Tab 2 Club Ledger to Server-Generated PDF
+  const handleDownloadClubLedger = async () => {
+    try {
+      setIsExportingClubPdf(true);
+      const clubLabel = clubHallFilter === "all" ? "All DU Halls (Central)" : clubHallFilter;
+      const monthLabel = formatMonthLabel(clubMonthFilter);
 
-    const headers = [
-      "Request ID",
-      "Date",
-      "Patient Name",
-      "Hospital",
-      "Blood Group",
-      "Is Plasma",
-      "Bags Managed",
-      "Total Bags",
-      "Managed By Volunteer",
-      "Volunteer Hall Unit",
-      "Status",
-      "Notes / Reason",
-    ];
+      const headers = [
+        "Req ID",
+        "Date",
+        "Patient Name",
+        "Blood",
+        "Hospital",
+        "Reason/Notes",
+        "Type",
+        "Bags Done",
+        "Total",
+        "Volunteer",
+        "Hall Unit",
+        "Status",
+      ];
 
-    const rows = clubFilteredRequests.map((req) => [
-      req.id,
-      req.dateNeeded || req.createdAt.split("T")[0],
-      `"${req.patientName}"`,
-      `"${req.hospital}"`,
-      req.bloodGroup,
-      req.isPlasma ? "Yes (Plasma)" : "No (Whole Blood)",
-      req.managedBags,
-      req.totalBags,
-      `"${req.managedByVolunteerName || req.createdByVolunteerName || "Unassigned"}"`,
-      `"${req.managedByVolunteerHall || "DU Central"}"`,
-      req.status,
-      `"${(req.cancellationReason || req.notes || req.reason || "").replace(/"/g, '""')}"`,
-    ]);
+      const rows = clubFilteredRequests.map((req) => [
+        req.id,
+        req.dateNeeded || req.createdAt.split("T")[0],
+        req.patientName,
+        req.bloodGroup,
+        req.hospital,
+        req.reason || req.notes || "N/A",
+        req.isPlasma ? "Plasma" : "Whole",
+        req.managedBags,
+        req.totalBags,
+        req.managedByVolunteerName || req.createdByVolunteerName || "Unassigned",
+        req.managedByVolunteerHall || "DU Central",
+        req.status,
+      ]);
 
-    const csvString = [
-      `"BADHON - Dhaka University Voluntary Blood Donors' Organization"`,
-      `"Club Donations & Management Ledger"`,
-      `"Club / Unit: ${clubLabel}"`,
-      `"Month: ${monthLabel}"`,
-      `"Total Bags Donated: ${clubStats.totalBagsDonated}"`,
-      `"Generated At: ${new Date().toLocaleString()}"`,
-      "",
-      headers.join(","),
-      ...rows.map((r) => r.join(",")),
-    ].join("\n");
+      const safeFilename = `badhon_club_donations_ledger_${clubHallFilter.replace(/\s+/g, "_")}_${clubMonthFilter}.pdf`;
 
-    const safeFilename = `badhon_club_donations_ledger_${clubHallFilter.replace(/\s+/g, "_")}_${clubMonthFilter}.csv`;
-    triggerCSVDownload(safeFilename, csvString);
+      await requestServerPdfDownload(
+        {
+          title: "DU Badhon Club Donations & Operations Ledger",
+          subtitle: `Total Bags Managed: ${clubStats.totalBagsDonated}`,
+          scope: clubLabel,
+          month: monthLabel,
+          headers,
+          rows,
+          generatedAt: new Date().toLocaleString(),
+        },
+        safeFilename
+      );
+    } catch (err) {
+      console.error("PDF download failed:", err);
+      alert("Failed to download PDF ledger. Please try again.");
+    } finally {
+      setIsExportingClubPdf(false);
+    }
   };
 
   return (
@@ -486,10 +531,15 @@ function DonationsContent() {
             {/* Download Monthly Report Button */}
             <button
               onClick={handleDownloadMembersReport}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition active:scale-95"
+              disabled={isExportingMembersPdf}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-70 text-white font-bold text-xs shadow-md transition active:scale-95"
             >
-              <FileSpreadsheet className="size-4" />
-              <span>Download Monthly Report (CSV)</span>
+              {isExportingMembersPdf ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <FileText className="size-4" />
+              )}
+              <span>{isExportingMembersPdf ? "Generating PDF..." : "Download Monthly Report (PDF)"}</span>
             </button>
           </div>
 
@@ -780,10 +830,15 @@ function DonationsContent() {
 
               <button
                 onClick={handleDownloadClubLedger}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition active:scale-95 shrink-0"
+                disabled={isExportingClubPdf}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-70 text-white font-bold text-xs shadow-md transition active:scale-95 shrink-0"
               >
-                <Download className="size-4" />
-                <span>Download Club Ledger (CSV)</span>
+                {isExportingClubPdf ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <FileText className="size-4" />
+                )}
+                <span>{isExportingClubPdf ? "Generating PDF..." : "Download Club Ledger (PDF)"}</span>
               </button>
             </div>
           </div>
