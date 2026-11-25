@@ -73,10 +73,15 @@ export async function POST(req: NextRequest) {
         bio: user.bio,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login error:", error);
+    const errorMessage =
+      error?.message || "An unexpected error occurred during sign in.";
     return NextResponse.json(
-      { error: "An unexpected error occurred during sign in." },
+      {
+        error: "An unexpected error occurred during sign in.",
+        details: errorMessage,
+      },
       { status: 500 }
     );
   }
