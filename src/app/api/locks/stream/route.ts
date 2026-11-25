@@ -8,9 +8,14 @@ export async function GET(req: Request) {
   const stream = new ReadableStream({
     async start(controller) {
       let isClosed = false;
+      let consecutiveErrors = 0;
 
       const sendLocks = async () => {
         if (isClosed) return;
+        if (consecutiveErrors >= 3 && consecutiveErrors % 5 !== 0) {
+          consecutiveErrors++;
+          return;
+        }
         try {
           // Delete expired locks
           await db.callLock.deleteMany({
@@ -35,6 +40,8 @@ export async function GET(req: Request) {
             },
           });
 
+          consecutiveErrors = 0; // reset error count on success
+
           const payload = {
             type: "locks_update",
             timestamp: Date.now(),
@@ -56,10 +63,27 @@ export async function GET(req: Request) {
             })),
           };
 
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+          if (!isClosed) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+          }
         } catch (e) {
-          // If connection is aborted or error happens
-          console.error("Error sending SSE locks:", e);
+          consecutiveErrors++;
+          // Log only the first failure to avoid flooding Vercel logs every 2 seconds
+          if (consecutiveErrors === 1) {
+            console.error("Error sending SSE locks (will back off gracefully):", e);
+          }
+          // Send a benign empty update so client stream stays healthy without crashing
+          try {
+            if (!isClosed) {
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({ type: "heartbeat", timestamp: Date.now(), locks: [] })}\n\n`
+                )
+              );
+            }
+          } catch {
+            // stream may have closed
+          }
         }
       };
 

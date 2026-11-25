@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postinstall": "prisma generate",
     "build:mobile": "BUILD_TARGET=mobile next build",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npx cap sync",
