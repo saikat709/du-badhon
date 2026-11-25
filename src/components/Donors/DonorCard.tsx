@@ -65,7 +65,7 @@ export function DonorCard({ donor, onCall, onQuickAssign, activeRequestId }: Don
       {/* Top Bar: Blood Group & Lock Indicator */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-3">
-          <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white font-black text-lg shadow-sm">
+          <span className="flex size-11 min-w-[48px] items-center justify-center rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white font-black text-lg shadow-sm text-center">
             {donor.bloodGroup}
           </span>
           <div>

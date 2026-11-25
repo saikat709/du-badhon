@@ -103,7 +103,7 @@ export function RequestCard({
 
           {/* Blood Group Badge: Safely Contained */}
           <span
-            className={`flex size-11 items-center justify-center rounded-2xl text-base font-black shadow-md border shrink-0 ${
+            className={`flex size-11 min-w-[48px] items-center justify-center rounded-2xl text-base font-black shadow-md border shrink-0 text-center ${
               isCompleted
                 ? "bg-emerald-600 border-emerald-500 text-white"
                 : isCancelled

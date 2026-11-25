@@ -133,7 +133,7 @@ export function SmartAppButton() {
       href="/download-app"
       onClick={handleClick}
       aria-label={isInstallable ? "Install DU Badhon App" : "Get DU Badhon App"}
-      title={isInstallable ? "Install DU Badhon to your device (1-Click)" : "Get DU Badhon App (Instant Web App or APK)"}
+      title={isInstallable ? "Install DU Badhon to your device (1-Click)" : "Get DU Badhon App (Install on Phone or Download)"}
       className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-xs font-bold border border-rose-200 dark:border-rose-900/50 transition active:scale-95 shadow-2xs group shrink-0 whitespace-nowrap"
     >
       {isInstallable ? (

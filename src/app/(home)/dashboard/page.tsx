@@ -91,68 +91,67 @@ function DashboardContent() {
   }, [activeDonorsList]);
 
   return (
-    <div className="space-y-7">
-      {/* Welcome Banner with Badhon Logo */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-950 p-6 md:p-8 text-white shadow-xl border border-rose-500/30">
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="flex items-start sm:items-center gap-4">
+    <div className="space-y-5">
+      {/* Compact Welcome Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-950 p-4 sm:p-5 text-white shadow-lg border border-rose-500/30">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
             {/* Badhon Logo Badge */}
-            <div className="w-16 h-16 rounded-2xl bg-slate-900/90 border border-white/20 p-2.5 flex items-center justify-center shadow-2xl shrink-0">
+            <div className="size-11 sm:size-12 rounded-xl bg-slate-900/90 border border-white/20 p-2 flex items-center justify-center shadow-md shrink-0">
               <Image
                 src="/images/logo/logo-icon.svg"
-                width={44}
-                height={44}
+                width={36}
+                height={36}
                 alt="Badhon Logo"
                 style={{ width: "auto", height: "auto" }}
                 priority
               />
             </div>
 
-            <div className="space-y-1.5 max-w-xl">
+            <div className="space-y-0.5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur-xs">
-                  <Building2 className="w-3.5 h-3.5" />
-                  <span>{currentVolunteer.hallUnit} Unit</span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-bold backdrop-blur-xs">
+                  <Building2 className="w-3 h-3" />
+                  <span>{currentVolunteer.hallUnit}</span>
                 </span>
-                <span className="text-xs text-rose-200">
-                  Duty Executive: <strong>{currentVolunteer.name} ({currentVolunteer.role})</strong>
+                <span className="text-[11px] text-rose-200">
+                  Duty: <strong>{currentVolunteer.name} ({currentVolunteer.role})</strong>
                 </span>
               </div>
 
-              <h1 className="text-2xl md:text-3xl font-black tracking-tight">
-                {currentVolunteer.hallUnit} Dashboard
+              <h1 className="text-lg sm:text-xl font-black tracking-tight">
+                {currentVolunteer.hallUnit} Unit Coordination
               </h1>
 
-              <p className="text-xs md:text-sm text-rose-100 font-medium leading-relaxed">
-                Managing voluntary blood donors for <strong>{currentVolunteer.hallUnit}</strong>. There are{" "}
-                <strong className="text-amber-300 underline underline-offset-2">
+              <p className="text-xs text-rose-100 font-medium line-clamp-1">
+                <strong className="text-amber-300">
                   {activeRequests.length} active emergency requests
                 </strong>{" "}
-                requiring {totalBagsNeeded} blood bags across DU today.
+                ({totalBagsNeeded} bags needed) across DU today.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
             <Link
               href="/blood-requests?new=true"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-rose-800 hover:bg-rose-50 text-xs font-black shadow-md transition active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white text-rose-800 hover:bg-rose-50 text-xs font-black shadow-sm transition active:scale-95"
             >
-              <Plus className="size-4 text-rose-800" />
-              <span>Record Blood Request</span>
+              <Plus className="size-3.5 text-rose-800" />
+              <span>New Request</span>
             </Link>
             <Link
               href="/search-blood"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-rose-950/80 hover:bg-rose-950 text-white text-xs font-bold border border-rose-500/40 transition"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-950/80 hover:bg-rose-950 text-white text-xs font-bold border border-rose-500/40 transition"
             >
-              <Search className="size-4" />
-              <span>Search Donors</span>
+              <Search className="size-3.5" />
+              <span>Search</span>
             </Link>
           </div>
         </div>
 
         {/* Scope Selector Bar */}
-        <div className="relative z-10 mt-6 pt-4 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="relative z-10 mt-3 pt-2.5 border-t border-white/15 flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2">
             <span className="text-rose-200 font-medium">Viewing Metrics:</span>
             <div className="inline-flex p-1 rounded-xl bg-black/30 backdrop-blur-md border border-white/10">

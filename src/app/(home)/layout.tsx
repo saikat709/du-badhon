@@ -4,6 +4,7 @@ import "@/css/style.css";
 import { Sidebar } from "@/components/Layouts/sidebar";
 import { Header } from "@/components/Layouts/header";
 import { GlobalCallingModal } from "@/components/Donors/GlobalCallingModal";
+import { MobileBottomNav } from "@/components/Navigation/MobileBottomNav";
 import type { PropsWithChildren } from "react";
 
 export default function HomeLayout({ children }: PropsWithChildren) {
@@ -18,7 +19,7 @@ export default function HomeLayout({ children }: PropsWithChildren) {
         <Header />
 
         {/* Scrollable Page Body */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 2xl:p-10 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 2xl:p-10 custom-scrollbar pb-24 lg:pb-10">
           <div className="mx-auto w-full max-w-7xl">
             {children}
           </div>
@@ -27,6 +28,9 @@ export default function HomeLayout({ children }: PropsWithChildren) {
 
       {/* Synchronized Global Calling Modal */}
       <GlobalCallingModal />
+
+      {/* Mobile Bottom Navigation (< lg screens) */}
+      <MobileBottomNav />
     </div>
   );
 }

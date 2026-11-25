@@ -237,11 +237,14 @@ export default function HallUnitsPage() {
                               <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">
                                 {member.role}
                               </span>
+                              <span className="inline-block ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-1 dark:bg-dark-3 text-dark-5">
+                                {member.hallUnit.split(" ")[0]}
+                              </span>
                             </div>
                           </div>
 
                           {member.bloodGroup && (
-                            <span className="px-2 py-0.5 rounded-lg text-xs font-black bg-rose-600 text-white shadow-2xs shrink-0">
+                            <span className="inline-flex min-w-[48px] justify-center text-center px-2 py-0.5 rounded-lg text-xs font-black bg-rose-600 text-white shadow-2xs shrink-0">
                               {member.bloodGroup}
                             </span>
                           )}

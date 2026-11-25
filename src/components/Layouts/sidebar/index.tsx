@@ -223,7 +223,7 @@ export function Sidebar() {
               &ldquo;রক্তই হোক আত্মার বাঁধন&rdquo;
             </p>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
-              DU Badhon v1.2.0 • PWA & APK
+              DU Badhon v1.2.0 • Install App & Android
             </p>
           </div>
         </div>

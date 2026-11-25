@@ -744,13 +744,13 @@ export default function HomePage() {
           <div className="space-y-3 max-w-xl text-center md:text-left">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-rose-300 text-xs font-bold">
               <Smartphone className="size-3.5" />
-              <span>Offline Ready • Progressive Web App & Android APK</span>
+              <span>Offline Ready • Install App & Android Download</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
               Get the Official DU Badhon App on Your Phone
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Don&apos;t get stuck during emergency hospital runs. Install DU Badhon directly from your browser or download the native APK for instant one-tap donor search and offline hall contact lists.
+              Don&apos;t get stuck during emergency hospital runs. Install DU Badhon directly from your browser or download for Android for instant one-tap donor search and offline hall contact lists.
             </p>
           </div>
 
@@ -760,14 +760,14 @@ export default function HomePage() {
               className="px-6 py-3.5 rounded-xl font-bold bg-white text-rose-900 hover:bg-rose-50 text-xs shadow-xl transition active:scale-95 flex items-center gap-2"
             >
               <Download className="size-4" />
-              <span>Download Android APK</span>
+              <span>Download for Android</span>
             </Link>
             <Link
               href="/download-app"
               className="px-6 py-3.5 rounded-xl font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs transition active:scale-95 flex items-center gap-2"
             >
               <Smartphone className="size-4" />
-              <span>Install Web App (PWA)</span>
+              <span>Install Web App</span>
             </Link>
           </div>
         </div>
