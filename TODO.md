@@ -9,8 +9,9 @@
 9. In http://localhost:3000/hall-units, when we select all units, we should not seperate them by unit wise cards. rather we should show a single card with grids of people with the info of unit in the information part of the elements body for each.
 10. Add developer recorgination in somewhere footer or somewhere as well as a designated page for that. (I am the developer, You know me! Saikat Islam.)
 11. Since multiple member can search for one blood request (but cant call same doner at the same time). We should show info saying being searched by chips with the names of the member.
-12. Add authentication and user specfic profile (currently can see other members profile by just selecting name, we should be able to select name in profile). Profile edit option (since current data is json, dont need to actually update, just place a placeholder method but all other things should be done) .
-13. Update current member and others seed data with simple member1 name and pass member1, this type easy pattern, so it becomes easy to remember and login for me.
-14. since we have pwa, we shoud setup connection error when no internet connection and others
-15. Use actual database now. (for now sqlite is good, later we will use postgresql or others.)
+12. Add actual authentication and user specific profile (currently can see other members profile by just selecting name, we should be able to select name in profile). Profile edit option (update contact, bio, department, and change password; persistent session via secure cookies).
+13. Update current member and others seed data with simple member1 name and pass member1, this type easy pattern, so it becomes easy to remember and login for me. (e.g. member1/member1, member2/member2, president1/president1, admin/admin).
+14. Since we have mobile PWA & Android app, setup connection error/offline notifications when no internet connection, along with friendly retry state.
+15. Use actual database now: Turso (libSQL / serverless SQLite) for Vercel persistence and local dev with zero data wipeouts, supporting seamless migration to PostgreSQL if needed later.
+16. Add bottom navigation bar for mobile app and mobile website view (Dashboard, Blood Requests, Search Donors, Pending Donations, My Profile) for quick thumb-reach access.
 
