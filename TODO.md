@@ -1,17 +1,20 @@
-1. Pending donation page with sidebar entry, where we see blood requests that have been assigned with donor and been send to donate. From here members can easily mark complete or cancelled. (dont remove those from blood requests page thats current beahviour)
-2. "Live Calling in Progress:🔒 Tanvir Hasan calling Kazi Farhan (B+)" is fake, and leads to homepage, fix it. make it real.
-3. the call locking works, but it isnt realtime. WHne i login from somehwre elsem and click resume, it started from countdowqn 0 and also it did not close the first opened call. It should be realtime communication. For same person as well as for different persons.
-4. We need a my club side bar entry, with our unit members listed. Where all other roles rather than members can add or remove or change role of others. Keep some predefined roles needed for a club, we will just select. 
-5. the /dashboard hero card takes much height. Redesign it.
-6. Make the blood request creation two step, first it selects target with checkbox dont ask today. Second step is informations.
-7. Remove technical wordings and sentences from the whole system e.g PWA. Normal users dont underatand them. E.g this sentence you wrote "DU Badhon v1.2.0 • PWA & APK"
-8. The blood group pill/icon with circular rectangle bg in cards are not fixed sized, so A- and AB- showing different size.
-9. In http://localhost:3000/hall-units, when we select all units, we should not seperate them by unit wise cards. rather we should show a single card with grids of people with the info of unit in the information part of the elements body for each.
-10. Add developer recorgination in somewhere footer or somewhere as well as a designated page for that. (I am the developer, You know me! Saikat Islam.)
-11. Since multiple member can search for one blood request (but cant call same doner at the same time). We should show info saying being searched by chips with the names of the member.
-12. Add actual authentication and user specific profile (currently can see other members profile by just selecting name, we should be able to select name in profile). Profile edit option (update contact, bio, department, and change password; persistent session via secure cookies).
-13. Update current member and others seed data with simple member1 name and pass member1, this type easy pattern, so it becomes easy to remember and login for me. (e.g. member1/member1, member2/member2, president1/president1, admin/admin).
-14. Since we have mobile PWA & Android app, setup connection error/offline notifications when no internet connection, along with friendly retry state.
-15. Use actual database now: Turso (libSQL / serverless SQLite) for Vercel persistence and local dev with zero data wipeouts, supporting seamless migration to PostgreSQL if needed later.
-16. Add bottom navigation bar for mobile app and mobile website view (Dashboard, Blood Requests, Search Donors, Pending Donations, My Profile) for quick thumb-reach access.
+# DU Badhon — Production Revamp & Implementation Tracker
 
+All 16 specification items and 5 core milestones have been completed, verified with TypeScript / ESLint zero-warning checks, full Next.js production builds, and pushed to `main`.
+
+- [x] **1. Pending donation page with sidebar entry (`/pending-donations`)**: Displays assigned donors awaiting completion with quick "Mark Verified & Recorded" and "Change / Unassign Donor" actions without altering base blood request records.
+- [x] **2. "Live Calling in Progress" banner fixed**: Replaced static text with live interactive buttons in the header and on `/dashboard` that directly open the synchronized `CallDonorModal` console.
+- [x] **3. Realtime synchronized call locking via SSE (`/api/locks/stream`)**: Server-backed calling locks with synchronized countdown timer computed directly from `expiresAt`, synchronized across multiple tabs and devices.
+- [x] **4. "My Club" hall unit administration page (`/my-club`)**: Unit member roster with role-based promotions for executives (President, Secretary, Admin), member addition, and live unit coordination stats.
+- [x] **5. Compact `/dashboard` hero card**: Redesigned hero card with high-density metrics and clear unit duty badges.
+- [x] **6. 2-Step Blood Request Creation Modal**: Step 1 selects target hall units with "Don't ask today" preference caching; Step 2 gathers patient requisition details with validation.
+- [x] **7. Technical wording cleanup**: Removed confusing jargon ("PWA & APK" -> "Install App", "Download for Android", "Local SQLite" -> "Secure Local Storage").
+- [x] **8. Fixed-size uniform blood group badges**: Standardized blood badges across all cards, modals, and directories with `min-w-[48px] justify-center text-center`.
+- [x] **9. Unified "All Units" Grid on `/hall-units`**: Responsive grid showing all members across 16 DU halls with hall unit badges.
+- [x] **10. Developer recognition for Saikat Islam**: Added footer recognition across the platform (*"Designed & Developed with ❤️ by Saikat Islam"*) and a dedicated profile showcase page at `/developer`.
+- [x] **11. Multi-volunteer search indicators ("Being searched by" chips)**: Live searcher heartbeats displayed on requisition cards when other volunteers are searching for donors.
+- [x] **12. Real authentication & user profile management (`/profile`)**: Cookie-based JWT sessions, bcrypt passwords, Next.js route protection middleware, and personal profile/password editing.
+- [x] **13. Memorable seed credentials**: Seeded test accounts (`member1`/`member1`, `member2`/`member2`, `president1`/`president1`, `admin`/`admin`) with one-click quick selector buttons on sign-in.
+- [x] **14. Offline detection banner & retry screen**: Global offline banner detecting connection loss, notifying that cached records are active, with instant network retry.
+- [x] **15. Turso libSQL / SQLite persistence**: Prisma models (`User`, `Donor`, `CallLock`, `BloodRequest`, `BagSlot`, `CallLog`) supporting remote Turso on Vercel and local dev without data loss.
+- [x] **16. Mobile bottom navigation bar (`<MobileBottomNav />`)**: 5 primary thumb-friendly navigation icons for mobile screens (`< lg`) with `pb-safe` padding.
