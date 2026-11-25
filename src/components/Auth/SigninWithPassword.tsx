@@ -74,25 +74,25 @@ export default function SigninWithPassword() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3 sm:space-y-3.5">
       {/* Quick Test Login Badges */}
-      <div className="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 space-y-2">
+      <div className="p-2.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 space-y-1.5">
         <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700 dark:text-rose-400">
-          <Sparkles className="size-3.5" />
-          <span>Quick Test Accounts (Click to auto-fill):</span>
+          <Sparkles className="size-3" />
+          <span>Quick Test Accounts:</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {[
-            { id: "member1", label: "member1 (Volunteer)" },
-            { id: "member2", label: "member2 (Volunteer)" },
-            { id: "president1", label: "president1 (President)" },
-            { id: "admin", label: "admin (Super Admin)" },
+            { id: "member1", label: "member1" },
+            { id: "member2", label: "member2" },
+            { id: "president1", label: "president1" },
+            { id: "admin", label: "admin" },
           ].map((acc) => (
             <button
               key={acc.id}
               type="button"
               onClick={() => handleQuickSelect(acc.id)}
-              className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border transition ${
+              className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md border transition ${
                 data.identifier === acc.id
                   ? "bg-rose-600 text-white border-rose-600 shadow-xs"
                   : "bg-white dark:bg-dark-2 text-dark dark:text-white border-stroke dark:border-dark-3 hover:border-rose-400"
@@ -105,28 +105,28 @@ export default function SigninWithPassword() {
       </div>
 
       {errorMsg && (
-        <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs font-bold flex items-center gap-2">
+        <div className="p-2.5 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs font-bold flex items-center gap-2">
           <AlertCircle className="size-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3">
         <InputGroup
           type="text"
           label="Username, Phone, or Email"
-          className="[&_input]:py-[14px]"
+          className="[&_input]:py-2 sm:[&_input]:py-2.5 [&_label]:text-xs [&_div]:mt-1"
           placeholder="member1, 017XXXXXXXX, or email"
           name="identifier"
           handleChange={handleChange}
           value={data.identifier}
-          icon={<User className="size-4.5 text-gray-4" />}
+          icon={<User className="size-4 text-gray-4" />}
         />
 
         <InputGroup
           type="password"
           label="Password"
-          className="[&_input]:py-[14px]"
+          className="[&_input]:py-2 sm:[&_input]:py-2.5 [&_label]:text-xs [&_div]:mt-1"
           placeholder="Enter your password"
           name="password"
           handleChange={handleChange}
@@ -134,7 +134,7 @@ export default function SigninWithPassword() {
           icon={<PasswordIcon />}
         />
 
-        <div className="flex items-center justify-between gap-2 py-1 text-xs font-medium">
+        <div className="flex items-center justify-between gap-2 py-0.5 text-xs font-medium">
           <Checkbox
             label="Remember me (30 days)"
             name="remember"
@@ -157,11 +157,11 @@ export default function SigninWithPassword() {
           </Link>
         </div>
 
-        <div>
+        <div className="pt-0.5">
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 p-3.5 font-bold text-xs sm:text-sm text-white shadow-md transition active:scale-95 disabled:opacity-60"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 py-2.5 px-4 font-bold text-xs sm:text-sm text-white shadow-md transition active:scale-95 disabled:opacity-60"
           >
             <LogIn className="size-4" />
             <span>{loading ? "Signing in..." : "Sign In to DU Badhon"}</span>

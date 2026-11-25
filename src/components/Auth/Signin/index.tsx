@@ -14,10 +14,10 @@ export default function Signin() {
         </Suspense>
       </div>
 
-      <div className="mt-6 text-center">
-        <p>
+      <div className="mt-2.5 text-center text-xs">
+        <p className="text-dark-5 dark:text-dark-6">
           Don’t have any account?{" "}
-          <Link href="/auth/sign-up" className="text-primary">
+          <Link href="/auth/sign-up" className="font-bold text-rose-600 hover:underline">
             Sign Up
           </Link>
         </p>
