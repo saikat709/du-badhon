@@ -29,6 +29,7 @@ function DashboardContent() {
     currentVolunteer,
     bloodRequests,
     donors,
+    setActiveCallingModalDonor,
     unassignDonorFromBag,
     markRequestCompleted,
     markRequestCancelled,
@@ -261,22 +262,50 @@ function DashboardContent() {
 
       {/* Live Caller Lock Alert Banner */}
       {activeInCallDonors.length > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 dark:bg-amber-950/30 flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2.5">
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 dark:bg-amber-950/30 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex flex-wrap items-center gap-2.5">
             <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
             <span className="font-bold text-amber-800 dark:text-amber-300">
               Live Calling in Progress:
             </span>
-            <span className="text-dark-5 dark:text-dark-6">
-              {activeInCallDonors.map((d) => (
-                <span
-                  key={d.id}
-                  className="inline-block mr-2 px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 font-medium"
-                >
-                  🔒 {d.currentLock?.lockedByVolunteerName} calling {d.name} ({d.bloodGroup})
-                </span>
-              ))}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              {activeInCallDonors.map((d) => {
+                const isMe = d.currentLock?.lockedByVolunteerId === currentVolunteer.id;
+                const remSecs = d.currentLock?.expiresAt
+                  ? Math.max(
+                      0,
+                      Math.floor(
+                        (new Date(d.currentLock.expiresAt).getTime() - Date.now()) / 1000,
+                      ),
+                    )
+                  : null;
+                const remStr =
+                  remSecs != null
+                    ? ` (${Math.floor(remSecs / 60)}:${(remSecs % 60).toString().padStart(2, "0")})`
+                    : "";
+
+                return (
+                  <button
+                    key={d.id}
+                    onClick={() => setActiveCallingModalDonor(d)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                      isMe
+                        ? "bg-amber-500 text-white hover:bg-amber-600 shadow-xs"
+                        : "bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 hover:bg-amber-200 dark:hover:bg-amber-900/60"
+                    }`}
+                  >
+                    <Lock className="size-3" />
+                    <span>
+                      {isMe ? "You are calling" : `${d.currentLock?.lockedByVolunteerName} calling`}{" "}
+                      <strong>{d.name}</strong> ({d.bloodGroup}){remStr}
+                    </span>
+                    <span className="underline ml-1">
+                      {isMe ? "Resume Console →" : "View →"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <Link
             href="/donors"

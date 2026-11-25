@@ -7,6 +7,7 @@ const SECRET_KEY = new TextEncoder().encode(process.env.AUTH_SECRET || DEFAULT_S
 
 export interface SessionPayload {
   userId: string;
+  id?: string;
   username: string;
   name: string;
   role: string;
@@ -15,7 +16,12 @@ export interface SessionPayload {
 
 export async function signSession(payload: SessionPayload, remember = false): Promise<string> {
   const expiration = remember ? "30d" : "24h";
-  return await new SignJWT({ ...payload })
+  const normalized = {
+    ...payload,
+    id: payload.userId || payload.id,
+    userId: payload.userId || payload.id,
+  };
+  return await new SignJWT({ ...normalized })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(expiration)
@@ -25,7 +31,13 @@ export async function signSession(payload: SessionPayload, remember = false): Pr
 export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, SECRET_KEY);
-    return payload as unknown as SessionPayload;
+    const data = payload as unknown as SessionPayload;
+    const uid = data.userId || data.id || "";
+    return {
+      ...data,
+      id: uid,
+      userId: uid,
+    };
   } catch {
     return null;
   }

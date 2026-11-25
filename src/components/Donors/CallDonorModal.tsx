@@ -102,15 +102,33 @@ export function CallDonorModal({
 
   const [callDuration, setCallDuration] = useState(0);
 
+  // Synchronized countdown timer based on server expiresAt
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(() => {
+    if (!donor?.currentLock?.expiresAt) return 180;
+    const diff = Math.floor(
+      (new Date(donor.currentLock.expiresAt).getTime() - Date.now()) / 1000,
+    );
+    return Math.max(0, diff);
+  });
+
   // Track submission to prevent releasing lock when saved
   const isSubmittedRef = React.useRef(false);
   const donorId = donor?.id;
 
-  // Call timer
+  // Call timer and synchronized lock countdown
   useEffect(() => {
     if (!donor) return;
     const interval = setInterval(() => {
       setCallDuration((prev) => prev + 1);
+
+      if (donor.currentLock?.expiresAt) {
+        const diff = Math.floor(
+          (new Date(donor.currentLock.expiresAt).getTime() - Date.now()) / 1000,
+        );
+        setRemainingSeconds(Math.max(0, diff));
+      } else {
+        setRemainingSeconds((prev) => Math.max(0, prev - 1));
+      }
     }, 1000);
     return () => clearInterval(interval);
   }, [donor]);
@@ -191,15 +209,26 @@ export function CallDonorModal({
         {/* Header with Call Lock Banner */}
         <div className="bg-gradient-to-r from-rose-600 via-rose-700 to-red-800 p-5 text-white">
           <div className="flex justify-between items-start">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="flex size-2.5 rounded-full bg-emerald-400 animate-ping" />
               <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider bg-black/25 px-2.5 py-0.5 rounded-full">
                 <Lock className="size-3" />
                 <span>Active Call Lock</span>
               </span>
-              <span className="inline-flex items-center gap-1 text-xs font-mono font-bold bg-white/20 px-2.5 py-0.5 rounded-md">
+              <span className="inline-flex items-center gap-1 text-xs font-mono font-bold bg-white/20 px-2.5 py-0.5 rounded-md" title="Total call duration">
                 <Timer className="size-3" />
-                <span>{formatTimer(callDuration)}</span>
+                <span>Call: {formatTimer(callDuration)}</span>
+              </span>
+              <span
+                className={`inline-flex items-center gap-1 text-xs font-mono font-bold px-2.5 py-0.5 rounded-md shadow-2xs ${
+                  remainingSeconds < 30
+                    ? "bg-rose-400 text-rose-950 animate-pulse font-black"
+                    : "bg-amber-400 text-amber-950"
+                }`}
+                title="Synchronized across all volunteers"
+              >
+                <Clock className="size-3" />
+                <span>Lock: {formatTimer(remainingSeconds)}</span>
               </span>
             </div>
 
@@ -229,7 +258,15 @@ export function CallDonorModal({
           <span className="flex items-center gap-1.5 font-medium">
             <Lock className="size-3.5 text-amber-600 shrink-0" />
             <span>
-              Locked by <strong>{currentVolunteer.name}</strong> ({currentVolunteer.hallUnit.split(" ")[0]} Hall). Other members see this donor as currently in-call.
+              {remainingSeconds === 0 ? (
+                <strong className="text-rose-600 dark:text-rose-400">
+                  ⚠️ Lock Expired: Other members can now contact this donor. Please save your outcome.
+                </strong>
+              ) : (
+                <>
+                  Locked by <strong>{currentVolunteer.name}</strong> ({currentVolunteer.hallUnit.split(" ")[0]} Hall). Realtime synced across all tabs and devices.
+                </>
+              )}
             </span>
           </span>
         </div>

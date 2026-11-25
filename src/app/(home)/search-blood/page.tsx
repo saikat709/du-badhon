@@ -27,7 +27,7 @@ const HALL_UNITS = ALL_HALL_UNITS;
 function SearchBloodContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { donors, bloodRequests, startCallingDonor, assignDonorToBag } = useBadhon();
+  const { donors, bloodRequests, startCallingDonor, assignDonorToBag, pulseViewer } = useBadhon();
 
   const requestIdParam = searchParams.get("requestId");
   const groupParam = searchParams.get("group");
@@ -44,6 +44,16 @@ function SearchBloodContent() {
     if (!requestIdParam) return null;
     return bloodRequests.find((r) => r.id === requestIdParam) || null;
   }, [requestIdParam, bloodRequests]);
+
+  // Multi-volunteer search pulse heartbeat
+  React.useEffect(() => {
+    if (!targetRequest) return;
+    pulseViewer(targetRequest.id);
+    const interval = setInterval(() => {
+      pulseViewer(targetRequest.id);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [targetRequest, pulseViewer]);
 
   const targetBagNumber = bagNumberParam ? parseInt(bagNumberParam) : 1;
 

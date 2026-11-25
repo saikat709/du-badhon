@@ -1,6 +1,7 @@
 "use client";
 
 import { BloodRequest, getShortHallUnit } from "@/types/badhon";
+import { useBadhon } from "@/context/badhon-context";
 import {
   AlertCircle,
   Building2,
@@ -30,6 +31,9 @@ export function RequestCard({
   onMarkCompleted,
   onCancelRequest,
 }: RequestCardProps) {
+  const { requestViewers } = useBadhon();
+  const viewers = requestViewers?.[request.id] || [];
+
   const isManaged = request.managedBags >= request.totalBags;
   const isCompleted = request.status === "completed";
   const isCancelled = request.status === "cancelled";
@@ -110,6 +114,16 @@ export function RequestCard({
             {request.bloodGroup}
           </span>
         </div>
+
+        {/* Live Search Indicator Chip */}
+        {viewers.length > 0 && !isCompleted && !isCancelled && (
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-400/20 border border-amber-400/40 text-amber-300 text-xs font-semibold animate-pulse">
+            <Search className="size-3.5 text-amber-400 shrink-0" />
+            <span className="truncate">
+              Being searched by {viewers.map((v) => `${v.name} (${v.hallUnit.split(" ")[0]})`).join(", ")}
+            </span>
+          </div>
+        )}
 
         {/* Hospital Name & Reason */}
         <div>

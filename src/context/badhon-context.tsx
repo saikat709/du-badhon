@@ -24,6 +24,10 @@ interface BadhonContextType {
   switchVolunteer: (id: string) => void;
   donors: Donor[];
   bloodRequests: BloodRequest[];
+  activeCallingModalDonor: Donor | null;
+  setActiveCallingModalDonor: (donor: Donor | null) => void;
+  requestViewers: Record<string, { userId: string; name: string; hallUnit: string }[]>;
+  pulseViewer: (requestId: string) => void;
   startCallingDonor: (donorId: string) => { success: boolean; message?: string };
   releaseCallingDonor: (donorId: string) => void;
   logCallOutcome: (
@@ -81,6 +85,10 @@ export const LOCK_TTL_MS = 10 * 60 * 1000;
 
 export function isLockActive(lock: Donor["currentLock"]): boolean {
   if (!lock) return false;
+  if (lock.expiresAt) {
+    const exp = new Date(lock.expiresAt).getTime();
+    if (!isNaN(exp)) return Date.now() < exp;
+  }
   const lockTime = new Date(lock.lockedAt).getTime();
   if (isNaN(lockTime)) return false;
   return Date.now() - lockTime < LOCK_TTL_MS;
@@ -138,6 +146,10 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
     getStored<Donor[]>(STORAGE_KEYS.DONORS, SAMPLE_DONORS),
   );
   const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>(getInitialRequests);
+  const [activeCallingModalDonor, setActiveCallingModalDonor] = useState<Donor | null>(null);
+  const [requestViewers, setRequestViewers] = useState<
+    Record<string, { userId: string; name: string; hallUnit: string }[]>
+  >({});
 
   // Sync with authenticated user session
   useEffect(() => {
@@ -162,6 +174,120 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
         // use fallback initial
       });
   }, []);
+
+  // Realtime Call Locks Sync via SSE (/api/locks/stream)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let es: EventSource | null = null;
+    let pollInterval: NodeJS.Timeout | null = null;
+
+    const applyLocksUpdate = (
+      serverLocks: Array<{
+        donorId: string;
+        lockedByUserId: string;
+        lockedByUserName: string;
+        lockedByUserHall: string;
+        lockedAt: string;
+        expiresAt: string;
+      }>,
+    ) => {
+      const lockMap = new Map(serverLocks.map((l) => [l.donorId, l]));
+      setDonors((prev) =>
+        prev.map((d) => {
+          const sl = lockMap.get(d.id);
+          if (sl) {
+            return {
+              ...d,
+              currentLock: {
+                lockedByVolunteerId: sl.lockedByUserId,
+                lockedByVolunteerName: sl.lockedByUserName,
+                lockedByVolunteerHall: sl.lockedByUserHall,
+                lockedAt: sl.lockedAt,
+                expiresAt: sl.expiresAt,
+              },
+            };
+          } else if (d.currentLock) {
+            return { ...d, currentLock: null };
+          }
+          return d;
+        }),
+      );
+    };
+
+    const pollFallback = async () => {
+      try {
+        const res = await fetch("/api/locks");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.locks)) {
+            applyLocksUpdate(data.locks);
+          }
+        }
+      } catch {
+        // network error
+      }
+    };
+
+    try {
+      es = new EventSource("/api/locks/stream");
+      es.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data?.type === "locks_update" && Array.isArray(data.locks)) {
+            applyLocksUpdate(data.locks);
+          }
+        } catch {
+          // ignore
+        }
+      };
+      es.onerror = () => {
+        if (!pollInterval) {
+          pollInterval = setInterval(pollFallback, 4000);
+        }
+      };
+    } catch {
+      pollInterval = setInterval(pollFallback, 4000);
+    }
+
+    return () => {
+      if (es) es.close();
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, []);
+
+  // Multi-volunteer search indicators heartbeat poll
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const fetchViewers = async () => {
+      try {
+        const res = await fetch("/api/requests/viewers");
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.viewers) {
+            setRequestViewers(data.viewers);
+          }
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    fetchViewers();
+    const interval = setInterval(fetchViewers, 8000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const pulseViewer = (requestId: string) => {
+    fetch(`/api/requests/${requestId}/viewers`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: currentVolunteer.id,
+        name: currentVolunteer.name,
+        hallUnit: currentVolunteer.hallUnit,
+      }),
+    }).catch(() => {});
+  };
 
   // Save to LocalStorage on changes
   useEffect(() => {
@@ -202,21 +328,28 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
+    const now = new Date();
+    const expires = new Date(now.getTime() + 180 * 1000);
+
+    const newLock = {
+      lockedByVolunteerId: currentVolunteer.id,
+      lockedByVolunteerName: currentVolunteer.name,
+      lockedByVolunteerHall: currentVolunteer.hallUnit,
+      lockedAt: now.toISOString(),
+      expiresAt: expires.toISOString(),
+    };
+
     setDonors((prev) =>
-      prev.map((d) =>
-        d.id === donorId
-          ? {
-              ...d,
-              currentLock: {
-                lockedByVolunteerId: currentVolunteer.id,
-                lockedByVolunteerName: currentVolunteer.name,
-                lockedByVolunteerHall: currentVolunteer.hallUnit,
-                lockedAt: new Date().toISOString(),
-              },
-            }
-          : d,
-      ),
+      prev.map((d) => (d.id === donorId ? { ...d, currentLock: newLock } : d)),
     );
+
+    // Call server to persist and broadcast lock
+    fetch("/api/locks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ donorId, ttlSeconds: 180 }),
+    }).catch(() => {});
+
     return { success: true };
   };
 
@@ -224,6 +357,11 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
     setDonors((prev) =>
       prev.map((d) => (d.id === donorId ? { ...d, currentLock: null } : d)),
     );
+
+    // Release on server
+    fetch(`/api/locks?donorId=${donorId}`, {
+      method: "DELETE",
+    }).catch(() => {});
   };
 
   const logCallOutcome = (
@@ -254,6 +392,11 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
         };
       }),
     );
+
+    // Release lock on server
+    fetch(`/api/locks?donorId=${donorId}`, {
+      method: "DELETE",
+    }).catch(() => {});
 
     // If caller opted to assign directly to a blood request
     if (assignToRequestId && bagNumber != null && outcome === "agreed") {
@@ -514,6 +657,10 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
         switchVolunteer,
         donors,
         bloodRequests,
+        activeCallingModalDonor,
+        setActiveCallingModalDonor,
+        requestViewers,
+        pulseViewer,
         startCallingDonor,
         releaseCallingDonor,
         logCallOutcome,

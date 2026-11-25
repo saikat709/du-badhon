@@ -74,6 +74,7 @@ export interface Donor {
     lockedByVolunteerName: string;
     lockedByVolunteerHall: string;
     lockedAt: string; // ISO string
+    expiresAt?: string; // ISO string
   } | null;
   callHistory: CallLog[];
 }

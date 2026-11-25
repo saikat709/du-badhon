@@ -3,6 +3,7 @@ import "@/css/style.css";
 
 import { Sidebar } from "@/components/Layouts/sidebar";
 import { Header } from "@/components/Layouts/header";
+import { GlobalCallingModal } from "@/components/Donors/GlobalCallingModal";
 import type { PropsWithChildren } from "react";
 
 export default function HomeLayout({ children }: PropsWithChildren) {
@@ -23,6 +24,9 @@ export default function HomeLayout({ children }: PropsWithChildren) {
           </div>
         </main>
       </div>
+
+      {/* Synchronized Global Calling Modal */}
+      <GlobalCallingModal />
     </div>
   );
 }

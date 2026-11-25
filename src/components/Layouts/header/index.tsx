@@ -2,6 +2,7 @@
 
 import {
   Menu,
+  PhoneCall,
   Plus,
 } from "lucide-react";
 import Image from "next/image";
@@ -10,11 +11,17 @@ import { useSidebarContext } from "../sidebar/sidebar-context";
 import { ThemeToggleSwitch } from "./theme-toggle";
 import { UserInfo } from "./user-info";
 import { SmartAppButton } from "@/components/PWA/PWAInstaller";
-import { useBadhon } from "@/context/badhon-context";
+import { useBadhon, isLockActive } from "@/context/badhon-context";
 
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
-  const { currentVolunteer } = useBadhon();
+  const { currentVolunteer, donors, setActiveCallingModalDonor } = useBadhon();
+
+  const myCallingDonor = donors.find(
+    (d) =>
+      d.currentLock?.lockedByVolunteerId === currentVolunteer.id &&
+      isLockActive(d.currentLock),
+  );
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white/90 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-2.5 shadow-xs dark:border-stroke-dark dark:bg-gray-dark/90 md:px-6 2xl:px-10">
@@ -57,6 +64,18 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        {myCallingDonor && (
+          <button
+            onClick={() => setActiveCallingModalDonor(myCallingDonor)}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition animate-pulse cursor-pointer"
+            title="Click to resume calling or record feedback"
+          >
+            <PhoneCall className="size-3.5" />
+            <span className="hidden sm:inline">Calling {myCallingDonor.name}</span>
+            <span className="sm:hidden">On Call</span>
+          </button>
+        )}
+
         <SmartAppButton />
 
         <Link
