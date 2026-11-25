@@ -844,7 +844,15 @@ export default function HomePage() {
 
           <div className="pt-6 border-t border-stroke dark:border-dark-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left text-[11px]">
             <p>© 2026 Badhon (Voluntary Blood Donors&apos; Organization) — University of Dhaka.</p>
-            <p>100% Non-Remunerated Voluntary Blood Donation Platform.</p>
+            <p className="flex items-center gap-1">
+              <span>Designed & Developed with ❤️ by</span>
+              <Link
+                href="/developer"
+                className="font-bold text-rose-600 dark:text-rose-400 hover:underline"
+              >
+                Saikat Islam
+              </Link>
+            </p>
           </div>
         </div>
       </footer>
