@@ -1,107 +1,89 @@
-import { db } from "@/lib/db";
+import {
+  getActiveLocks,
+  getLocksEmitter,
+  SanitizedLock,
+} from "@/lib/locks-manager";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   const encoder = new TextEncoder();
+  const emitter = getLocksEmitter();
 
   const stream = new ReadableStream({
     async start(controller) {
       let isClosed = false;
-      let consecutiveErrors = 0;
+      let currentLocks: SanitizedLock[] = [];
 
-      const sendLocks = async () => {
+      const sendPayload = (locks: SanitizedLock[]) => {
         if (isClosed) return;
-        if (consecutiveErrors >= 3 && consecutiveErrors % 5 !== 0) {
-          consecutiveErrors++;
-          return;
-        }
+        currentLocks = locks;
         try {
-          // Delete expired locks
-          await db.callLock.deleteMany({
-            where: {
-              expiresAt: {
-                lt: new Date(),
-              },
-            },
-          });
-
-          const activeLocks = await db.callLock.findMany({
-            include: {
-              donor: {
-                select: {
-                  id: true,
-                  name: true,
-                  phone: true,
-                  bloodGroup: true,
-                  hallUnit: true,
-                },
-              },
-            },
-          });
-
-          consecutiveErrors = 0; // reset error count on success
-
           const payload = {
             type: "locks_update",
             timestamp: Date.now(),
-            locks: activeLocks.map((lock) => ({
-              id: lock.id,
-              donorId: lock.donorId,
-              donorName: lock.donor?.name || "Unknown Donor",
-              donorBloodGroup: lock.donor?.bloodGroup || "",
-              donorHall: lock.donor?.hallUnit || "",
-              lockedByUserId: lock.lockedByUserId,
-              lockedByUserName: lock.lockedByUserName,
-              lockedByUserHall: lock.lockedByUserHall,
-              lockedAt: lock.lockedAt.toISOString(),
-              expiresAt: lock.expiresAt.toISOString(),
-              remainingSeconds: Math.max(
-                0,
-                Math.floor((lock.expiresAt.getTime() - Date.now()) / 1000),
-              ),
-            })),
+            locks,
           };
-
-          if (!isClosed) {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
-          }
-        } catch (e) {
-          consecutiveErrors++;
-          // Log only the first failure to avoid flooding Vercel logs every 2 seconds
-          if (consecutiveErrors === 1) {
-            console.error("Error sending SSE locks (will back off gracefully):", e);
-          }
-          // Send a benign empty update so client stream stays healthy without crashing
-          try {
-            if (!isClosed) {
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ type: "heartbeat", timestamp: Date.now(), locks: [] })}\n\n`
-                )
-              );
-            }
-          } catch {
-            // stream may have closed
-          }
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify(payload)}\n\n`),
+          );
+        } catch {
+          // Stream might have terminated
         }
       };
 
-      // Send initial data immediately
-      await sendLocks();
+      // Listener for real-time changes
+      const onLocksUpdated = (updatedLocks: SanitizedLock[]) => {
+        sendPayload(updatedLocks);
+      };
 
-      // Send updates every 2 seconds
+      emitter.on("locks_updated", onLocksUpdated);
+
+      // Send initial data immediately
+      try {
+        const initialLocks = await getActiveLocks();
+        sendPayload(initialLocks);
+      } catch {
+        sendPayload([]);
+      }
+
+      // In-memory timer for ticking active lock timers down without querying the database
       const interval = setInterval(async () => {
         if (isClosed) {
           clearInterval(interval);
           return;
         }
-        await sendLocks();
-      }, 2000);
+
+        const now = Date.now();
+
+        if (currentLocks.length > 0) {
+          // Decrement in-memory timers
+          const updated = currentLocks
+            .filter((l) => new Date(l.expiresAt).getTime() > now)
+            .map((l) => ({
+              ...l,
+              remainingSeconds: Math.max(
+                0,
+                Math.floor((new Date(l.expiresAt).getTime() - now) / 1000),
+              ),
+            }));
+
+          sendPayload(updated);
+        } else {
+          // When idle with no active locks, simply send an SSE heartbeat comment
+          // to keep the connection open without making database queries
+          try {
+            controller.enqueue(encoder.encode(": heartbeat\n\n"));
+          } catch {
+            // stream closed
+          }
+        }
+      }, 3000);
 
       req.signal.addEventListener("abort", () => {
         isClosed = true;
         clearInterval(interval);
+        emitter.off("locks_updated", onLocksUpdated);
         try {
           controller.close();
         } catch {

@@ -1,54 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import {
+  getActiveLocks,
+  fetchActiveLocksFromDb,
+  broadcastLocksUpdate,
+} from "@/lib/locks-manager";
 
 export async function GET() {
   try {
-    // Delete any expired locks first
-    await db.callLock.deleteMany({
-      where: {
-        expiresAt: {
-          lt: new Date(),
-        },
-      },
-    });
-
-    const activeLocks = await db.callLock.findMany({
-      include: {
-        donor: {
-          select: {
-            id: true,
-            name: true,
-            phone: true,
-            bloodGroup: true,
-            hallUnit: true,
-          },
-        },
-      },
-      orderBy: {
-        lockedAt: "desc",
-      },
-    });
-
+    const locks = await getActiveLocks();
     return NextResponse.json({
       success: true,
-      locks: activeLocks.map((lock) => ({
-        id: lock.id,
-        donorId: lock.donorId,
-        donorName: lock.donor?.name || "Unknown Donor",
-        donorPhone: lock.donor?.phone || "",
-        donorBloodGroup: lock.donor?.bloodGroup || "",
-        donorHall: lock.donor?.hallUnit || "",
-        lockedByUserId: lock.lockedByUserId,
-        lockedByUserName: lock.lockedByUserName,
-        lockedByUserHall: lock.lockedByUserHall,
-        lockedAt: lock.lockedAt.toISOString(),
-        expiresAt: lock.expiresAt.toISOString(),
-        remainingSeconds: Math.max(
-          0,
-          Math.floor((lock.expiresAt.getTime() - Date.now()) / 1000),
-        ),
-      })),
+      locks,
     });
   } catch (error) {
     console.error("GET /api/locks error:", error);
@@ -141,6 +105,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Notify all active listeners immediately
+    fetchActiveLocksFromDb()
+      .then((updated) => broadcastLocksUpdate(updated))
+      .catch(() => {});
+
     return NextResponse.json({
       success: true,
       lock: {
@@ -195,6 +164,7 @@ export async function DELETE(req: NextRequest) {
           lockedByUserId: session.id,
         },
       });
+      fetchActiveLocksFromDb().then(broadcastLocksUpdate).catch(() => {});
       return NextResponse.json({ success: true, message: "All user locks released" });
     }
 
@@ -211,6 +181,7 @@ export async function DELETE(req: NextRequest) {
       await db.callLock.delete({
         where: { donorId },
       });
+      fetchActiveLocksFromDb().then(broadcastLocksUpdate).catch(() => {});
       return NextResponse.json({ success: true, message: "Lock released" });
     }
 

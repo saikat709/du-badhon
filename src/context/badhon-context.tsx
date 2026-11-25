@@ -239,14 +239,18 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
           const data = JSON.parse(event.data);
           if (data?.type === "locks_update" && Array.isArray(data.locks)) {
             applyLocksUpdate(data.locks);
+            if (pollInterval) {
+              clearInterval(pollInterval);
+              pollInterval = null;
+            }
           }
         } catch {
-          // ignore
+          // ignore comments/heartbeats
         }
       };
       es.onerror = () => {
         if (!pollInterval) {
-          pollInterval = setInterval(pollFallback, 4000);
+          pollInterval = setInterval(pollFallback, 8000);
         }
       };
     } catch {
