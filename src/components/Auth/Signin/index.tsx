@@ -2,14 +2,15 @@ import Link from "next/link";
 import { Suspense } from "react";
 import GoogleSigninButton from "../GoogleSigninButton";
 import SigninWithPassword from "../SigninWithPassword";
+import SigninSkeleton from "../SigninSkeleton";
 
 export default function Signin() {
   return (
     <>
       {/* <GoogleSigninButton text="Sign in" /> */}
 
-      <div>
-        <Suspense fallback={<div className="p-4 text-center text-sm text-gray-500">Loading sign in form...</div>}>
+      <div className="min-h-[360px]">
+        <Suspense fallback={<SigninSkeleton />}>
           <SigninWithPassword />
         </Suspense>
       </div>

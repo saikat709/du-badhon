@@ -1,4 +1,5 @@
 import Signin from "@/components/Auth/Signin";
+import SigninSkeleton from "@/components/Auth/SigninSkeleton";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,10 +12,10 @@ export const metadata: Metadata = {
 
 export default function SignIn() {
   return (
-    <div className="w-full rounded-2xl sm:rounded-3xl bg-white shadow-2xl dark:bg-gray-dark dark:shadow-card border border-stroke dark:border-dark-3 overflow-hidden">
-      <div className="flex flex-col lg:flex-row items-stretch">
+    <div className="w-full rounded-2xl sm:rounded-3xl bg-white shadow-2xl dark:bg-gray-dark dark:shadow-card border border-stroke dark:border-dark-3 overflow-hidden min-h-[500px]">
+      <div className="flex flex-col lg:flex-row items-stretch min-h-[500px]">
         {/* Left Side: Sign In Form */}
-        <div className="w-full lg:w-7/12 p-5 sm:p-6 md:p-7 lg:p-7 flex flex-col justify-center">
+        <div className="w-full lg:w-7/12 p-5 sm:p-6 md:p-7 lg:p-7 flex flex-col justify-center min-h-[500px]">
           {/* Logo & Platform Header */}
           <div className="flex items-center gap-2.5 mb-3.5 lg:mb-4">
             <Link href="/" className="flex items-center gap-2">
@@ -45,19 +46,13 @@ export default function SignIn() {
             </p>
           </div>
 
-          <Suspense
-            fallback={
-              <div className="py-4 text-center text-xs text-gray-500">
-                Loading sign in form...
-              </div>
-            }
-          >
+          <Suspense fallback={<SigninSkeleton />}>
             <Signin />
           </Suspense>
         </div>
 
         {/* Right Side: Badhon Information & DU Heritage (visible on lg+) */}
-        <div className="hidden lg:flex lg:w-5/12 bg-gradient-to-br from-rose-700 via-rose-800 to-red-950 p-6 sm:p-7 lg:p-7 flex-col justify-between text-white relative overflow-hidden">
+        <div className="hidden lg:flex lg:w-5/12 bg-gradient-to-br from-rose-700 via-rose-800 to-red-950 p-6 sm:p-7 lg:p-7 flex-col justify-between text-white relative overflow-hidden min-h-[500px]">
           {/* Subtle background decoration */}
           <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
           <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-black/20 rounded-full blur-2xl pointer-events-none" />

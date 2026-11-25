@@ -74,7 +74,7 @@ export default function SigninWithPassword() {
   };
 
   return (
-    <div className="space-y-3 sm:space-y-3.5">
+    <div className="space-y-3 sm:space-y-3.5 min-h-[360px]">
       {/* Quick Test Login Badges */}
       <div className="p-2.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 space-y-1.5">
         <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700 dark:text-rose-400">
