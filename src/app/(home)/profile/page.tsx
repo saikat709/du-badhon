@@ -4,18 +4,39 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useBadhon } from "@/context/badhon-context";
 import { getSafeTelUri } from "@/utils/security";
 import {
+  AlertCircle,
+  CheckCircle2,
   Droplet,
+  Edit3,
   ExternalLink,
+  Lock,
+  LogOut,
   Phone,
   ShieldCheck,
+  User,
   Users,
+  X,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useMemo } from "react";
+import { useRouter } from "next/navigation";
+import React, { useMemo, useState } from "react";
 
 export default function ProfilePage() {
-  const { currentVolunteer, volunteers, switchVolunteer, bloodRequests, donors } =
-    useBadhon();
+  const router = useRouter();
+  const { currentVolunteer, bloodRequests, donors } = useBadhon();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: currentVolunteer.name,
+    phone: currentVolunteer.phone,
+    department: currentVolunteer.department,
+    bloodGroup: currentVolunteer.bloodGroup || "B+",
+    bio: "Active voluntary blood transfusion coordinator at Dhaka University.",
+    currentPassword: "",
+    newPassword: "",
+  });
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   // Requests created or managed by this volunteer
   const coordinatedRequests = useMemo(() => {
@@ -57,258 +78,392 @@ export default function ProfilePage() {
     return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [donors, currentVolunteer]);
 
-  // Unit peers in the same hall
-  const myUnitMembers = useMemo(() => {
-    return volunteers.filter((v) => v.hallUnit === currentVolunteer.hallUnit);
-  }, [volunteers, currentVolunteer.hallUnit]);
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/auth/sign-in");
+    } catch {
+      router.push("/auth/sign-in");
+    }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaveLoading(true);
+    setFeedback(null);
+
+    try {
+      const res = await fetch("/api/auth/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setFeedback({ type: "error", msg: data.error || "Failed to update profile." });
+        setSaveLoading(false);
+        return;
+      }
+
+      setFeedback({ type: "success", msg: "Profile successfully updated!" });
+      setTimeout(() => {
+        setIsEditing(false);
+        setFeedback(null);
+        window.location.reload();
+      }, 1200);
+    } catch {
+      setFeedback({ type: "error", msg: "Network error saving profile." });
+      setSaveLoading(false);
+    }
+  };
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6">
-      <Breadcrumb pageName="Volunteer Profile" crumbName="My Profile" hideTitle />
+    <div className="space-y-6">
+      <Breadcrumb pageName="Volunteer Profile" crumbName="Profile" hideTitle />
 
-      {/* Profile Card */}
-      <div className="overflow-hidden rounded-3xl bg-white dark:bg-dark-2 shadow-xs border border-stroke dark:border-dark-3">
-        {/* Cover / Header Banner */}
-        <div className="h-36 bg-gradient-to-r from-rose-700 via-rose-800 to-red-950 p-6 flex items-end justify-between text-white">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="size-4.5 text-rose-300" />
-            <span className="text-xs font-bold uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full backdrop-blur-xs">
-              Badhon Active Executive Member
+      {/* Main Identity Hero Card */}
+      <div className="bg-white dark:bg-dark-2 rounded-3xl p-6 border border-stroke dark:border-dark-3 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stroke dark:border-dark-3 pb-5 mb-5">
+          <div className="flex items-center gap-4">
+            <div
+              className="size-16 sm:size-20 rounded-2xl text-white font-black text-xl flex items-center justify-center shrink-0 shadow-md ring-4 ring-rose-50 dark:ring-rose-950/40"
+              style={{ backgroundColor: currentVolunteer.avatarBg }}
+            >
+              {currentVolunteer.name
+                .split(" ")
+                .map((n) => n[0])
+                .slice(0, 2)
+                .join("")}
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-black text-dark dark:text-white">
+                  {currentVolunteer.name}
+                </h1>
+                <span className="size-2 rounded-full bg-emerald-500" title="Active Duty Session" />
+              </div>
+              <p className="text-xs text-rose-600 dark:text-rose-400 font-bold mt-0.5">
+                {currentVolunteer.role} • {currentVolunteer.hallUnit}
+              </p>
+              <p className="text-xs text-dark-5 dark:text-dark-6 mt-0.5">
+                Student ID: <strong>{currentVolunteer.studentId}</strong>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stroke dark:border-dark-3 hover:border-rose-400 text-dark dark:text-white text-xs font-bold transition"
+            >
+              <Edit3 className="size-3.5 text-rose-600" />
+              <span>Edit Profile</span>
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-1 dark:bg-dark-3 hover:bg-rose-50 hover:text-rose-600 text-dark-5 dark:text-dark-6 text-xs font-bold transition"
+            >
+              <LogOut className="size-3.5" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Detailed Personal Attributes Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-gray-1 dark:bg-dark-3 border border-stroke dark:border-dark-4 text-xs mb-5">
+          <div>
+            <span className="text-dark-5 dark:text-dark-6 text-[11px] block">Department</span>
+            <span className="font-bold text-dark dark:text-white">
+              {currentVolunteer.department || "Faculty of Science"}
             </span>
           </div>
-
-          <Link
-            href="/hall-units"
-            className="text-xs font-bold bg-black/20 hover:bg-black/40 px-3 py-1 rounded-full text-white/90 hover:text-white transition flex items-center gap-1.5"
-          >
-            <span>Unit Directory</span>
-            <ExternalLink className="size-3" />
-          </Link>
-        </div>
-
-        <div className="px-6 pb-6 pt-0 relative">
-          {/* Avatar and Basic Info */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between -mt-12 mb-5 gap-4">
-            <div className="flex items-end gap-4">
-              <div
-                className="size-24 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg ring-4 ring-white dark:ring-dark-2 shrink-0"
-                style={{ backgroundColor: currentVolunteer.avatarBg }}
-              >
-                {currentVolunteer.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .slice(0, 2)
-                  .join("")}
-              </div>
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-black text-dark dark:text-white">
-                    {currentVolunteer.name}
-                  </h1>
-                  {currentVolunteer.bloodGroup && (
-                    <span className="inline-flex items-center gap-1 text-xs font-black px-2 py-0.5 rounded-lg bg-rose-600 text-white">
-                      <Droplet className="size-3 fill-white" />
-                      <span>{currentVolunteer.bloodGroup}</span>
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-rose-600 dark:text-rose-400 font-bold">
-                  {currentVolunteer.role} • {currentVolunteer.hallUnit}
-                </p>
-                <p className="text-xs text-dark-5 dark:text-dark-6">
-                  Student ID: <strong>{currentVolunteer.studentId}</strong>
-                </p>
-              </div>
-            </div>
-
-            {/* Test Volunteer Switcher */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-dark-5 dark:text-dark-6 font-semibold">
-                Active Member:
-              </span>
-              <select
-                value={currentVolunteer.id}
-                onChange={(e) => switchVolunteer(e.target.value)}
-                className="rounded-xl border border-stroke dark:border-dark-3 bg-gray-1 dark:bg-dark-3 px-3 py-1.5 text-xs font-bold text-dark dark:text-white outline-none focus:border-rose-600"
-              >
-                {volunteers.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name} ({v.hallUnit.split(" ")[0]})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Detailed Personal Attributes Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-gray-1 dark:bg-dark-3 border border-stroke dark:border-dark-4 text-xs mb-5">
-            <div>
-              <span className="text-dark-5 dark:text-dark-6 text-[11px] block">Department</span>
-              <span className="font-bold text-dark dark:text-white">
-                {currentVolunteer.department || "Faculty of Science"}
-              </span>
-            </div>
-            <div>
-              <span className="text-dark-5 dark:text-dark-6 text-[11px] block">Academic Session</span>
-              <span className="font-bold text-dark dark:text-white">
-                {currentVolunteer.session || "2020-21"}
-              </span>
-            </div>
-            <div>
-              <span className="text-dark-5 dark:text-dark-6 text-[11px] block">Phone Contact</span>
-              <a
-                href={getSafeTelUri(currentVolunteer.phone)}
-                className="font-bold text-rose-600 dark:text-rose-400 hover:underline"
-              >
-                {currentVolunteer.phone}
-              </a>
-            </div>
-            <div>
-              <span className="text-dark-5 dark:text-dark-6 text-[11px] block">Hall Residence</span>
-              <span className="font-bold text-dark dark:text-white">
-                {currentVolunteer.roomNo || "Main Building"}
-              </span>
-            </div>
-          </div>
-
-          {/* Stats Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-stroke dark:border-dark-3">
-            <div className="p-3.5 rounded-xl bg-gray-1/60 dark:bg-dark-3/60 text-center">
-              <p className="text-xs text-dark-5 dark:text-dark-6">Managed & Coordinated</p>
-              <p className="text-xl font-black text-rose-600 dark:text-rose-400 mt-0.5">
-                {coordinatedRequests.length}
-              </p>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-gray-1/60 dark:bg-dark-3/60 text-center">
-              <p className="text-xs text-dark-5 dark:text-dark-6">Calls & Inquiries Logged</p>
-              <p className="text-xl font-black text-blue-600 dark:text-blue-400 mt-0.5">
-                {myCallLogs.length}
-              </p>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-gray-1/60 dark:bg-dark-3/60 text-center col-span-2 sm:col-span-1">
-              <p className="text-xs text-dark-5 dark:text-dark-6">Assigned Unit</p>
-              <p className="text-sm font-bold text-dark dark:text-white mt-1 truncate">
-                {currentVolunteer.hallUnit.split(" ")[0]} Hall
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* My Hall Unit Executive Committee Members */}
-      <div className="rounded-3xl bg-white dark:bg-dark-2 p-6 border border-stroke dark:border-dark-3 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-base font-black text-dark dark:text-white flex items-center gap-2">
-              <Users className="size-5 text-rose-600" />
-              <span>My Hall Unit Team ({currentVolunteer.hallUnit})</span>
-            </h2>
-            <p className="text-xs text-dark-5 dark:text-dark-6">
-              Executive committee peers of your hall unit. To see all 16 DU halls, visit the Hall Units Directory.
-            </p>
+            <span className="text-dark-5 dark:text-dark-6 text-[11px] block">Academic Session</span>
+            <span className="font-bold text-dark dark:text-white">
+              {currentVolunteer.session || "2020-21"}
+            </span>
           </div>
-
-          <Link
-            href="/hall-units"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 hover:bg-rose-100 transition self-start sm:self-auto"
-          >
-            <span>All 16 Hall Units</span>
-            <ExternalLink className="size-3.5" />
-          </Link>
+          <div>
+            <span className="text-dark-5 dark:text-dark-6 text-[11px] block">Phone Contact</span>
+            <a
+              href={getSafeTelUri(currentVolunteer.phone)}
+              className="font-bold text-rose-600 dark:text-rose-400 hover:underline"
+            >
+              {currentVolunteer.phone}
+            </a>
+          </div>
+          <div>
+            <span className="text-dark-5 dark:text-dark-6 text-[11px] block">Blood Group</span>
+            <span className="font-bold text-dark dark:text-white inline-flex items-center gap-1">
+              <Droplet className="size-3 text-rose-600 fill-rose-600" />
+              <span>{currentVolunteer.bloodGroup || "B+"}</span>
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-          {myUnitMembers.map((member) => (
-            <div
-              key={member.id}
-              className={`p-3.5 rounded-2xl border transition flex items-center justify-between gap-3 ${
-                member.id === currentVolunteer.id
-                  ? "border-rose-300 bg-rose-50/50 dark:border-rose-900/60 dark:bg-rose-950/20"
-                  : "border-stroke dark:border-dark-4 bg-gray-1/50 dark:bg-dark-3/50 hover:bg-white dark:hover:bg-dark-3"
-              }`}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <div
-                  className="size-10 rounded-xl text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs"
-                  style={{ backgroundColor: member.avatarBg }}
-                >
-                  {member.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .slice(0, 2)
-                    .join("")}
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-xs text-dark dark:text-white truncate">
-                      {member.name}
-                    </span>
-                    {member.id === currentVolunteer.id && (
-                      <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-rose-600 text-white">
-                        You
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[10px] text-rose-600 dark:text-rose-400 font-semibold block">
-                    {member.role}
-                  </span>
-                  <span className="text-[10px] text-dark-5 dark:text-dark-6 block truncate">
-                    {member.department || member.session || member.studentId}
-                  </span>
-                </div>
-              </div>
-
-              <a
-                href={getSafeTelUri(member.phone)}
-                className="size-8 rounded-xl bg-white dark:bg-dark-2 border border-stroke dark:border-dark-4 flex items-center justify-center text-rose-600 hover:bg-rose-600 hover:text-white transition shrink-0"
-                title={`Call ${member.name}`}
-              >
-                <Phone className="size-3.5" />
-              </a>
-            </div>
-          ))}
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="p-3.5 rounded-xl border border-stroke dark:border-dark-4 bg-white dark:bg-dark-2">
+            <span className="text-[11px] text-dark-5 dark:text-dark-6 font-semibold block">
+              Calls Placed
+            </span>
+            <span className="text-xl font-black text-rose-600 mt-1 block">
+              {myCallLogs.length}
+            </span>
+          </div>
+          <div className="p-3.5 rounded-xl border border-stroke dark:border-dark-4 bg-white dark:bg-dark-2">
+            <span className="text-[11px] text-dark-5 dark:text-dark-6 font-semibold block">
+              Managed Requests
+            </span>
+            <span className="text-xl font-black text-emerald-600 mt-1 block">
+              {coordinatedRequests.length}
+            </span>
+          </div>
+          <div className="p-3.5 rounded-xl border border-stroke dark:border-dark-4 bg-white dark:bg-dark-2 col-span-2 sm:col-span-1">
+            <span className="text-[11px] text-dark-5 dark:text-dark-6 font-semibold block">
+              Assigned Hall Unit
+            </span>
+            <span className="text-xs font-bold text-dark dark:text-white mt-1 block truncate">
+              {currentVolunteer.hallUnit}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Recent Calls by this Volunteer */}
-      <div className="rounded-3xl bg-white dark:bg-dark-2 p-6 border border-stroke dark:border-dark-3 shadow-xs space-y-4">
-        <h3 className="text-base font-black text-dark dark:text-white">
-          My Call History & Donor Feedback ({myCallLogs.length})
-        </h3>
-
-        {myCallLogs.length > 0 ? (
-          <div className="space-y-2.5">
-            {myCallLogs.map((c) => (
-              <div
-                key={c.id}
-                className="p-3.5 rounded-xl bg-gray-1 dark:bg-dark-3 border border-stroke dark:border-dark-4 text-xs space-y-1"
+      {/* Edit Profile Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-white dark:bg-dark-2 rounded-2xl shadow-2xl border border-stroke dark:border-dark-3 overflow-hidden">
+            <div className="p-5 border-b border-stroke dark:border-dark-3 flex items-center justify-between">
+              <h2 className="font-black text-sm text-dark dark:text-white flex items-center gap-2">
+                <Edit3 className="size-4 text-rose-600" />
+                <span>Edit Profile & Security</span>
+              </h2>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="p-1 rounded-lg hover:bg-gray-1 dark:hover:bg-dark-3 text-dark-5"
               >
-                <div className="flex justify-between items-center text-dark-5 dark:text-dark-6 text-[11px]">
-                  <span className="font-bold text-dark dark:text-white">
-                    {c.donorName} ({c.bloodGroup}) • {c.donorPhone}
-                  </span>
-                  <span>{new Date(c.timestamp).toLocaleString()}</span>
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="p-5 space-y-4 text-xs">
+              {feedback && (
+                <div
+                  className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
+                    feedback.type === "success"
+                      ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+                      : "bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400"
+                  }`}
+                >
+                  {feedback.type === "success" ? (
+                    <CheckCircle2 className="size-4" />
+                  ) : (
+                    <AlertCircle className="size-4" />
+                  )}
+                  <span>{feedback.msg}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-black text-rose-600 dark:text-rose-400 uppercase text-[10px] bg-rose-50 dark:bg-rose-950 px-2 py-0.5 rounded-md">
-                    {c.outcome}
-                  </span>
-                  <p className="text-dark dark:text-white font-medium">{c.comment}</p>
+              )}
+
+              <div>
+                <label className="font-bold text-dark dark:text-white block mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full rounded-xl border border-stroke dark:border-dark-3 bg-gray-1 dark:bg-dark-3 px-3 py-2 text-dark dark:text-white outline-none focus:border-rose-600"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-dark dark:text-white block mb-1">
+                    Phone Contact
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    className="w-full rounded-xl border border-stroke dark:border-dark-3 bg-gray-1 dark:bg-dark-3 px-3 py-2 text-dark dark:text-white outline-none focus:border-rose-600"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-dark dark:text-white block mb-1">
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.department}
+                    onChange={(e) => setEditForm({ ...editForm, department: e.target.value })}
+                    className="w-full rounded-xl border border-stroke dark:border-dark-3 bg-gray-1 dark:bg-dark-3 px-3 py-2 text-dark dark:text-white outline-none focus:border-rose-600"
+                  />
                 </div>
               </div>
-            ))}
+
+              <div className="pt-3 border-t border-stroke dark:border-dark-3 space-y-3">
+                <span className="font-bold text-dark dark:text-white block">
+                  Change Password (Optional)
+                </span>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] text-dark-5 dark:text-dark-6 block mb-1">
+                      Current Password
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Enter current"
+                      value={editForm.currentPassword}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, currentPassword: e.target.value })
+                      }
+                      className="w-full rounded-xl border border-stroke dark:border-dark-3 bg-gray-1 dark:bg-dark-3 px-3 py-2 text-dark dark:text-white outline-none focus:border-rose-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-dark-5 dark:text-dark-6 block mb-1">
+                      New Password
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="At least 4 chars"
+                      value={editForm.newPassword}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, newPassword: e.target.value })
+                      }
+                      className="w-full rounded-xl border border-stroke dark:border-dark-3 bg-gray-1 dark:bg-dark-3 px-3 py-2 text-dark dark:text-white outline-none focus:border-rose-600"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 flex items-center justify-end gap-2 border-t border-stroke dark:border-dark-3">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="px-4 py-2 rounded-xl border border-stroke text-dark-5 hover:text-dark text-xs font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saveLoading}
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md transition disabled:opacity-60"
+                >
+                  {saveLoading ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
           </div>
-        ) : (
-          <p className="text-xs text-dark-5 dark:text-dark-6 italic">
-            You have not logged any donor calls yet. Go to{" "}
-            <Link href="/search-blood" className="text-rose-600 font-bold hover:underline">
-              Search Blood
-            </Link>{" "}
-            to call donors.
-          </p>
-        )}
+        </div>
+      )}
+
+      {/* Two Column Section: Recent Calls and Coordinated Blood Requests */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Call Logs */}
+        <div className="bg-white dark:bg-dark-2 rounded-2xl p-5 border border-stroke dark:border-dark-3 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-sm text-dark dark:text-white flex items-center gap-2">
+              <Phone className="size-4 text-rose-600" />
+              <span>Recent Calls Placed ({myCallLogs.length})</span>
+            </h2>
+            <Link
+              href="/search-blood"
+              className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline"
+            >
+              Call More Donors
+            </Link>
+          </div>
+
+          {myCallLogs.length === 0 ? (
+            <p className="text-xs text-dark-5 dark:text-dark-6 py-8 text-center">
+              You have not logged any donor calls yet. Go to{" "}
+              <Link href="/search-blood" className="text-rose-600 font-bold hover:underline">
+                Search Donors
+              </Link>{" "}
+              to start coordinating.
+            </p>
+          ) : (
+            <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+              {myCallLogs.map((log) => (
+                <div
+                  key={log.id}
+                  className="p-3 rounded-xl bg-gray-1/60 dark:bg-dark-3/60 border border-stroke dark:border-dark-4 text-xs space-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-dark dark:text-white">{log.donorName}</span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
+                        {log.bloodGroup}
+                      </span>
+                    </div>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        log.outcome === "agreed"
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                          : log.outcome === "refused"
+                            ? "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
+                            : "bg-gray-2 text-dark-5 dark:bg-dark-4 dark:text-dark-6"
+                      }`}
+                    >
+                      {log.outcome}
+                    </span>
+                  </div>
+                  <p className="text-dark-5 dark:text-dark-6 text-[11px]">{log.comment}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Coordinated Blood Requests */}
+        <div className="bg-white dark:bg-dark-2 rounded-2xl p-5 border border-stroke dark:border-dark-3 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-sm text-dark dark:text-white flex items-center gap-2">
+              <Droplet className="size-4 text-rose-600" />
+              <span>Coordinated Requisitions ({coordinatedRequests.length})</span>
+            </h2>
+            <Link
+              href="/blood-requests"
+              className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline"
+            >
+              View All Requests
+            </Link>
+          </div>
+
+          {coordinatedRequests.length === 0 ? (
+            <p className="text-xs text-dark-5 dark:text-dark-6 py-8 text-center">
+              No requisitions coordinated yet. When you create or manage requests, they will appear here.
+            </p>
+          ) : (
+            <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+              {coordinatedRequests.map((req) => (
+                <div
+                  key={req.id}
+                  className="p-3 rounded-xl bg-gray-1/60 dark:bg-dark-3/60 border border-stroke dark:border-dark-4 text-xs space-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-dark dark:text-white">{req.patientName}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-dark-5 dark:text-dark-6">
+                      {req.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-dark-5 dark:text-dark-6 text-[11px]">
+                    <span>{req.hospital}</span>
+                    <span className="font-bold text-rose-600">{req.bloodGroup}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

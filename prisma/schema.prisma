@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(cuid())
+  username         String          @unique
+  passwordHash     String
+  name             String
+  phone            String          @unique
+  email            String?         @unique
+  studentId        String
+  department       String
+  hallUnit         String
+  role             String          @default("VOLUNTEER") // ADMIN, PRESIDENT, GENERAL_SECRETARY, UNIT_COORDINATOR, ORGANIZING_SECRETARY, OFFICE_SECRETARY, VOLUNTEER
+  avatarBg         String          @default("#e11d48")
+  bloodGroup       String?
+  bio              String?
+  isActive         Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  callsMade        CallLog[]
+  managedBags      BagSlot[]       @relation("ManagedBags")
+  createdRequests  BloodRequest[]  @relation("CreatedRequests")
+  managedRequests  BloodRequest[]  @relation("ManagedRequests")
+}
+
+model Donor {
+  id               String          @id @default(cuid())
+  name             String
+  phone            String          @unique
+  bloodGroup       String
+  hallUnit         String
+  department       String
+  session          String
+  studentId        String?
+  isAvailable      Boolean         @default(true)
+  totalDonations   Int             @default(0)
+  lastDonationDate String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  callLogs         CallLog[]
+  bagAssignments   BagSlot[]
+  activeLock       CallLock?
+}
+
+model CallLock {
+  id                  String       @id @default(cuid())
+  donorId             String       @unique
+  donor               Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  lockedByUserId      String
+  lockedByUserName    String
+  lockedByUserHall    String
+  lockedAt            DateTime     @default(now())
+  expiresAt           DateTime
+}
+
+model BloodRequest {
+  id                  String       @id @default(cuid())
+  patientName         String
+  hospital            String
+  contactPerson       String
+  contactPhone        String
+  bloodGroup          String
+  isPlasma            Boolean      @default(false)
+  totalBags           Int          @default(1)
+  managedBags         Int          @default(0)
+  urgency             String       @default("Emergency (Immediate)")
+  dateNeeded          String
+  reason              String
+  notes               String?
+  status              String       @default("active") // active, partially_managed, managed, completed, cancelled
+  cancellationReason  String?
+  visibleUnits        String       @default("[]") // JSON serialized HallUnit[]
+  createdById         String?
+  createdBy           User?        @relation("CreatedRequests", fields: [createdById], references: [id])
+  managedById         String?
+  managedBy           User?        @relation("ManagedRequests", fields: [managedById], references: [id])
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  bagSlots            BagSlot[]
+}
+
+model BagSlot {
+  id                  String       @id @default(cuid())
+  bagNumber           Int
+  requestId           String
+  request             BloodRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  donorId             String?
+  donor               Donor?       @relation(fields: [donorId], references: [id])
+  donorName           String?
+  donorPhone          String?
+  donorHall           String?
+  status              String       @default("pending") // pending, assigned, donated
+  assignedAt          DateTime?
+  managedById         String?
+  managedBy           User?        @relation("ManagedBags", fields: [managedById], references: [id])
+}
+
+model CallLog {
+  id                  String       @id @default(cuid())
+  donorId             String
+  donor               Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  volunteerId         String
+  volunteer           User         @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  volunteerName       String
+  volunteerHall       String
+  calledAt            DateTime     @default(now())
+  durationSeconds     Int          @default(0)
+  outcome             String       // agreed, refused, unreachable, busy, ineligible, callback_requested
+  notes               String?
+  requestId           String?
+  bagNumber           Int?
+}

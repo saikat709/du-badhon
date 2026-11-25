@@ -139,6 +139,30 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
   );
   const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>(getInitialRequests);
 
+  // Sync with authenticated user session
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) {
+          setCurrentVolunteer((prev) => ({
+            ...prev,
+            id: data.user.id,
+            name: data.user.name,
+            phone: data.user.phone,
+            role: data.user.role,
+            hallUnit: data.user.hallUnit,
+            department: data.user.department,
+            studentId: data.user.studentId,
+            avatarBg: data.user.avatarBg || prev.avatarBg,
+          }));
+        }
+      })
+      .catch(() => {
+        // use fallback initial
+      });
+  }, []);
+
   // Save to LocalStorage on changes
   useEffect(() => {
     try {

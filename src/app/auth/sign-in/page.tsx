@@ -2,6 +2,7 @@ import Signin from "@/components/Auth/Signin";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -14,7 +15,9 @@ export default function SignIn() {
         <div className="flex flex-wrap items-center justify-center xl:justify-between h-full">
           <div className="w-full xl:w-1/2">
             <div className="w-full p-0 sm:p-3 xl:p-0 px-7.5 md:w-[90%] lg:w-[80%] mx-auto">
-              <Signin />
+              <Suspense fallback={null}>
+                <Signin />
+              </Suspense>
             </div>
           </div>
 
