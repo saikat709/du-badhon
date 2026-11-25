@@ -57,6 +57,10 @@ interface BadhonContextType {
     donorId: string,
   ) => { success: boolean; message?: string };
   unassignDonorFromBag: (requestId: string, bagNumber: number) => void;
+  confirmBagDonation: (requestId: string, bagNumber: number) => void;
+  confirmBagDonated: (requestId: string, bagNumber: number) => void;
+  updateVolunteerRole: (volunteerId: string, newRole: string) => void;
+  addVolunteerMember: (data: Omit<VolunteerMember, "id">) => VolunteerMember;
   markRequestCompleted: (
     requestId: string,
     notes?: string,
@@ -535,6 +539,74 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const confirmBagDonation = (requestId: string, bagNumber: number) => {
+    const target = bloodRequests.find((r) => r.id === requestId);
+    if (!target) return;
+
+    const bag = target.assignedBags.find((b) => b.bagNumber === bagNumber);
+    if (!bag || !bag.donorId) return;
+
+    const now = new Date().toISOString();
+    const today = now.split("T")[0];
+
+    // Update donor records
+    setDonors((prev) =>
+      prev.map((d) =>
+        d.id === bag.donorId
+          ? {
+              ...d,
+              lastDonationDate: today,
+              totalDonations: d.totalDonations + 1,
+              isAvailable: true,
+            }
+          : d,
+      ),
+    );
+
+    // Update bag slot status
+    setBloodRequests((prev) =>
+      prev.map((req) => {
+        if (req.id !== requestId) return req;
+        const updatedBags = req.assignedBags.map((b) =>
+          b.bagNumber === bagNumber
+            ? {
+                ...b,
+                status: "donated" as const,
+                donatedAt: now,
+                managedByVolunteerId: b.managedByVolunteerId || currentVolunteer.id,
+                managedByVolunteerName: b.managedByVolunteerName || currentVolunteer.name,
+              }
+            : b,
+        );
+        const allDonated = updatedBags.every((b) => b.status === "donated");
+        return {
+          ...req,
+          assignedBags: updatedBags,
+          status: allDonated ? "completed" : req.status,
+          completedAt: allDonated ? now : req.completedAt,
+        };
+      }),
+    );
+  };
+
+  const updateVolunteerRole = (volunteerId: string, newRole: string) => {
+    setVolunteers((prev) =>
+      prev.map((v) => (v.id === volunteerId ? { ...v, role: newRole } : v)),
+    );
+    if (currentVolunteer.id === volunteerId) {
+      setCurrentVolunteer((prev) => ({ ...prev, role: newRole }));
+    }
+  };
+
+  const addVolunteerMember = (data: Omit<VolunteerMember, "id">): VolunteerMember => {
+    const newMember: VolunteerMember = {
+      ...data,
+      id: `vol-${Date.now()}`,
+    };
+    setVolunteers((prev) => [newMember, ...prev]);
+    return newMember;
+  };
+
   const markRequestCompleted = (
     requestId: string,
     notes?: string,
@@ -669,6 +741,10 @@ export function BadhonProvider({ children }: { children: React.ReactNode }) {
         unassignDonorFromBag,
         markRequestCompleted,
         markRequestCancelled,
+        confirmBagDonation,
+        confirmBagDonated: confirmBagDonation,
+        updateVolunteerRole,
+        addVolunteerMember,
         addDonor,
         resetToSampleData,
       }}

@@ -1,10 +1,12 @@
 import {
   Building2,
   ClipboardList,
+  Clock,
   HeartHandshake,
   LayoutDashboard,
   LucideIcon,
   Search,
+  ShieldCheck,
   Smartphone,
   User,
   Users,
@@ -47,6 +49,11 @@ export const NAV_DATA: NavSection[] = [
         icon: Search,
       },
       {
+        title: "Pending Donations",
+        url: "/pending-donations",
+        icon: Clock,
+      },
+      {
         title: "Donors Directory",
         url: "/donors",
         icon: Users,
@@ -56,6 +63,11 @@ export const NAV_DATA: NavSection[] = [
   {
     label: "COMMUNITY & DIRECTORY",
     items: [
+      {
+        title: "My Club Unit",
+        url: "/my-club",
+        icon: ShieldCheck,
+      },
       {
         title: "Hall Units & Executives",
         url: "/hall-units",
