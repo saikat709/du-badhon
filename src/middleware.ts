@@ -28,9 +28,16 @@ export async function middleware(req: NextRequest) {
 
   const token = req.cookies.get("badhon_session")?.value;
 
+  const safeCallbackUrl =
+    pathname.startsWith("/") &&
+    !pathname.startsWith("/api") &&
+    !pathname.startsWith("/auth")
+      ? pathname
+      : "/dashboard";
+
   if (!token) {
     const signInUrl = new URL("/auth/sign-in", req.url);
-    signInUrl.searchParams.set("callbackUrl", pathname);
+    signInUrl.searchParams.set("callbackUrl", safeCallbackUrl);
     return NextResponse.redirect(signInUrl);
   }
 
@@ -39,7 +46,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   } catch {
     const signInUrl = new URL("/auth/sign-in", req.url);
-    signInUrl.searchParams.set("callbackUrl", pathname);
+    signInUrl.searchParams.set("callbackUrl", safeCallbackUrl);
     const response = NextResponse.redirect(signInUrl);
     response.cookies.delete("badhon_session");
     return response;

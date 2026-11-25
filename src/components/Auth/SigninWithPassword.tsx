@@ -11,7 +11,14 @@ import { AlertCircle, LogIn, User, Sparkles } from "lucide-react";
 export default function SigninWithPassword() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const rawCallback = searchParams.get("callbackUrl");
+  const callbackUrl =
+    rawCallback &&
+    !rawCallback.startsWith("/api") &&
+    !rawCallback.startsWith("/auth") &&
+    rawCallback.startsWith("/")
+      ? rawCallback
+      : "/dashboard";
 
   const [data, setData] = useState({
     identifier: "member1",
